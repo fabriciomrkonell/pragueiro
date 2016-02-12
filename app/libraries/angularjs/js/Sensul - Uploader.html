@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<!-- saved from url=(0034)http://localhost:3000/#/greenhouse -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style type="text/css">@charset "UTF-8";[ng\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="http://localhost:3000/dist/images/favicon.ico">
+    <link rel="mask-icon" href="http://localhost:3000/dist/images/favicon.ico" color="black">
+    <title>Sensul - Uploader</title>
+    <link rel="stylesheet" type="text/css" href="./Sensul - Uploader_files/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="./Sensul - Uploader_files/style.css">
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>ß
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="http://localhost:3000/">
+          <img id="logo-menu" src="./Sensul - Uploader_files/black_p.png">
+        </a>
+      </div>
+      <div id="navbar" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li><a href="http://localhost:3000/#index">Home</a></li>
+          <li><a href="http://localhost:3000/#grower">Produtores</a></li>
+          <li><a href="http://localhost:3000/#greenhouse">Abrigos</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li class="dropdown">
+            <a href="http://localhost:3000/#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Configurações <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="http://localhost:3000/">Sair</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <div class="container container-view">
+      <!-- ngView: undefined --><ng-view class="ng-scope"><div class="ng-scope">
+  <div class="row">
+    <div class="col-sm-4">
+      <form class="ng-valid ng-dirty">
+        <div class="form-group">
+          <label>Nome</label>
+          <input type="text" class="form-control ng-pristine ng-valid ng-not-empty ng-touched" placeholder="Nome do abrigo" ng-model="data.name">
+        </div>
+        <div class="form-group">
+          <label>Produtor</label>
+           <select class="form-control ng-valid ng-dirty ng-touched ng-not-empty" ng-options="grower.name for grower in growers" ng-model="data.grower"><option value="" class="" selected="selected">Selecione</option><option label="Agricultor 1" value="object:13">Agricultor 1</option><option label="Agricultor 2" value="object:14" selected="selected">Agricultor 2</option><option label="Fulano" value="object:15" selected="selected">Fulano</option><option label="HUE" value="object:16">HUE</option></select>
+        </div>
+        <button type="button" class="btn btn-default" ng-click="saveGreenHouse(data)" ng-disabled="data.grower == null">Salvar</button>
+        <button type="button" class="btn btn-default" ng-click="clear()">Limpar</button>
+      </form>
+    </div>
+    <div class="col-sm-8">
+      <table class="table table-responsive table-condensed table-bordered">
+        <thead>
+          <tr>
+            <th>Abrigo</th>
+            <th>Produtor</th>
+            <th width="80" class="text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- ngRepeat: greenhouse in greenhouses --><tr ng-repeat="greenhouse in greenhouses" class="ng-scope">
+            <td class="ng-binding">423423</td>
+            <td class="ng-binding">Agricultor 2</td>
+            <td width="80" class="text-center">
+              <button type="button" class="btn btn-default btn-xs" ng-click="editGreenHouse(greenhouse)">
+                <i class="glyphicon glyphicon-pencil"></i>
+              </button>
+              <button type="button" class="btn btn-default btn-xs" ng-click="deleteGreenHouse(greenhouse, $index)">
+                <i class="glyphicon glyphicon-remove"></i>
+              </button>
+            </td>
+          </tr><!-- end ngRepeat: greenhouse in greenhouses --><tr ng-repeat="greenhouse in greenhouses" class="ng-scope">
+            <td class="ng-binding">ewew</td>
+            <td class="ng-binding">HUE</td>
+            <td width="80" class="text-center">
+              <button type="button" class="btn btn-default btn-xs" ng-click="editGreenHouse(greenhouse)">
+                <i class="glyphicon glyphicon-pencil"></i>
+              </button>
+              <button type="button" class="btn btn-default btn-xs" ng-click="deleteGreenHouse(greenhouse, $index)">
+                <i class="glyphicon glyphicon-remove"></i>
+              </button>
+            </td>
+          </tr><!-- end ngRepeat: greenhouse in greenhouses --><tr ng-repeat="greenhouse in greenhouses" class="ng-scope">
+            <td class="ng-binding">ewew</td>
+            <td class="ng-binding">Fulano</td>
+            <td width="80" class="text-center">
+              <button type="button" class="btn btn-default btn-xs" ng-click="editGreenHouse(greenhouse)">
+                <i class="glyphicon glyphicon-pencil"></i>
+              </button>
+              <button type="button" class="btn btn-default btn-xs" ng-click="deleteGreenHouse(greenhouse, $index)">
+                <i class="glyphicon glyphicon-remove"></i>
+              </button>
+            </td>
+          </tr><!-- end ngRepeat: greenhouse in greenhouses --><tr ng-repeat="greenhouse in greenhouses" class="ng-scope">
+            <td class="ng-binding">2323</td>
+            <td class="ng-binding">Agricultor 1</td>
+            <td width="80" class="text-center">
+              <button type="button" class="btn btn-default btn-xs" ng-click="editGreenHouse(greenhouse)">
+                <i class="glyphicon glyphicon-pencil"></i>
+              </button>
+              <button type="button" class="btn btn-default btn-xs" ng-click="deleteGreenHouse(greenhouse, $index)">
+                <i class="glyphicon glyphicon-remove"></i>
+              </button>
+            </td>
+          </tr><!-- end ngRepeat: greenhouse in greenhouses -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div></ng-view>
+    </div>
+    <script src="./Sensul - Uploader_files/angular.min.js"></script>
+    <script src="./Sensul - Uploader_files/angular-route.min.js"></script>
+    <script src="./Sensul - Uploader_files/jquery.min.js"></script>
+    <script src="./Sensul - Uploader_files/jquery-form.js"></script>
+    <script src="./Sensul - Uploader_files/bootstrap.min.js"></script>
+    <script src="./Sensul - Uploader_files/app.js"></script>
+    <script src="./Sensul - Uploader_files/index.js"></script>
+    <script src="./Sensul - Uploader_files/grower.js"></script>
+    <script src="./Sensul - Uploader_files/greenhouse.js"></script>
+    <script src="./Sensul - Uploader_files/config.js"></script>
+    <script src="./Sensul - Uploader_files/constant.js"></script>
+  
+</body></html>
