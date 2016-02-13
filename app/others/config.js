@@ -22,6 +22,26 @@
         resolve: {
           deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/home.js'])
         }
+      }).when('/fazenda', {
+        templateUrl: '/views/partials/fazenda.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/fazenda.js'])
+        }
+      }).when('/filial', {
+        templateUrl: '/views/partials/filial.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/filial.js'])
+        }
+      }).when('/safra', {
+        templateUrl: '/views/partials/safra.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/safra.js'])
+        }
+      }).when('/regiao', {
+        templateUrl: '/views/partials/regiao.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/regiao.js'])
+        }
       }).otherwise({
         redirectTo: '/home'
       });

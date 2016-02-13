@@ -8,7 +8,7 @@
     <link rel="mask-icon" href="/dist/images/favicon.ico" color="black">
     <title>Pragueiro</title>
     <link rel="stylesheet" type="text/css" href="app/libraries/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="app/dist/css/style.css">
+    <link rel="stylesheet" type="text/css" href="app/dist/css/index.css">
     <style type="text/css">
       [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
         display: none !important;
@@ -29,14 +29,14 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li><a href="#">Início</a></li>
+            <li><a href="#/home">Início</a></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Cadastro <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href="#">Fazenda</a></li>
-                <li><a href="#">Filial</a></li>
-                <li><a href="#">Safra</a></li>
-                <li><a href="#">Regiāo</a></li>
+                <li><a href="#/fazenda">Fazenda</a></li>
+                <li><a href="#/filial">Filial</a></li>
+                <li><a href="#/safra">Safra</a></li>
+                <li><a href="#/regiao">Regiāo</a></li>
               </ul>
             </li>
           </ul>
@@ -44,8 +44,8 @@
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Configurações <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href="#">Meu perfil</a></li>
-                <li><a href="#">Sair</a></li>
+                <li><a href="#/perfil">Meu perfil</a></li>
+                <li><a href="/logout">Sair</a></li>
               </ul>
             </li>
           </ul>
