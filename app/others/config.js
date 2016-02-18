@@ -27,11 +27,6 @@
         resolve: {
           deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/fazenda.js'])
         }
-      }).when('/filial', {
-        templateUrl: '/views/partials/filial.html',
-        resolve: {
-          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/filial.js'])
-        }
       }).when('/safra', {
         templateUrl: '/views/partials/safra.html',
         resolve: {

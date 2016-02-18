@@ -1,8 +1,39 @@
 <div ng-controller="safraCtrl">
-	<div class="row">
-		Safra
-		<div class="col-sm-12 text-center">
-			<img src="/app/dist/img/logo/home.png" class="logo-home">
+	<div class="container container-view">
+		<div class="row">
+			<div class="col-sm-4">
+				<form class="form-signin" role="form" action="/login" method="post">
+	        <div class="form-group">
+	          <label>Descriçāo</label>
+	          <input type="text" class="form-control" placeholder="Descriçāo" name="descricao" />
+	        </div>
+	        <div class="form-group">
+	          <label>Fazenda</label>
+	          <input type="email" class="form-control" placeholder="Fazenda" name="fazenda" value="Colocar aqui um combo com as fazendas do usuario logado" />
+	        </div>
+	        <div class="form-group">
+	          <label>Ativo</label>
+	          <select class="form-control">
+	          	<option value="true">Sim</option>
+	          	<option value="false">Nāo</option>
+	          </select>
+	        </div>
+	        <button type="submit" class="btn btn-success pull-left">Salvar</button>
+	        <button type="submit" class="btn btn-default btn-cancel">Cancelar</button>
+	      </form>
+			</div>
+			<div class="col-sm-8">
+				<table class="table table-condensed table-bordered">
+					<thead>
+						<tr>
+								<th>Descriçāo</th>
+								<th>Fazenda</th>
+								<th>Ativo</th>
+								<th>Ações</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
 		</div>
 	</div>
 </div>
