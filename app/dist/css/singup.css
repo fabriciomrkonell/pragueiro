@@ -1,5 +1,5 @@
 body {
-  padding-top: 60px;
+  padding-top: 40px;
 }
 
 .label-login{
@@ -13,8 +13,8 @@ body {
   margin: -25px auto 0 auto;
 }
 
-.logo-login{
-	width: 350px;
+.logo-singup{
+	width: 300px;
 }
 
 .btn-create-user{

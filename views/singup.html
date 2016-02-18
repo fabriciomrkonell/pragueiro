@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="/dist/images/favicon.ico">
+    <link rel="mask-icon" href="/dist/images/favicon.ico" color="black">
+    <title>Pragueiro - Cadastrar</title>
+    <link rel="stylesheet" type="text/css" href="app/libraries/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="app/dist/css/singup.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-12 text-center">
+          <img src="app/dist/img/logo/home.png" class="logo-singup">
+        </div>
+      </div>
+      <br>
+      <form class="form-signin" role="form" action="/login" method="post">
+        <div class="form-group">
+          <label>Nome</label>
+          <input type="text" class="form-control" placeholder="Nome completo" name="nome" />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" class="form-control" placeholder="Email" name="email" />
+        </div>
+        <div class="form-group">
+          <label>Telefone</label>
+          <input type="text" class="form-control" placeholder="Telefone" name="telefone" />
+        </div>
+        <div class="form-group">
+          <label>Cidade</label>
+          <input type="text" class="form-control" placeholder="Cidade" name="cidade" />
+        </div>
+        <button type="submit" class="btn btn-success pull-left">Cadastrar</button>
+        <a href="/login" class="pull-right btn-create-user" >Entrar</a>
+      </form>
+    </div>
+  </body>
+</html>
