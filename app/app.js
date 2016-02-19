@@ -21,6 +21,10 @@ angular.module('Pragueiro').run(['$rootScope', function($rootScope){
 		window.location.href = '/login';
 	};
 
+	$rootScope.getUser = function(){
+		return ref.getAuth();
+	}
+
 }]);
 
 angular.element(document).ready(function() {

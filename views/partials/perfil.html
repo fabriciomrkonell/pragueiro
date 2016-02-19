@@ -2,18 +2,10 @@
 	<div class="container container-view">
 		<div class="row">
 			<div class="col-sm-4">
-				<form class="form-signin" role="form">
+				<form class="form-signin" role="form" ng-repeat="data in arrayData">
 	        <div class="form-group">
 	          <label>Nome</label>
 	          <input type="text" class="form-control" placeholder="Nome completo" ng-model="data.nome" />
-	        </div>
-	        <div class="form-group">
-	          <label>Email</label>
-	          <input type="email" class="form-control" placeholder="Email" ng-model="data.email" />
-	        </div>
-	        <div class="form-group">
-	          <label>Senha</label>
-	          <input type="password" class="form-control" placeholder="Senha" ng-model="data.senha" />
 	        </div>
 	        <div class="form-group">
 	          <label>Telefone</label>
@@ -23,9 +15,43 @@
 	          <label>Cidade</label>
 	          <input type="text" class="form-control" placeholder="Cidade" ng-model="data.cidade" />
 	        </div>
-	        {{data}}
-	        <button type="button" class="btn btn-success" ng-click="data.$save()">Salvar</button>
-	        <button type="button" class="btn btn-default btn-cancel" ng-click="createuser(data)">Cancelar</button>
+	        <button type="button" class="btn btn-success" ng-keypress="arrayData.$save(data)">Salvar</button>
+	      </form>
+	      <form class="form-signin" role="form" ng-hide="arrayData.length >= 1">
+	        <div class="form-group">
+	          <label>Nome</label>
+	          <input type="text" class="form-control" placeholder="Nome completo" />
+	        </div>
+	        <div class="form-group">
+	          <label>Telefone</label>
+	          <input type="text" class="form-control" placeholder="Telefone" />
+	        </div>
+	        <div class="form-group">
+	          <label>Cidade</label>
+	          <input type="text" class="form-control" placeholder="Cidade" />
+	        </div>
+	        <button type="button" class="btn btn-success">Salvar</button>
+	      </form>
+			</div>
+			<div class="col-sm-4">
+				<form class="form-signin" role="form">
+	        <div class="form-group">
+	          <label>Email</label>
+	          <input type="email" class="form-control" placeholder="Email" ng-model="editEmail.email" ng-disabled="true"/>
+	        </div>
+	      </form>
+			</div>
+			<div class="col-sm-4">
+				<form class="form-signin" role="form">
+	        <div class="form-group">
+	          <label>Senha</label>
+	          <input type="password" class="form-control" placeholder="Senha" ng-model="editSenha.senha" />
+	        </div>
+	        <div class="form-group">
+	          <label>Nova Senha</label>
+	          <input type="password" class="form-control" placeholder="Nova Senha" ng-model="editSenha.novasenha" />
+	        </div>
+	        <button type="button" class="btn btn-success" ng-keypress="salvarSenha()">Salvar</button>
 	      </form>
 			</div>
 		</div>
