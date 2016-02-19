@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="login">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -10,7 +10,7 @@
     <link rel="stylesheet" type="text/css" href="app/libraries/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="app/dist/css/login.css">
   </head>
-  <body>
+  <body ng-controller="loginCtrl">
     <div class="container">
       <div class="row">
         <div class="col-sm-12 text-center">
@@ -18,18 +18,89 @@
         </div>
       </div>
       <br>
-      <form class="form-signin" role="form" action="/login" method="post">
+      <form class="form-signin" role="form">
         <div class="form-group">
           <label>Email</label>
-          <input type="email" class="form-control" placeholder="Email" name="username" />
+          <input type="email" class="form-control" placeholder="Email" name="username" ng-model="data.email" />
         </div>
         <div class="form-group">
           <label>Senha</label>
-          <input type="password" class="form-control" placeholder="Senha" name="password" />
+          <input type="password" class="form-control" placeholder="Senha" name="password" ng-model="data.senha" />
         </div>
-        <button type="submit" class="btn btn-success pull-left">Entrar</button>
+        <button type="button" class="btn btn-success pull-left" ng-click="login(data)">Entrar</button>
         <a href="/singup" class="pull-right btn-create-user">Cadastre-se</a>
       </form>
     </div>
+    <script src="app/libraries/angularjs/js/angular.min.js"></script>
+    <script src="app/libraries/jquery/js/jquery.min.js"></script>
+    <script src="https://cdn.firebase.com/js/client/2.2.4/firebase.js"></script>
+    <script src="https://cdn.firebase.com/libs/angularfire/1.1.3/angularfire.min.js"></script>
+    <script src="app/libraries/notify/js/bootstrap-notify.min.js"></script>
+    <script type="text/javascript">
+      angular.module('login', ['firebase']);
+
+      angular.module('login').controller('loginCtrl', ['$scope', function($scope){
+
+        function setMessageSuccess(message){
+          $.notify({
+            message: message
+          },{
+            aling: 'center',
+            type: 'success'
+          });
+        }
+
+        function setMessageError(message){
+          $.notify({
+            message: message
+          },{
+            aling: 'center',
+            type: 'danger'
+          });
+        }
+
+        function validForm(data){
+          if(data.nome === ''){
+            setMessage('O campo nome é inválido!');
+            return true
+          }
+          if(data.email === ''){
+            setMessage('O campo email é inválido!');
+            return true
+          }
+          return false;
+        };
+
+        var ref = new Firebase("https://pragueiro.firebaseio.com");
+
+        angular.extend($scope, {
+          data: {}
+        })
+
+        $scope.clear = function(){
+          angular.extend($scope.data, {
+            email: '',
+            senha: ''
+          })
+        };
+
+        $scope.clear();
+
+        $scope.login = function(data){
+          if(validForm(data)) return false;
+          ref.authWithPassword({
+            email: data.email,
+            password: data.senha
+          }, function(error, auth) {
+            if(error){
+              setMessageError(error);
+            }else{
+              window.location.href = '/';
+            }
+          });
+        }
+
+      }]);
+    </script>
   </body>
 </html>

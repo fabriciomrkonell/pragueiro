@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="singin">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -10,7 +10,7 @@
     <link rel="stylesheet" type="text/css" href="app/libraries/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="app/dist/css/singup.css">
   </head>
-  <body>
+  <body ng-controller="singinCtrl">
     <div class="container">
       <div class="row">
         <div class="col-sm-12 text-center">
@@ -18,26 +18,122 @@
         </div>
       </div>
       <br>
-      <form class="form-signin" role="form" action="/login" method="post">
+      <form class="form-signin" role="form">
         <div class="form-group">
           <label>Nome</label>
-          <input type="text" class="form-control" placeholder="Nome completo" name="nome" />
+          <input type="text" class="form-control" placeholder="Nome completo" name="nome" ng-model="data.nome" />
         </div>
         <div class="form-group">
           <label>Email</label>
-          <input type="email" class="form-control" placeholder="Email" name="email" />
+          <input type="email" class="form-control" placeholder="Email" name="email" ng-model="data.email" />
+        </div>
+        <div class="form-group">
+          <label>Senha</label>
+          <input type="password" class="form-control" placeholder="Senha" name="senha" ng-model="data.senha" />
         </div>
         <div class="form-group">
           <label>Telefone</label>
-          <input type="text" class="form-control" placeholder="Telefone" name="telefone" />
+          <input type="text" class="form-control" placeholder="Telefone" name="telefone" ng-model="data.telefone" />
         </div>
         <div class="form-group">
           <label>Cidade</label>
-          <input type="text" class="form-control" placeholder="Cidade" name="cidade" />
+          <input type="text" class="form-control" placeholder="Cidade" name="cidade" ng-model="data.cidade" />
         </div>
-        <button type="submit" class="btn btn-success pull-left">Cadastrar</button>
+        <button type="button" class="btn btn-success pull-left" ng-click="createuser(data)">Cadastrar</button>
         <a href="/login" class="pull-right btn-create-user" >Entrar</a>
       </form>
     </div>
+    <script src="app/libraries/angularjs/js/angular.min.js"></script>
+    <script src="app/libraries/jquery/js/jquery.min.js"></script>
+    <script src="https://cdn.firebase.com/js/client/2.2.4/firebase.js"></script>
+    <script src="https://cdn.firebase.com/libs/angularfire/1.1.3/angularfire.min.js"></script>
+    <script src="app/libraries/notify/js/bootstrap-notify.min.js"></script>
+    <script type="text/javascript">
+      angular.module('singin', ['firebase']);
+
+      angular.module('singin').controller('singinCtrl', ['$scope', function($scope){
+
+        function setMessageSuccess(message){
+          $.notify({
+            message: message
+          },{
+            aling: 'center',
+            type: 'success'
+          });
+        }
+
+        function setMessageError(message){
+          $.notify({
+            message: message
+          },{
+            aling: 'center',
+            type: 'danger'
+          });
+        }
+
+        function validForm(data){
+          if(data.nome === ''){
+            setMessage('O campo nome é inválido!');
+            return true
+          }
+          if(data.email === ''){
+            setMessage('O campo email é inválido!');
+            return true
+          }
+          if(data.senha === ''){
+            setMessage('O campo senha é inválido!');
+            return true
+          }
+          if(data.telefone === ''){
+            setMessage('O campo telefone é inválido!');
+            return true
+          }
+          if(data.cidade === ''){
+            setMessage('O campo cidade é inválido!');
+            return true
+          }
+
+          return false;
+        };
+
+        var ref = new Firebase("https://pragueiro.firebaseio.com");
+
+        angular.extend($scope, {
+          data: {}
+        })
+
+        $scope.clear = function(){
+          angular.extend($scope.data, {
+            nome: '',
+            email: '',
+            senha: '',
+            telefone: '',
+            cidade: ''
+          })
+        };
+
+        $scope.clear();
+
+        $scope.createuser = function(data){
+          if(validForm(data)) return false;
+          ref.createUser({
+            email: data.email,
+            password : data.senha
+          }, function(error, user) {
+            if (error) {
+              setMessageError(error);
+            } else {
+              data.uid = user.uid
+              delete data.email;
+              delete data.senha;
+              ref.child('usuario').push(data, function(){
+                window.location.href = '/login';
+              });
+            }
+          });
+        }
+
+      }]);
+    </script>
   </body>
 </html>
