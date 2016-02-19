@@ -37,6 +37,11 @@
         resolve: {
           deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/regiao.js'])
         }
+      }).when('/perfil', {
+        templateUrl: '/views/partials/perfil.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/perfil.js'])
+        }
       }).otherwise({
         redirectTo: '/home'
       });

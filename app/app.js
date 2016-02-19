@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module('Pragueiro.controllers', []);
+angular.module('Pragueiro.controllers', ['firebase']);
 
 angular.module('Pragueiro.config', ['ngRoute']);
 
@@ -13,6 +13,8 @@ angular.module('Pragueiro', ['Pragueiro.controllers', 'Pragueiro.config', 'Pragu
 angular.module('Pragueiro').run(['$rootScope', function($rootScope){
 
 	var ref = new Firebase("https://pragueiro.firebaseio.com");
+
+	$rootScope.__user = ref.getAuth();
 
 	$rootScope.logout = function(){
 		ref.unauth();
