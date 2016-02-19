@@ -1,0 +1,33 @@
+<div ng-controller="perfilCtrl">
+	<div class="container container-view">
+		<div class="row">
+			<div class="col-sm-4">
+				<form class="form-signin" role="form">
+	        <div class="form-group">
+	          <label>Nome</label>
+	          <input type="text" class="form-control" placeholder="Nome completo" ng-model="data.nome" />
+	        </div>
+	        <div class="form-group">
+	          <label>Email</label>
+	          <input type="email" class="form-control" placeholder="Email" ng-model="data.email" />
+	        </div>
+	        <div class="form-group">
+	          <label>Senha</label>
+	          <input type="password" class="form-control" placeholder="Senha" ng-model="data.senha" />
+	        </div>
+	        <div class="form-group">
+	          <label>Telefone</label>
+	          <input type="text" class="form-control" placeholder="Telefone" ng-model="data.telefone" />
+	        </div>
+	        <div class="form-group">
+	          <label>Cidade</label>
+	          <input type="text" class="form-control" placeholder="Cidade" ng-model="data.cidade" />
+	        </div>
+	        {{data}}
+	        <button type="button" class="btn btn-success" ng-click="data.$save()">Salvar</button>
+	        <button type="button" class="btn btn-default btn-cancel" ng-click="createuser(data)">Cancelar</button>
+	      </form>
+			</div>
+		</div>
+	</div>
+</div>
