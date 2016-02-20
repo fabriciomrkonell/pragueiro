@@ -4,26 +4,26 @@ angular.module('Pragueiro.controllers', ['firebase']);
 
 angular.module('Pragueiro.config', ['ngRoute']);
 
-angular.module('Pragueiro.constant', []);
+angular.module('Pragueiro.constant', []).constant('Constant', {
+	Url: 'https://pragueiro.firebaseio.com'
+});
 
 angular.module('Pragueiro.services', []);
 
 angular.module('Pragueiro', ['Pragueiro.controllers', 'Pragueiro.config', 'Pragueiro.constant', 'Pragueiro.services']);
 
-angular.module('Pragueiro').run(['$rootScope', function($rootScope){
+angular.module('Pragueiro').run(['$rootScope', 'Session', 'Constant', function($rootScope, Session, Constant){
 
-	var ref = new Firebase("https://pragueiro.firebaseio.com");
-
-	$rootScope.__user = ref.getAuth();
+	var ref = new Firebase(Constant.Url);
 
 	$rootScope.logout = function(){
 		ref.unauth();
 		window.location.href = '/login';
 	};
 
-	$rootScope.getUser = function(){
-		return ref.getAuth();
-	}
+	$rootScope.$on('$routeChangeStart', function(event, next, current) {
+    Session.getUser();
+  });
 
 }]);
 
