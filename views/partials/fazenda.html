@@ -2,33 +2,34 @@
 	<div class="container container-view">
 		<div class="row">
 			<div class="col-sm-4">
-				<form class="form-signin" role="form" action="/login" method="post">
+				<form class="form-signin" role="form">
 	        <div class="form-group">
 	          <label>Nome</label>
-	          <input type="text" class="form-control" placeholder="Nome" name="nome" />
+	          <input type="text" class="form-control" placeholder="Nome" ng-model="data.nome" />
 	        </div>
 	        <div class="form-group">
 	          <label>Razāo Social</label>
-	          <input type="email" class="form-control" placeholder="Razāo social" name="razaosocial" />
+	          <input type="text" class="form-control" placeholder="Razāo social" ng-model="data.razaosocial" />
 	        </div>
 	        <div class="form-group">
 	          <label>Telefone</label>
-	          <input type="text" class="form-control" placeholder="Telefone" name="telefone" />
+	          <input type="text" class="form-control" placeholder="Telefone" ng-model="data.telefone"  />
 	        </div>
 	        <div class="form-group">
 	          <label>Website</label>
-	          <input type="text" class="form-control" placeholder="Website" name="website" />
+	          <input type="text" class="form-control" placeholder="Website" ng-model="data.website" />
 	        </div>
 	        <div class="form-group">
 	          <label>Cidade</label>
-	          <input type="text" class="form-control" placeholder="Cidade" name="cidade" />
+	          <input type="text" class="form-control" placeholder="Cidade" ng-model="data.cidade" />
 	        </div>
 	        <div class="form-group">
 	          <label>Email</label>
-	          <input type="email" class="form-control" placeholder="Email" name="email" />
+	          <input type="email" class="form-control" placeholder="Email" ng-model="data.email" />
 	        </div>
-	        <button type="submit" class="btn btn-success pull-left">Salvar</button>
-	        <button type="submit" class="btn btn-default btn-cancel">Cancelar</button>
+	        <button type="button" class="btn btn-success" ng-show="!edit" ng-click="salvarFazenda(data)">Salvar</button>
+	        <button type="button" class="btn btn-success" ng-show="edit" ng-click="editarFazenda(data)">Atualizar</button>
+	        <button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar</button>
 	      </form>
 			</div>
 			<div class="col-sm-8">
@@ -37,11 +38,22 @@
 						<tr>
 								<th>Nome</th>
 								<th>Razāo social</th>
-								<th>Razāo Social</th>
+								<th>Telefone</th>
 								<th>Cidade</th>
-								<th>Ações</th>
+								<th class="text-center" width="70px">Ações</th>
 						</tr>
 					</thead>
+					<tbody>
+						<tr ng-repeat="fazenda in fazendas">
+							<td>{{fazenda.nome}}</td>
+							<td>{{fazenda.razaosocial}}</td>
+							<td>{{fazenda.telefone}}</td>
+							<td>{{fazenda.cidade}}</td>
+							<td class="text-center" width="70px">
+								<button type="button" class="btn btn-default btn-xs" ng-click="editar(fazenda)">Editar</button>
+							</td>
+						</tr>
+					</tbody>
 				</table>
 			</div>
 		</div>

@@ -10,3 +10,7 @@
 .btn-cancel{
 	margin-left: 10px;
 }
+
+.col-sm-no-bottom{
+	margin-bottom: -10px;
+}
