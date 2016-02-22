@@ -66,6 +66,7 @@
 			$scope.safras.$save(form);
 			Notify.successBottom('Safra atualizada com sucesso!');
 			$scope.clear();
+			$scope.safras = $firebaseArray(refSafra);
 		};
 
 		$scope.editarSafra = function(data){
