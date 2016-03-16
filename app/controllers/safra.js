@@ -21,6 +21,7 @@
     };
 
 		angular.extend($scope, {
+			objModalQuadra: {},
 			edit: false,
 			fazendas: [],
 			safras: [],
@@ -77,6 +78,11 @@
 		$scope.excluirSafra = function(data){
 			$scope.safras.$remove(data);
 			Notify.successBottom('Safra removida com sucesso!');
+		};
+
+		$scope.getQuadras = function(data){
+			$scope.objModalQuadra = data;
+			$('#modalQuadras').modal('show');
 		};
   }
 
