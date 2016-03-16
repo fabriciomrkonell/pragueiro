@@ -8,25 +8,30 @@
 
 	function perfilCtrl($scope, $rootScope, $firebaseArray, Constant, Notify, Session, Util) {
 
+		function isEmail(email){
+      var er = /^[a-zA-Z0-9][a-zA-Z0-9\._-]+@([a-zA-Z0-9\._-]+\.)[a-zA-Z-0-9]{2}/;
+      return !!er.exec(email);
+    };
+
     function validFormPerfil(data){
       if(data.nome === ''){
-        Notify.infoBottom('O campo nome é inválido!');
+        Notify.errorBottom('O campo nome é inválido!');
         return true
       }
-      if(data.telefone === ''){
-        Notify.infoBottom('O campo telefone é inválido!');
+      if(data.telefone === '' ||   data.telefone.length < 14){
+        Notify.errorBottom('O campo telefone é inválido!');
         return true
       }
       if(data.cidade === ''){
-        Notify.infoBottom('O campo cidade é inválido!');
+        Notify.errorBottom('O campo cidade é inválido!');
         return true
       }
       return false;
     };
 
     function validFormEmail(data){
-      if(data.novoemail === ''){
-        Notify.infoBottom('O campo novo email é inválido!');
+      if(isEmail(data.novoemail) !== true){
+        Notify.errorBottom('O campo novo email é inválido!');
         return true
       }
       return false;
@@ -34,7 +39,15 @@
 
     function validFormSenha(data){
       if(data.novasenha === ''){
-        Notify.infoBottom('O campo nova senha é inválido!');
+        Notify.errorBottom('O campo nova senha é inválido!');
+        return true
+      }
+      return false;
+    };
+
+     function validFormSenhaModal(senha){
+      if(senha === ''){
+        Notify.errorBottom('O campo senha atual é inválido!');
         return true
       }
       return false;
@@ -65,6 +78,7 @@
 		};
 
 		$scope.salvarSenha = function(){
+			if(validFormSenhaModal($scope.data.editSenha.senha)) return true;
 			ref.changePassword({
 			  email: user.password.email,
 			  oldPassword: $scope.data.editSenha.senha,
@@ -79,12 +93,13 @@
 			    });
 			    Util.refresh($scope);
 			  }else{
-			  	Notify.infoBottom(error);
+			  	Notify.errorBottom(error);
 			  }
 			});
 		};
 
 		$scope.salvarEmail = function(){
+			if(validFormSenhaModal($scope.data.editSenha.senha)) return true;
 			ref.changeEmail({
 			  oldEmail: $scope.data.editEmail.email,
 			  newEmail: $scope.data.editEmail.novoemail,
@@ -94,18 +109,18 @@
 			    ref.unauth();
 			    window.location.href = '/login';
 			  }else{
-			    Notify.infoBottom(error);
+			    Notify.errorBottom(error);
 			  }
 			});
 		};
 
 		$scope.openModalSalvarSenha = function(data){
-			if(validFormSenha(data)) return true;
+			$scope.data.editSenha.senha = '';
 			$('#modalSenha').modal();
 		};
 
 		$scope.openModalSalvarEmail = function(data){
-			if(validFormEmail(data)) return true;
+			$scope.data.editSenha.senha = '';
 			$('#modalEmail').modal();
 		};
 

@@ -13,7 +13,7 @@
 	        </div>
 	        <div class="form-group">
 	          <label>Telefone</label>
-	          <input type="text" class="form-control" placeholder="Telefone" ng-model="data.telefone"  />
+	          <input type="text" class="form-control" placeholder="Telefone" ng-model="data.telefone"  phone/>
 	        </div>
 	        <div class="form-group">
 	          <label>Website</label>
@@ -40,7 +40,7 @@
 								<th>Razāo social</th>
 								<th>Telefone</th>
 								<th>Cidade</th>
-								<th class="text-center" width="70px">Ações</th>
+								<th class="text-center" width="80px">Ações</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -50,7 +50,12 @@
 							<td>{{fazenda.telefone}}</td>
 							<td>{{fazenda.cidade}}</td>
 							<td class="text-center" width="70px">
-								<button type="button" class="btn btn-default btn-xs" ng-click="editar(fazenda)">Editar</button>
+								<button type="button" class="btn btn-default btn-xs" ng-click="editar(fazenda)">
+									<i class="glyphicon glyphicon-pencil"></i>
+								</button>
+								<button type="button" class="btn btn-danger btn-xs" ng-click="excluir(fazenda)">
+									<i class="glyphicon glyphicon-remove"></i>
+								</button>
 							</td>
 						</tr>
 					</tbody>

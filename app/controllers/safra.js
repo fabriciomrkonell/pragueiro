@@ -10,11 +10,11 @@
 
 		function validFormSafra(data){
       if(data.descricao === ''){
-        Notify.infoBottom('O campo descriçāo é inválido!');
+        Notify.errorBottom('O campo descriçāo é inválido!');
         return true
       }
       if(data.ativo === ''){
-        Notify.infoBottom('O campo ativo é inválido!');
+        Notify.errorBottom('O campo ativo é inválido!');
         return true
       }
       return false;
@@ -72,6 +72,11 @@
 		$scope.editarSafra = function(data){
 			$scope.form = data;
 			$scope.edit = true;
+		};
+
+		$scope.excluirSafra = function(data){
+			$scope.safras.$remove(data);
+			Notify.successBottom('Safra removida com sucesso!');
 		};
   }
 

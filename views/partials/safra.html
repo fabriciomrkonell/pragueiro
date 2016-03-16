@@ -41,16 +41,21 @@
 					<thead>
 						<tr>
 								<th>Descriçāo</th>
-								<th>Ativo</th>
-								<th class="text-center" width="70px">Ações</th>
+								<th class="text-center" width="100px">Ativo</th>
+								<th class="text-center" width="80px">Ações</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr ng-repeat="safra in safras">
 							<td>{{safra.descricao}}</td>
-							<td>{{safra.ativo == 'true' ? 'Sim' : 'Nāo'}}</td>
+							<td class="text-center">{{safra.ativo == 'true' ? 'Sim' : 'Nāo'}}</td>
 							<td class="text-center" width="70px">
-								<button type="button" class="btn btn-default btn-xs" ng-click="editarSafra(safra)">Editar</button>
+								<button type="button" class="btn btn-default btn-xs" ng-click="editarSafra(safra)">
+									<i class="glyphicon glyphicon-pencil"></i>
+								</button>
+								<button type="button" class="btn btn-danger btn-xs" ng-click="excluirSafra(safra)">
+									<i class="glyphicon glyphicon-remove"></i>
+								</button>
 							</td>
 						</tr>
 					</tbody>

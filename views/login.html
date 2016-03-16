@@ -41,18 +41,19 @@
 
       angular.module('login').controller('loginCtrl', ['$scope', function($scope){
 
-        function setMessageSuccess(message){
-          $.notify({
-            message: message
-          },{
-            aling: 'center',
-            type: 'success'
-          });
-        }
+        var messages = {};
+        messages['Error: The specified user does not exist.'] = 'Não existe um usuário cadastrado com esse email ou senha.';
+        messages['Error: The specified password is incorrect.'] = 'A senha está incorreta.';
+
+        function isEmail(email){
+          er = /^[a-zA-Z0-9][a-zA-Z0-9\._-]+@([a-zA-Z0-9\._-]+\.)[a-zA-Z-0-9]{2}/;
+          return !!er.exec(email);
+        };
 
         function setMessageError(message){
+          console.log(message);
           $.notify({
-            message: message
+            message: messages[message] || message
           },{
             aling: 'center',
             type: 'danger'
@@ -60,12 +61,12 @@
         }
 
         function validForm(data){
-          if(data.nome === ''){
-            setMessage('O campo nome é inválido!');
+          if(isEmail(data.email) !== true){
+            setMessageError('O campo email é inválido!');
             return true
           }
-          if(data.email === ''){
-            setMessage('O campo email é inválido!');
+          if(data.senha === ''){
+            setMessageError('O campo senha é inválido!');
             return true
           }
           return false;

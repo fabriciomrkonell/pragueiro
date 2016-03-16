@@ -5,12 +5,18 @@ angular.module('Pragueiro.controllers', ['firebase']);
 angular.module('Pragueiro.config', ['ngRoute']);
 
 angular.module('Pragueiro.constant', []).constant('Constant', {
-	Url: 'https://pragueiro.firebaseio.com'
+	Url: 'https://pragueiro.firebaseio.com',
+	Message: {
+		'Error: The specified password is incorrect.': 'A senha está inválida!',
+		'Error: The specified email address is already in use.': 'O endereço de email já está em uso!'
+	}
 });
 
 angular.module('Pragueiro.services', []);
 
-angular.module('Pragueiro', ['Pragueiro.controllers', 'Pragueiro.config', 'Pragueiro.constant', 'Pragueiro.services']);
+angular.module('Pragueiro.directives', []);
+
+angular.module('Pragueiro', ['Pragueiro.controllers', 'Pragueiro.config', 'Pragueiro.constant', 'Pragueiro.services', 'Pragueiro.directives']);
 
 angular.module('Pragueiro').run(['$rootScope', 'Session', 'Constant', function($rootScope, Session, Constant){
 

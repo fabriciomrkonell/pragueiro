@@ -2,13 +2,25 @@
 
   'use strict';
 
-  angular.module('Pragueiro.services').service('Notify', [function() {
+  angular.module('Pragueiro.services').service('Notify', ['Constant', function(Constant) {
     this.successBottom = function(message){
       $.notify({
         message: message
       },{
         aling: 'center',
         type: 'success',
+        placement: {
+          from: 'bottom',
+          align: 'center'
+        }
+      });
+    },
+    this.errorBottom = function(message){
+      $.notify({
+        message: Constant.Message[message] || message
+      },{
+        aling: 'center',
+        type: 'danger',
         placement: {
           from: 'bottom',
           align: 'center'

@@ -31,7 +31,7 @@ app.get('/singup', function(req, res){
 });
 
 firebase.child("usuario").equalTo('996513bd-1a1a-430d-ba8d-fbe343eac402').on("value", function(snapshot) {
-	  console.log(snapshot.key());  // Alerts "San Francisco"
+	  console.log(snapshot.key());
 	});
 
 app.get('/logout', function(req, res){
