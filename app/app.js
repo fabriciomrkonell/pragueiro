@@ -9,7 +9,14 @@ angular.module('Pragueiro.constant', []).constant('Constant', {
 	Message: {
 		'Error: The specified password is incorrect.': 'A senha está inválida!',
 		'Error: The specified email address is already in use.': 'O endereço de email já está em uso!'
-	}
+	},
+	Culturas: [{
+		id: 1,
+		nome: 'Soja'
+	}, {
+		id: 2,
+		nome: 'Milho'
+	}],
 });
 
 angular.module('Pragueiro.services', []);
