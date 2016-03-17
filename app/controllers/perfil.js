@@ -115,11 +115,13 @@
 		};
 
 		$scope.openModalSalvarSenha = function(data){
+			if(validFormSenha(data)) return true;
 			$scope.data.editSenha.senha = '';
 			$('#modalSenha').modal();
 		};
 
 		$scope.openModalSalvarEmail = function(data){
+			if(validFormEmail(data)) return true;
 			$scope.data.editSenha.senha = '';
 			$('#modalEmail').modal();
 		};
