@@ -63,25 +63,29 @@
 
 		$scope.fazendas = $firebaseArray(ref.orderByChild("key_usuario").equalTo(Session.getUser().uid));
 
-		$scope.clearQuadra = function(){
+		$scope.clearQuadra = function(getquadras){
 			angular.extend($scope.objModalQuadra, {
 				descricao: '',
 				ativo: 'true',
 				coordenada: 'false',
-				cultura: Constant.Culturas[0]
+				cultura: Constant.Culturas[0].nome
 			});
 			$scope.editQuadra = false;
+			if(getquadras) return false;
+			$scope.quadras = $firebaseArray(refQuadra);
 		};
 
-		$scope.clear = function(){
+		$scope.clear = function(getsafras){
 			angular.extend($scope.form, {
 				descricao: '',
 				ativo: 'true'
 			});
 			$scope.edit = false;
+			if(getsafras) return false;
+			$scope.safras = $firebaseArray(refSafra);
 		};
 
-		$scope.clear();
+		$scope.clear(true);
 
 		$scope.chengeFazenda = function(fazenda){
 			if(fazenda === null) return false;
@@ -103,12 +107,18 @@
 			$scope.clearQuadra();
 		};
 
+		$scope.atualizarQuadra = function(form){
+			if(validFormSafra(form)) return true;
+			$scope.quadras.$save(form);
+			Notify.successBottom('Quadra atualizada com sucesso!');
+			$scope.clearQuadra();
+		};
+
 		$scope.atualizarSafra = function(form){
 			if(validFormSafra(form)) return true;
 			$scope.safras.$save(form);
 			Notify.successBottom('Safra atualizada com sucesso!');
 			$scope.clear();
-			$scope.safras = $firebaseArray(refSafra);
 		};
 
 		$scope.editarQuadra = function(data){
@@ -134,9 +144,9 @@
 		$scope.getQuadras = function(data){
 			if(data === null) return false;
 			$scope.objModal = data;
-			$scope.clearQuadra();
 			refQuadra = new Firebase(Constant.Url + '/filial/' + data.$id + '/safra/quadra');
 			$scope.quadras = $firebaseArray(refQuadra);
+			$scope.clearQuadra(true);
 			$('#modalQuadras').modal('show');
 		};
   }

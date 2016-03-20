@@ -29,7 +29,7 @@
 	        </div>
 	        <button type="button" class="btn btn-success pull-left" ng-show="!edit" ng-click="salvarSafra(form)">Salvar</button>
 	        <button type="button" class="btn btn-success pull-left" ng-show="edit" ng-click="atualizarSafra(form)">Atuaizar</button>
-	        <button type="button" class="btn btn-default btn-cancel">Cancelar</button>
+	        <button type="button" class="btn btn-default btn-cancel" ng-click="clear()">Cancelar</button>
 	      </form>
 			</div>
 			<div class="col-sm-8">
@@ -91,14 +91,13 @@
 				        </div>
 				        <div class="form-group">
 				          <label>Cultura</label>
-
-				          {{objModalQuadra.cultura}}
-						      <select class="form-control" ng-options="cultura.nome for cultura in culturas" ng-model="objModalQuadra.cultura">
+						      <select class="form-control" ng-model="objModalQuadra.cultura">
+						      	<option value="{{cultura.nome}}" ng-repeat="cultura in culturas">{{cultura.nome}}</option>
 			         	  </select>
 				        </div>
 				        <button type="button" class="btn btn-success pull-left" ng-show="!editQuadra" ng-click="salvarQuadra(objModalQuadra)">Salvar</button>
 				        <button type="button" class="btn btn-success pull-left" ng-show="editQuadra" ng-click="atualizarQuadra(objModalQuadra)">Atuaizar</button>
-				        <button type="button" class="btn btn-default btn-cancel">Cancelar</button>
+				        <button type="button" class="btn btn-default btn-cancel" ng-click="clearQuadra()">Cancelar</button>
 				      </form>
 						</div>
 						<div class="col-sm-8">
@@ -114,7 +113,7 @@
 								<tbody>
 									<tr ng-repeat="quadra in quadras">
 										<td>{{quadra.descricao}}</td>
-										<td class="text-center" width="130px">{{quadra.cultura.nome}}</td>
+										<td class="text-center" width="130px">{{quadra.cultura}}</td>
 										<td class="text-center">{{quadra.ativo == 'true' ? 'Sim' : 'Nāo'}}</td>
 										<td class="text-center" width="70px">
 											<button type="button" class="btn btn-default btn-xs" ng-click="editarQuadra(quadra)">
