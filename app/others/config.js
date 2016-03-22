@@ -32,11 +32,6 @@
         resolve: {
           deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/safra.js'])
         }
-      }).when('/regiao', {
-        templateUrl: '/views/partials/regiao.html',
-        resolve: {
-          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/regiao.js'])
-        }
       }).when('/perfil', {
         templateUrl: '/views/partials/perfil.html',
         resolve: {

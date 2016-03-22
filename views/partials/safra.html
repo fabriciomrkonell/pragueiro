@@ -38,7 +38,7 @@
 						<tr>
 								<th>Descriçāo</th>
 								<th class="text-center" width="100px">Ativo</th>
-								<th class="text-center" width="130px">Ações</th>
+								<th class="text-center" width="190px">Ações</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -46,7 +46,8 @@
 							<td>{{safra.descricao}}</td>
 							<td class="text-center">{{safra.ativo == 'true' ? 'Sim' : 'Nāo'}}</td>
 							<td class="text-center" width="130px">
-								<button type="button" class="btn btn-default btn-xs" ng-click="getQuadras(safra)">Quadras</button>
+								<button type="button" class="btn btn-default btn-xs" ng-click="getQuadras(data.fazenda, safra)">Quadras</button>
+								<button type="button" class="btn btn-default btn-xs" ng-click="getHistoricoQuadras(data.fazenda, safra)">Histórico</button>
 								<button type="button" class="btn btn-default btn-xs" ng-click="editarSafra(safra)">
 									<i class="glyphicon glyphicon-pencil"></i>
 								</button>
@@ -123,6 +124,43 @@
 												<i class="glyphicon glyphicon-remove"></i>
 											</button>
 										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	<div class="modal fade" tabindex="-1" role="dialog" id="modalHistoricoQuadras">
+	  <div class="modal-dialog modal-lg">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title">Histórico Safra - {{objModalHistorico.descricao}}</h4>
+	      </div>
+	      <div class="modal-body">
+	      	<div class="row">
+						<div class="col-sm-12">
+							<table class="table table-condensed table-bordered">
+								<thead>
+									<tr>
+											<th class="text-center" width="190px">Quadra - Id</th>
+											<th class="text-center">Quadra - Nome</th>
+											<th class="text-center">Cultura (Para)</th>
+											<th class="text-center" width="140px">Data</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="hist in historico | orderBy : 'dataAlteracao' : true">
+										<td class="text-center">{{hist.quadraId}}</td>
+										<td class="text-center">{{hist.descricaoNova}}</td>
+										<td class="text-center">{{hist.culturaNovo}}</td>
+										<td class="text-center">{{hist.dataAlteracao | date:'HH:mm dd/MM/yyyy'}}</td>
 									</tr>
 								</tbody>
 							</table>
