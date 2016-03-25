@@ -48,7 +48,7 @@
 			fazendas: [],
 			safras: [],
 			historico: [],
-			culturas: Constant.Culturas,
+			culturas: [],
 			quadras: [],
 			data: {
 				fazenda: null
@@ -60,6 +60,7 @@
 		});
 
 		var ref = new Firebase(Constant.Url + '/filial'),
+				refCultura = new Firebase(Constant.Url + '/cultura'),
 				_salvarQuadra = false,
 				refSafra = null,
 				refQuadra = null,
@@ -67,13 +68,14 @@
 				historico = null;
 
 		$scope.fazendas = $firebaseArray(ref.orderByChild("key_usuario").equalTo(Session.getUser().uid));
+		$scope.culturas = $firebaseArray(refCultura);
 
 		$scope.clearQuadra = function(getquadras){
 			angular.extend($scope.objModalQuadra, {
 				descricao: '',
 				ativo: 'true',
 				coordenada: 'false',
-				cultura: Constant.Culturas[0].nome
+				cultura: $scope.culturas[0].$id
 			});
 			$scope.editQuadra = false;
 			if(getquadras) return false;
@@ -178,6 +180,14 @@
 			historico = data.$id;
 			$scope.addRefHistorico(fazenda);
 			$('#modalHistoricoQuadras').modal('show');
+		};
+
+		$scope.getCulturaNome = function(culturaId){
+			var retorno = '';
+			$scope.culturas.forEach(function(item){
+				if(item.$id === culturaId) retorno = item.nome;
+			});
+			return retorno;
 		};
 
 		$scope.$watch('quadras', function(newValue, oldValue){

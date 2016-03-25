@@ -28,7 +28,7 @@
 	          </select>
 	        </div>
 	        <button type="button" class="btn btn-success pull-left" ng-show="!edit" ng-click="salvarSafra(form)">Salvar</button>
-	        <button type="button" class="btn btn-success pull-left" ng-show="edit" ng-click="atualizarSafra(form)">Atuaizar</button>
+	        <button type="button" class="btn btn-success pull-left" ng-show="edit" ng-click="atualizarSafra(form)">Atualizar</button>
 	        <button type="button" class="btn btn-default btn-cancel" ng-click="clear()">Cancelar</button>
 	      </form>
 			</div>
@@ -93,7 +93,7 @@
 				        <div class="form-group">
 				          <label>Cultura</label>
 						      <select class="form-control" ng-model="objModalQuadra.cultura">
-						      	<option value="{{cultura.nome}}" ng-repeat="cultura in culturas">{{cultura.nome}}</option>
+						      	<option value="{{cultura.$id}}" ng-repeat="cultura in culturas">{{cultura.nome}}</option>
 			         	  </select>
 				        </div>
 				        <button type="button" class="btn btn-success pull-left" ng-show="!editQuadra" ng-click="salvarQuadra(objModalQuadra)">Salvar</button>
@@ -114,7 +114,7 @@
 								<tbody>
 									<tr ng-repeat="quadra in quadras">
 										<td>{{quadra.descricao}}</td>
-										<td class="text-center" width="130px">{{quadra.cultura}}</td>
+										<td class="text-center" width="130px">{{getCulturaNome(quadra.cultura)}}</td>
 										<td class="text-center">{{quadra.ativo == 'true' ? 'Sim' : 'Nāo'}}</td>
 										<td class="text-center" width="70px">
 											<button type="button" class="btn btn-default btn-xs" ng-click="editarQuadra(quadra)">
@@ -159,7 +159,7 @@
 									<tr ng-repeat="hist in historico | orderBy : 'dataAlteracao' : true">
 										<td class="text-center">{{hist.quadraId}}</td>
 										<td class="text-center">{{hist.descricaoNova}}</td>
-										<td class="text-center">{{hist.culturaNovo}}</td>
+										<td class="text-center">{{getCulturaNome(hist.culturaNovo)}}</td>
 										<td class="text-center">{{hist.dataAlteracao | date:'HH:mm dd/MM/yyyy'}}</td>
 									</tr>
 								</tbody>
