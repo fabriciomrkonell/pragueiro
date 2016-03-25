@@ -47,7 +47,7 @@
 							<td class="text-center">{{safra.ativo == 'true' ? 'Sim' : 'Nāo'}}</td>
 							<td class="text-center" width="130px">
 								<button type="button" class="btn btn-default btn-xs" ng-click="getQuadras(data.fazenda, safra)">Quadras</button>
-								<button type="button" class="btn btn-default btn-xs" ng-click="getHistoricoQuadras(data.fazenda, safra)">Histórico</button>
+								<button type="button" class="btn btn-default btn-xs" ng-click="getHistoricoQuadrasCulturas(data.fazenda, safra)">Histórico</button>
 								<button type="button" class="btn btn-default btn-xs" ng-click="editarSafra(safra)">
 									<i class="glyphicon glyphicon-pencil"></i>
 								</button>
@@ -66,29 +66,17 @@
 	    <div class="modal-content">
 	      <div class="modal-header">
 	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-	        <h4 class="modal-title">Quadra - {{objModal.descricao}}</h4>
+	        <h4 class="modal-title">Quadras - {{objModal.descricao}}</h4>
 	      </div>
 	      <div class="modal-body">
 	      	<div class="row">
 						<div class="col-sm-4">
 							<form class="form-signin" role="form" action="/login" method="post">
-				        <div class="form-group">
-				          <label>Descriçāo</label>
-				          <input type="text" class="form-control" placeholder="Descriçāo" name="descricao" ng-model="objModalQuadra.descricao" />
-				        </div>
-				        <div class="form-group">
-				          <label>Ativo</label>
-				          <select class="form-control" ng-model="objModalQuadra.ativo">
-				          	<option value="true">Sim</option>
-				          	<option value="false">Nāo</option>
-				          </select>
-				        </div>
-				        <div class="form-group">
-				          <label>Coordenadas</label>
-				          <select class="form-control" ng-model="objModalQuadra.coordenada">
-				          	<option value="true">Sim</option>
-				          	<option value="false">Nāo</option>
-				          </select>
+				       	<div class="form-group">
+				          <label>Quadra</label>
+						      <select class="form-control" ng-model="objModalQuadra.quadra">
+						      	<option value="{{quadra.$id}}" ng-repeat="quadra in quadras">{{quadra.nome}}</option>
+			         	  </select>
 				        </div>
 				        <div class="form-group">
 				          <label>Cultura</label>
@@ -96,31 +84,29 @@
 						      	<option value="{{cultura.$id}}" ng-repeat="cultura in culturas">{{cultura.nome}}</option>
 			         	  </select>
 				        </div>
-				        <button type="button" class="btn btn-success pull-left" ng-show="!editQuadra" ng-click="salvarQuadra(objModalQuadra)">Salvar</button>
-				        <button type="button" class="btn btn-success pull-left" ng-show="editQuadra" ng-click="atualizarQuadra(objModalQuadra)">Atuaizar</button>
-				        <button type="button" class="btn btn-default btn-cancel" ng-click="clearQuadra()">Cancelar</button>
+				        <button type="button" class="btn btn-success pull-left" ng-show="!editQuadra" ng-click="salvarQuadrasCulturas(data.fazenda, objModal.$id, objModalQuadra)">Salvar</button>
+				        <button type="button" class="btn btn-success pull-left" ng-show="editQuadra" ng-click="atualizarQuadrasCulturas(data.fazenda, objModal.$id, objModalQuadra)">Atuaizar</button>
+				        <button type="button" class="btn btn-default btn-cancel" ng-click="clearQuadrasCulturas(data.fazenda.$id, objModal.$id)">Cancelar</button>
 				      </form>
 						</div>
 						<div class="col-sm-8">
 							<table class="table table-condensed table-bordered">
 								<thead>
 									<tr>
-											<th>Descriçāo</th>
+											<th>Quadra</th>
 											<th class="text-center" width="130px">Cultura</th>
-											<th class="text-center" width="100px">Ativo</th>
 											<th class="text-center" width="70px">Ações</th>
 									</tr>
 								</thead>
 								<tbody>
-									<tr ng-repeat="quadra in quadras">
-										<td>{{quadra.descricao}}</td>
-										<td class="text-center" width="130px">{{getCulturaNome(quadra.cultura)}}</td>
-										<td class="text-center">{{quadra.ativo == 'true' ? 'Sim' : 'Nāo'}}</td>
+									<tr ng-repeat="quadracultura in quadrasculturas">
+										<td>{{getQuadraNome(quadracultura.quadra)}}</td>
+										<td class="text-center" width="130px">{{getCulturaNome(quadracultura.cultura)}}</td>
 										<td class="text-center" width="70px">
-											<button type="button" class="btn btn-default btn-xs" ng-click="editarQuadra(quadra)">
+											<button type="button" class="btn btn-default btn-xs" ng-click="editarQuadrasCulturas(quadracultura)">
 												<i class="glyphicon glyphicon-pencil"></i>
 											</button>
-											<button type="button" class="btn btn-danger btn-xs" ng-click="excluirQuadra(quadra)">
+											<button type="button" class="btn btn-danger btn-xs" ng-click="excluirQuadrasCulturas(quadracultura)">
 												<i class="glyphicon glyphicon-remove"></i>
 											</button>
 										</td>
@@ -149,17 +135,17 @@
 							<table class="table table-condensed table-bordered">
 								<thead>
 									<tr>
-											<th class="text-center" width="190px">Quadra - Id</th>
-											<th class="text-center">Quadra - Nome</th>
-											<th class="text-center">Cultura (Para)</th>
+											<th>Quadra</th>
+											<th class="text-center" width="130px">Cultura</th>
+											<th class="text-center" width="130px">Tipo</th>
 											<th class="text-center" width="140px">Data</th>
 									</tr>
 								</thead>
 								<tbody>
 									<tr ng-repeat="hist in historico | orderBy : 'dataAlteracao' : true">
-										<td class="text-center">{{hist.quadraId}}</td>
-										<td class="text-center">{{hist.descricaoNova}}</td>
-										<td class="text-center">{{getCulturaNome(hist.culturaNovo)}}</td>
+										<td>{{getQuadraNome(hist.quadra)}}</td>
+										<td class="text-center" width="130px">{{getCulturaNome(hist.cultura)}}</td>
+										<td class="text-center" width="130px">{{hist.tipo}}</td>
 										<td class="text-center">{{hist.dataAlteracao | date:'HH:mm dd/MM/yyyy'}}</td>
 									</tr>
 								</tbody>

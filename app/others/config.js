@@ -32,6 +32,11 @@
         resolve: {
           deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/safra.js'])
         }
+      }).when('/quadra', {
+        templateUrl: '/views/partials/quadra.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/quadra.js'])
+        }
       }).when('/perfil', {
         templateUrl: '/views/partials/perfil.html',
         resolve: {
