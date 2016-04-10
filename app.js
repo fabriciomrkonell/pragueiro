@@ -16,6 +16,10 @@ app.get('/', function(req, res, next) {
   res.sendfile(__dirname + '/views/index.html');
 });
 
+app.get('/table', function(req, res, next) {
+  res.sendfile(__dirname + '/views/table.html');
+});
+
 app.get('/login', function(req, res){
   res.sendfile(__dirname + '/views/login.html');
 });
