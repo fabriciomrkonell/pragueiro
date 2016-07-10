@@ -8,6 +8,8 @@
 
 	function homeCtrl($scope) {
 
+		console.log('Pragueiro iniciado.');
+
   }
 
 }());
