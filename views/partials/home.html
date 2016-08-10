@@ -1,7 +1,219 @@
-<div ng-controller="homeCtrl">
-	<div class="row">
-		<div class="col-sm-12 text-center">
-			<img src="/app/dist/img/logo/home.png" class="logo-home">
-		</div>
-	</div>
+ <style type="text/css">
+ 	.active-table{
+ 		background-color: #eee;
+ 	}
+ 	.nopadding {
+ 		padding: 0 !important;
+ 		margin: 0 !important;
+ 	}
+ 	.title_resumo {
+ 		margin-left: 35px;
+ 	}
+
+
+
+ 	.row{
+ 		margin-top:40px;
+ 		padding: 0 10px;
+ 	}
+
+ 	.clickable{
+ 		cursor: pointer;   
+ 	}
+
+ 	.panel-heading span {
+ 		margin-top: -20px;
+ 		font-size: 15px;
+ 	}
+ 	.panel_tabela{
+ 		padding:1px;
+ 	}
+
+ 	.count{
+ 		font-size: 40px;
+ 		font-weight: 600;
+ 	}
+
+ 	.count_top
+ 	{
+ 		font-size: 13px;
+ 	}
+
+
+ </style>
+ <div ng-controller="homeCtrl" >
+ 	<div class="container container-view ">
+ 		<div class="row">
+ 			<div class="col-sm-3 nopadding col-sm-no-bottom ">
+ 				<form class="form-signin" role="form">
+ 					<div class="form-group">
+ 						<label>Fazenda</label>
+ 						<select class="form-control" ng-options="fazenda.nome for fazenda in fazendas" ng-model="fazenda" >
+ 						</select>
+ 					</div>
+ 				</form>
+ 			</div>
+ 			<div class="col-sm-2 col-sm-no-bottom ">
+ 				<form class="form-signin" role="form" >
+ 					<div class="form-group">
+ 						<label>Safra</label>
+ 						<select class="form-control" ng-options="safra.descricao for safra in fazenda.safra" ng-model="safra" ng-change="chengeSafra()">
+ 						</select>
+ 					</div>
+ 				</form>
+ 			</div>
+
+ 		</div>
+ 		<div class="row" ng-show=false>
+ 			<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count" style="padding-right:20px; border-right: 1px solid #ccc;">
+ 				<span class="count_top"><i class="glyphicon glyphicon-bookmark"></i> Usuários no período</span>
+ 				<div class="count">1</div>
+ 			</div>
+
+ 			<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count" style="padding-right:20px; border-right: 1px solid #ccc;">
+ 				<span class="count_top"><i class="glyphicon glyphicon-bookmark"></i> Média de pontos</span>
+ 				<div class="count">12</div>
+ 			</div>
+
+ 			<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count" style="padding-right:20px; border-right: 1px solid #ccc;">
+ 				<span class="count_top"><i class="glyphicon glyphicon-bookmark"></i>Distância entre pontos</span>
+ 				<div class="count">20m</div>
+ 				<span class="count_bottom"><i class="green">Média**</i> </span>
+ 			</div>
+
+ 			<div class="col-md-4 col-sm-8 col-xs-12 tile_stats_count" style="padding-right:20px; border-right: 1px solid #ccc;">
+ 				<div google-chart chart="chart" style="{{cssStyle}}"></div>
+ 			</div>
+ 			
+ 		</div>
+ 		<div class="row" ng-show="table_pronta">
+ 			
+ 			<div class="panel panel-success">
+ 				<div class="panel-heading">
+ 					<h3 class="panel-title">Resumo das vistorias</h3>
+ 					<span class="pull-right clickable"><i class="glyphicon glyphicon-chevron-up"></i></span>
+ 				</div>
+ 				<div class="panel-body panel_tabela">
+
+
+ 					<div class="table-responsive">
+ 						<table class="table table-condensed table-bordered" >
+ 							<tbody> 	
+
+ 								<tr> 							
+ 									<th class="text-right"  colspan="2" style="vertical-align:middle;" >Quadra</th>
+ 									<th class="text-center active-table" ng-repeat="v in vistorias" >{{v.quadra.nome}}</th>
+ 								</tr>
+ 								<tr>
+ 									<th class="text-right" colspan="2">Cultura</th>
+ 									<th class="text-center" ng-repeat="v in vistorias" >{{v.cultura.nome}}</th>
+ 								</tr>
+ 								<tr>
+ 									<th  colspan="2" class="text-right">DAE Atual</th>
+ 									<th class="text-center" ng-repeat="v in vistorias" >{{diferencaData(v.quadraxcultura.data_plantio, v.dataMilis)}}</th>
+ 								</tr>
+ 								<tr>
+ 									<th colspan="2" class="text-right">Data do Levantamento</th>
+ 									<th class="text-center active-table" ng-repeat="v in vistorias">{{v.dataExtenso}}</th>
+ 								</tr>
+ 								<tr>
+ 									<th colspan="2" class="text-right" style="vertical-align:middle;" >Estágio</th>
+ 									<th class="text-center"  ng-repeat="v in vistorias">{{v.estagio.codigo}} - {{v.estagio.nome}}</th>
+ 								</tr>
+ 								<tr>
+ 									<th colspan="2" class="text-right" style="vertical-align:middle;" >Monitor</th>
+ 									<th class="text-center" ng-repeat="v in vistorias" >{{v.usuario.nome}}</th>
+ 								</tr>
+ 								<tr>
+ 									<th colspan="2" class="text-right">Método (tipo)</th>
+ 									<th class="text-center" ng-repeat="v in vistorias">{{v.metodo}}</th>
+ 								</tr>
+
+ 								<tr>
+ 									<th colspan="2" class="text-right">Qtde Pontos</th>
+ 									<th class="text-center" ng-repeat="v in vistorias">{{v.qtde_ponto}}</th>
+ 								</tr>
+
+ 								<tr>
+ 									<th  colspan="2"  class="text-right">Tecnologia</th>
+ 									<th class="text-center" ng-repeat="v in vistorias"> &nbsp;</th>
+ 								</tr>
+ 								<tr>
+ 									<th colspan="2" class="text-right">Variedade</th>
+ 									<th class="text-center" ng-repeat="v in vistorias"> &nbsp;</th>
+ 								</tr>
+ 								<tr>
+ 									<th colspan="2" class="text-right">Data da última aplicação</th>
+ 									<th class="text-center" ng-repeat="v in vistorias"> &nbsp;</th>
+ 								</tr>
+ 								<tr>
+ 									<th colspan="2" class="text-right">Intervalo da aplicação</th>
+ 									<th class="text-center" ng-repeat="v in vistorias"> &nbsp;</th> 							
+ 								</tr>		
+ 								<tr>
+ 									<th colspan="2" class="text-right">&nbsp;</th>
+ 									<th class="text-center"  ng-repeat="v in vistorias" >{{v.metodo=='Planta' ? 'Total plantas: ' + v.qtde_planta * v.qtde_ponto : '%'}}</th>
+ 								</tr>	
+ 								<tbody ng-repeat="praga in pragas2">
+ 									<tr>
+ 										<th rowspan="{{praga.tamanhos.length+1}}"  colspan="{{praga.colspan}}" style="vertical-align:middle;" class="text-center active-table">{{praga.descricao}}</th>
+
+ 										<tr ng-repeat="tam in praga.tamanhos track by $index" >
+ 											<th height="32" class="text-right active-table" ng-show="praga.tamanhos.length>1">{{tam.nome}}</th>
+ 											<th class="text-center" ng-repeat="v in vistorias">
+ 												{{vistorias[$index].pragas_com_valor[tam.id].valor !=0 ? vistorias[$index].pragas_com_valor[tam.id].valor  : '&nbsp;'}}
+
+
+ 											</th>
+ 										</tr>
+
+ 									</tr>
+
+ 								</tbody>
+
+ 							</tbody>
+ 						</table>
+ 					</div>
+
+
+ 				</div>
+ 			</div>
+ 			
+
+ 		</div>
+ 		
+
+
+
+
+
+
+ 	</div> <!-- container container-view -->
+
+ </div> <!-- final homeCtrl-->
+
+
+ <!-- Modal Start here-->
+ <div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"
+ role="dialog" aria-hidden="true" data-backdrop="static">
+ <div class="modal-dialog modal-sm">
+ 	<div class="modal-content">
+ 		<div class="modal-header">
+ 			<h4 class="modal-title">
+ 				<span class="glyphicon glyphicon-time">
+ 				</span>&nbsp;&nbsp;Aguarde, carregando...
+ 			</h4>
+ 		</div>
+ 		<div class="modal-body">
+ 			<div class="progress">
+ 				<div class="progress-bar progress-bar-info
+ 				progress-bar-striped active"
+ 				style="width: 100%">
+ 			</div>
+ 		</div>
+ 	</div>
+ </div>
+</div>
+</div>
+<!-- Modal ends Here -->
 </div>

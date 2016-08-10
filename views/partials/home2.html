@@ -1,0 +1,169 @@
+<div ng-controller="homeCtrl">
+	<div class="container container-view">
+		<div class="row">
+			<table class="table table-condensed table-bordered" style="width: 350px; display: inline-table">
+				<thead>
+					<tr>
+						<th colspan="2" class="text-center">&nbsp;</th>
+					</tr>
+					<tr>
+						<th rowspan="2" class="text-center">Resumo de leituras, <br/> de avaliações de</th>
+						<th class="text-right">Talhão</th>
+					</tr>
+					<tr>
+						<th class="text-right">Cultura</th>
+					</tr>
+					<tr>
+						<th rowspan="2" class="text-center" style="padding-bottom: 20px">29/03/2016</th>
+						<th class="text-right">Tecnologia</th>
+					</tr>
+					<tr>
+						<th colspan="2" class="text-right">DAE Atual</th>
+					</tr>
+					<tr>
+						<th colspan="2" class="text-right">Variedade</th>
+					</tr>
+					<tr>
+						<th colspan="2" class="text-right">Data do levantamento</th>
+					</tr>
+					<tr>
+						<th colspan="2" class="text-right">Data da última aplicação</th>
+					</tr>
+					<tr>
+						<th colspan="2" class="text-right">Intervalo da aplicação</th>
+					</tr>
+					<tr>
+						<th colspan="2" class="text-right">Estádio</th>
+					</tr>
+					<tr>
+						<th colspan="2" class="text-right">Manitor</th>
+					</tr>
+					<tr>
+						<th colspan="2" class="text-right">Observação</th>
+					</tr>
+					<tr>
+						<th colspan="2" class="text-right">Método de amostragem/unidade</th>
+					</tr>
+					<tr>
+						<th colspan="2" class="text-center">Soma de Largatas</th>
+					</tr>
+					<tr>
+						<th rowspan="3" class="text-center active-table" style="padding-bottom: 35px">L. Helicoverpa</th>
+						<th class="text-center active-table">Postura</th>
+					</tr>
+					<tr>
+						<th colspan="2" class="text-center active-table">Largatas < 1 cm</th>
+					</tr>
+					<tr>
+						<th colspan="2" class="text-center active-table">Largatas > 1 cm</th>
+					</tr>
+					<tr>
+						<th rowspan="3" class="text-center active-table" style="padding-bottom: 35px">L. Helicoverpa</th>
+						<th class="text-center active-table">Postura</th>
+					</tr>
+					<tr>
+						<th colspan="2" class="text-center active-table">Largatas < 1 cm</th>
+					</tr>
+					<tr>
+						<th colspan="2" class="text-center active-table">Largatas > 1 cm</th>
+					</tr>
+					<tr>
+						<th rowspan="3" class="text-center active-table" style="padding-bottom: 35px">L. Helicoverpa</th>
+						<th class="text-center active-table">Postura</th>
+					</tr>
+					<tr>
+						<th colspan="2" class="text-center active-table">Largatas < 1 cm</th>
+					</tr>
+					<tr>
+						<th colspan="2" class="text-center active-table">Largatas > 1 cm</th>
+					</tr>
+					<tr>
+						<th rowspan="3" class="text-center active-table" style="padding-bottom: 35px">L. Helicoverpa</th>
+						<th class="text-center active-table">Postura</th>
+					</tr>
+					<tr>
+						<th colspan="2" class="text-center active-table">Largatas < 1 cm</th>
+					</tr>
+					<tr>
+						<th colspan="2" class="text-center active-table">Largatas > 1 cm</th>
+					</tr>
+					<tr>
+						<th rowspan="3" class="text-center active-table" style="padding-bottom: 35px">L. Helicoverpa</th>
+						<th class="text-center active-table">Postura</th>
+					</tr>
+					<tr>
+						<th colspan="2" class="text-center active-table">Largatas < 1 cm</th>
+					</tr>
+					<tr>
+						<th colspan="2" class="text-center active-table">Largatas > 1 cm</th>
+					</tr>
+					<tr>
+						<th rowspan="3" class="text-center active-table" style="padding-bottom: 35px">L. Helicoverpa</th>
+						<th class="text-center active-table">Postura</th>
+					</tr>
+					<tr>
+						<th colspan="2" class="text-center active-table">Largatas < 1 cm</th>
+					</tr>
+					<tr>
+						<th colspan="2" class="text-center active-table">Largatas > 1 cm</th>
+					</tr>
+				</thead>
+			</table>
+			<table class="table table-condensed table-bordered" style="width: 350px; display: inline-table; margin-left: -5px">
+				<thead>
+
+					<tr>
+						<th class="text-center active-table"    >
+							teste
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+
+				</tbody>
+
+
+
+			</table>
+			<button type="button" class="btn btn-default btn-xs" ng-click="teste()">Usuários</button>
+			<table class="table table-condensed table-bordered">
+				<thead>
+					<tr>
+						<th>{{$scope.data.nome}}</th>
+						<th class="text-center" width="80px">Permissão</th>
+						<th class="text-center" width="80px">Ações</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="q in $quadras">
+						<td>{{q.$id}}</td>
+						<td class="text-center" width="130px">
+							<button type="button" class="btn btn-default btn-xs" ng-click="getUsuarios(fazenda)">Usuários</button>
+						</td>
+						<td class="text-center" width="70px">
+							<button type="button" class="btn btn-default btn-xs" ng-click="editar(fazenda)">
+								<i class="glyphicon glyphicon-pencil"></i>
+							</button>
+							<button type="button" class="btn btn-danger btn-xs" ng-click="excluir(fazenda)">
+								<i class="glyphicon glyphicon-remove"></i>
+							</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div ng-controller="homeCtrl">
+				I have {{quadras.length}} friends. They are:
+				<input type="search" ng-model="q" placeholder="filter friends..." aria-label="filter friends" />
+				<ul class="example-animate-container">
+					<li class="animate-repeat" ng-repeat="friend in quadras">
+						[{{$index + 1}}] {{friend.nome}} who is {{friend.codigo}} years old.
+					</li>
+					<li class="animate-repeat" ng-if="results.length == 0">
+						<strong>No results found...</strong>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+</div>

@@ -2,7 +2,7 @@
 
 	'use strict';
 
-	angular.module('Pragueiro.controllers').registerCtrl('homeCtrl', homeCtrl);
+	angular.module('Pragueiro.controllers').registerCtrl('indexCtrl', indexCtrl);
 
 	homeCtrl.$inject = ['$scope', 'Constant', 'Session', '$firebaseArray', '$firebaseObject', 'Notify', '$routeParams'];
 
@@ -21,142 +21,104 @@
 		$scope.myNumber = 5;
 		$scope.table_pronta=false;
 
-		$scope.mCountTamanhos = 0;
-		$scope.mCont = 0;
-		$scope.teste2="<table class='table'>	<thead>	<tr><th ng-repeat='v in vistorias'>{{v.quadra.nome}}</th> </tr>	</thead> <tr><th ng-repeat='v in vistorias'>{{v.cultura.nome}}</th> </tr> 	<tr> 	<th ng-repeat='v in vistorias'>{{v.dataExtenso}}</th>			</tr> </table>";
 
-		atualizaListaFiliais();
-		atualizaCulturas();
-		atualizaUsuarios();
-		atualizaPragas2();
-		//atualizaListaQuadras();
-		var chart1 = {};
-		chart1.type = "ColumnChart";
-		chart1.data = [
-		['Component', 'cost'],
-		['Software and hardware', 50000],
-		['Hardware', 80000]
-		];
-		chart1.data.push(['Services',20000]);
-		chart1.options = {chartArea:{height:'200',width:'100%'},
-		legend:{ position: 'none'},
-		'width':400,
-		'height':225,
-		vAxis: {
-			gridlines: {
-				color: 'transparent'
-			}
+
+		$scope.getNumber2 = function(id_vistoria, id_praga) {
+			$scope.vistorias[id_vistoria].pragas_com_valor[id_praga].valor;
+			return 0;	
 		}
-	};
-	chart1.formatters = {
-		number : [{
-			columnNum: 1,
-			pattern: "$ #,##0.00"
-		}]
-	};
-
-	$scope.chart = chart1;
-
-	$scope.aa=1*$scope.chart.data[1][1];
-	$scope.bb=1*$scope.chart.data[2][1];
-	$scope.cc=1*$scope.chart.data[3][1];
-
-	$scope.getNumber2 = function(id_vistoria, id_praga) {
-		$scope.vistorias[id_vistoria].pragas_com_valor[id_praga].valor;
-		return 0;	
-	}
 
 
-	$scope.teste = function(){
-		console.log('Adicionou filial', $scope);
-	};
+		$scope.teste = function(){
+			console.log('Adicionou filial', $scope);
+		};
 
-	function atualizaCulturas()
-	{
-		var refCultura = new Firebase(Constant.Url + '/cultura');
-		refCultura.ref().on('child_added', function(snap) {
-			$scope.culturas.push(snap.val());
-		});
-	}
+		function atualizaCulturas()
+		{
+			var refCultura = new Firebase(Constant.Url + '/cultura');
+			refCultura.ref().on('child_added', function(snap) {
+				$scope.culturas.push(snap.val());
+			});
+		}
 
-	function atualizaUsuarios()
-	{
-		var refUsuarios= new Firebase(Constant.Url + '/usuario');
-		refUsuarios.ref().on('child_added', function(snap) {
-			$scope.usuarios.push(snap.val());
-		});
-	}
+		function atualizaUsuarios()
+		{
+			var refUsuarios= new Firebase(Constant.Url + '/usuario');
+			refUsuarios.ref().on('child_added', function(snap) {
+				$scope.usuarios.push(snap.val());
+			});
+		}
 
-	function atualizaPragas()
-	{
-		var refPraga= new Firebase(Constant.Url + '/praga');
-		refPraga.ref().on('child_added', function(snap) {
+		function atualizaPragas()
+		{
+			var refPraga= new Firebase(Constant.Url + '/praga');
+			refPraga.ref().on('child_added', function(snap) {
 
-			var praga=snap.val();
-			var count_tamanho=0;
-			var tamanhos=[];
-			var primeiro_tamanho;
-			for(var obj in praga.tamanho ){
-				if(count_tamanho==0)
+				var praga=snap.val();
+				var count_tamanho=0;
+				var tamanhos=[];
+				var primeiro_tamanho;
+				for(var obj in praga.tamanho ){
+					if(count_tamanho==0)
+					{
+						primeiro_tamanho=praga.tamanho[obj];
+					}
+					else
+					{
+						tamanhos.push(praga.tamanho[obj]);
+					}
+					count_tamanho++;
+
+				}
+				if(tamanhos.length==0)
 				{
-					primeiro_tamanho=praga.tamanho[obj];
+					praga['colspan']=2;			
+					praga['class']='text-right';			
 				}
 				else
 				{
-					tamanhos.push(praga.tamanho[obj]);
+					praga['colspan']=1;
+					praga['class']='text-center';	
 				}
-				count_tamanho++;
+				praga['primeiro_tamanho']=primeiro_tamanho;
+				praga['tamanhos']=tamanhos;
+				$scope.pragas.push(praga);
+			});
+		}
 
-			}
-			if(tamanhos.length==0)
-			{
-				praga['colspan']=2;			
-				praga['class']='text-right';			
-			}
-			else
-			{
-				praga['colspan']=1;
-				praga['class']='text-center';	
-			}
-			praga['primeiro_tamanho']=primeiro_tamanho;
-			praga['tamanhos']=tamanhos;
-			$scope.pragas.push(praga);
-		});
-	}
+		function atualizaPragas2()
+		{
+			$scope.pragas2=[];
+			var refPraga= new Firebase(Constant.Url + '/praga');
+			refPraga.ref().on('child_added', function(snap) {
 
-	function atualizaPragas2()
-	{
-		$scope.pragas2=[];
-		var refPraga= new Firebase(Constant.Url + '/praga');
-		refPraga.ref().on('child_added', function(snap) {
+				var praga=snap.val();
+				var count_tamanho=0;
+				var tamanhos=[];
+				var primeiro_tamanho;
+				for(var obj in praga.tamanho ){
+					var tam=praga.tamanho[obj];
+					tam['id']=$scope.mCountTamanhos;
+					tamanhos.push(tam);
 
-			var praga=snap.val();
-			var count_tamanho=0;
-			var tamanhos=[];
-			var primeiro_tamanho;
-			for(var obj in praga.tamanho ){
-				var tam=praga.tamanho[obj];
-				tam['id']=$scope.mCountTamanhos;
-				tamanhos.push(tam);
-
-				count_tamanho++;
-				$scope.mCountTamanhos++;
-			}
-			if(tamanhos.length==1)
-			{
-				praga['colspan']=2;			
-				praga['class']='text-right';			
-			}
-			else
-			{
-				praga['colspan']=1;
-				praga['class']='text-center';	
-			}
-			praga['primeiro_tamanho']=primeiro_tamanho;
-			praga['tamanhos']=tamanhos;
-			$scope.pragas2.push(praga);
-		});
-	}
+					count_tamanho++;
+					$scope.mCountTamanhos++;
+				}
+				if(tamanhos.length==1)
+				{
+					praga['colspan']=2;			
+					praga['class']='text-right';			
+				}
+				else
+				{
+					praga['colspan']=1;
+					praga['class']='text-center';	
+				}
+				praga['primeiro_tamanho']=primeiro_tamanho;
+				praga['tamanhos']=tamanhos;
+				$scope.pragas2.push(praga);
+			});
+		}
 
 		//############################################################################################################################
 		//############################################################################################################################

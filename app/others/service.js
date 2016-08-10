@@ -2,6 +2,8 @@
 
   'use strict';
 
+
+
   angular.module('Pragueiro.services').service('Notify', ['Constant', function(Constant) {
     this.successBottom = function(message){
       $.notify({
@@ -44,11 +46,12 @@
   angular.module('Pragueiro.services').service('Session', ['Constant', function(Constant) {
     this.getUser = function(){
       var ref = new Firebase(Constant.Url),
-          user = ref.getAuth();
+      user = ref.getAuth();
       if(user === null) window.location.href = '/login';
       return user;
     }
   }]);
+
 
   angular.module('Pragueiro.services').service('Util', [function() {
     this.refresh = function(scope){

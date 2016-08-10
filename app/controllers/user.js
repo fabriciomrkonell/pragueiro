@@ -37,9 +37,9 @@
 			angular.extend($scope.data, {
 				_id: null,
 				name: '',
-			  email: '',
-			  password: '',
-			  type: Constant.options.Users[0]
+				email: '',
+				password: '',
+				type: Constant.options.Users[0]
 			});
 		};
 
@@ -58,15 +58,17 @@
 			$http.post(Constant.url.User, item).success(function(data){
 				if(item._id == null){
 					$rootScope.options.users.push(data.data);
+					$window.alert("O ID é:" + data.data._id);
 				}else{
 					$rootScope.options.users.forEach(function(item){
 						if(item._id === data.data._id){
 							item.name = data.data.name;
-					    item.email = data.data.email;
-					    item.password = data.data.password;
-					    item.type = data.data.type;
+							item.email = data.data.email;
+							item.password = data.data.password;
+							item.type = data.data.type;
 						}
 					});
+					$window.alert("2-O ID é:" + data.data._id);
 				}
 				$scope.clear();
 				Util.hideLoader();
@@ -93,6 +95,6 @@
 			return false;
 		}
 
-  }
+	}
 
 }());

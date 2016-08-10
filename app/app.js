@@ -1,14 +1,14 @@
 'use strict'
 
-var ref = new Firebase("https://pragueiro.firebaseio.com");
+var ref = new Firebase("https://pragueiroproducao.firebaseio.com");
 if(ref.getAuth() === null) window.location.href = '/login';
 
-angular.module('Pragueiro.controllers', ['firebase']);
+angular.module('Pragueiro.controllers', ['firebase', 'ngSanitize', 'googlechart']);
 
 angular.module('Pragueiro.config', ['ngRoute']);
 
 angular.module('Pragueiro.constant', []).constant('Constant', {
-	Url: 'https://pragueiro.firebaseio.com',
+	Url: 'https://pragueiroproducao.firebaseio.com',
 	Message: {
 		'Error: The specified password is incorrect.': 'A senha está inválida!',
 		'Error: The specified email address is already in use.': 'O endereço de email já está em uso!'
@@ -31,11 +31,12 @@ angular.module('Pragueiro').run(['$rootScope', 'Session', 'Constant', function($
 	};
 
 	$rootScope.$on('$routeChangeStart', function(event, next, current) {
-    Session.getUser();
-  });
+		Session.getUser();
+	});
 
 }]);
 
 angular.element(document).ready(function() {
 	angular.bootstrap(document, ['Pragueiro']);
 });
+

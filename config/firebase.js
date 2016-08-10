@@ -2,4 +2,4 @@
 
 var Firebase = require("firebase");
 
-module.exports = new Firebase("https://pragueiro.firebaseio.com/");
+module.exports = new Firebase("https://pragueiroproducao.firebaseio.com/");

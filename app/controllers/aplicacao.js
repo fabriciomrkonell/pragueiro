@@ -2,11 +2,11 @@
 
 	'use strict';
 
-	angular.module('Pragueiro.controllers').registerCtrl('safraCtrl', safraCtrl);
+	angular.module('Pragueiro.controllers').registerCtrl('aplicacaoCtrl', aplicacaoCtrl);
 
-	safraCtrl.$inject = ['$scope', 'Constant', 'Session', '$firebaseArray', '$firebaseObject', 'Notify'];
+	aplicacaoCtrl.$inject = ['$scope', 'Constant', 'Session', '$firebaseArray', '$firebaseObject', 'Notify'];
 
-	function safraCtrl($scope, Constant, Session, $firebaseArray, $firebaseObject, Notify) {
+	function aplicacaoCtrl($scope, Constant, Session, $firebaseArray, $firebaseObject, Notify) {
 
 		angular.extend($scope, {
 			objModal: {},

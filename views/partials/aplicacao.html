@@ -20,12 +20,12 @@
 						<input type="text" class="form-control" placeholder="Descriçāo" name="descricao" ng-model="form.descricao" />
 					</div>
 					<div class="form-group">
-						<input type="checkbox"  ng-model="form.ativo"
-						ng-true-value="true" ng-false-value="false">	
 						<label>Ativo</label>
-						
+						<select class="form-control" ng-model="form.ativo">
+							<option value="true">Sim</option>
+							<option value="false">Nāo</option>
+						</select>
 					</div>
-					
 					<button type="button" class="btn btn-success pull-left" ng-show="!edit" ng-click="salvarSafra(data.fazenda, form)">Salvar</button>
 					<button type="button" class="btn btn-success pull-left" ng-show="edit" ng-click="atualizarSafra(form)">Atualizar</button>
 					<button type="button" class="btn btn-default btn-cancel" ng-click="clear()">Cancelar</button>

@@ -1,0 +1,93 @@
+<div ng-controller="erroCtrl">
+	<div class="container container-view">
+		<div class="row">
+			<div class="col-sm-4 col-sm-no-bottom">
+				<label>Painel de Erros</label>
+			</div>
+		</div>
+		<hr/>
+		<div class="row">
+			<div class="col-sm-5">
+				<form class="form-signin" role="form">
+					<div class="form-group">
+						<label>Key erro</label>
+						<input type="text" class="form-control" placeholder="Nome" ng-model="data.erro.key" />
+					</div>
+					<div class="form-group">
+						<label>Usuário</label>
+						<input type="text" class="form-control" placeholder="Nome" ng-model="data.usuario.nome" />
+					</div>
+					
+					<div class="form-group">
+						<label>Key</label>
+						<input type="text" class="form-control" placeholder="Telefone" ng-model="data.usuario.key"  phone/>
+					</div>
+					<div class="form-group">
+						<label>Erro:</label>
+						<textarea ng-model="data.erro.erro" style="width:460px; height:1000px;">
+							{{data.erro.erro}}
+						</textarea>
+					</div>
+					
+					
+					<button type="button" class="btn btn-success"  ng-click="setarConsertado(data)">Setar Consertado</button>
+					<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar</button>
+				</form>
+			</div>
+			<div class="col-sm-7">
+				<table class="table table-condensed table-bordered">
+					<thead>
+						<tr>
+							<th>Usuário</th>
+							<th>Data</th>
+							<th>Código Versão</th>
+							<th>Email</th>
+							<th>Senha</th>
+							<th>Consertado</th>
+							<th>Detalhar</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="erro in erros ">
+							<td>{{erro.usuario.nome}}</td>
+							<td>{{erro.data | date:'dd/MM/yyyy  h:mm a'}}</td>
+							<td>{{erro.erro.versao}}</td>
+							<td>{{erro.usuario.email}}</td>							
+							<td>{{erro.usuario.senha}}</td>
+							<td>{{erro.erro.conserto_data | date:'dd/MM/yyyy  h:mm a'}}</td>
+							<td>
+								<button type="button" class="btn btn-default btn-xs" ng-click="getDetalhes(erro)">
+									<i class="glyphicon glyphicon-pencil"></i>
+								</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	
+	<!-- Modal Start here-->
+	<div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"
+	role="dialog" aria-hidden="true" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">
+					<span class="glyphicon glyphicon-time">
+					</span>&nbsp;&nbsp;Aguarde, carregando...
+				</h4>
+			</div>
+			<div class="modal-body">
+				<div class="progress">
+					<div class="progress-bar progress-bar-info
+					progress-bar-striped active"
+					style="width: 100%">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+<!-- Modal ends Here -->
+</div>

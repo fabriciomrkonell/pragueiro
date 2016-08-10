@@ -1,104 +1,130 @@
 <div ng-controller="perfilCtrl">
 	<div class="modal fade" tabindex="-1" role="dialog" id="modalEmail">
-	  <div class="modal-dialog">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-	        <h4 class="modal-title">Alteraçāo de Email</h4>
-	      </div>
-	      <div class="modal-body">
-	        <form class="form-signin" role="form">
-		        <div class="form-group">
-		          <label>Senha</label>
-		          <input type="password" class="form-control" placeholder="Senha" ng-model="data.editSenha.senha" />
-		        </div>
-		      </form>
-	      </div>
-	      <div class="modal-footer">
-	      	<button type="button" class="btn btn-success" ng-click="salvarEmail()">Confirmar</button>
-	        <button type="button" class="btn btn-default btn-cancel" data-dismiss="modal">Cancelar</button>
-	      </div>
-	    </div>
-	  </div>
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">Alteraçāo de Email - Confirmação</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-signin" role="form">
+						<div class="form-group">
+							<label>Informe sua senha</label>
+							<input type="password" class="form-control" placeholder="Senha" ng-model="data.editSenha.senha" />
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-success" ng-click="salvarEmail()">Confirmar</button>
+					<button type="button" class="btn btn-default btn-cancel" data-dismiss="modal">Cancelar</button>
+				</div>
+			</div>
+		</div>
 	</div>
 	<div class="modal fade" tabindex="-1" role="dialog" id="modalSenha">
-	  <div class="modal-dialog">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-	        <h4 class="modal-title">Alteraçāo de Senha</h4>
-	      </div>
-	      <div class="modal-body">
-	        <form class="form-signin" role="form">
-		        <div class="form-group">
-		          <label>Senha</label>
-		          <input type="password" class="form-control" placeholder="Senha" ng-model="data.editSenha.senha" />
-		        </div>
-		      </form>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-success" ng-click="salvarSenha()">Confirmar</button>
-	        <button type="button" class="btn btn-default btn-cancel" data-dismiss="modal">Cancelar</button>
-	      </div>
-	    </div>
-	  </div>
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">Alteraçāo de Senha - Confirmação</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-signin" role="form">
+						<div class="form-group">
+							<label>Informe a senha ANTIGA</label>
+							<input type="password" class="form-control" placeholder="Senha" ng-model="data.editSenha.senha" />
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-success" ng-click="salvarSenha()">Confirmar</button>
+					<button type="button" class="btn btn-default btn-cancel" data-dismiss="modal">Cancelar</button>
+				</div>
+			</div>
+		</div>
 	</div>
 	<div class="container container-view">
 		<div class="row">
 			<div class="col-sm-4">
-				<form class="form-signin" role="form" ng-repeat="data in arrayData">
-	        <div class="form-group">
-	          <label>Nome</label>
-	          <input type="text" class="form-control" placeholder="Nome completo" ng-model="data.nome" />
-	        </div>
-	        <div class="form-group">
-	          <label>Telefone</label>
-	          <input type="text" class="form-control" placeholder="Telefone" ng-model="data.telefone" phone />
-	        </div>
-	        <div class="form-group">
-	          <label>Cidade</label>
-	          <input type="text" class="form-control" placeholder="Cidade" ng-model="data.cidade" />
-	        </div>
-	        <button type="button" class="btn btn-success" ng-click="salvarPerfil(data)">Salvar</button>
-	      </form>
-	      <form class="form-signin" role="form" ng-hide="arrayData.length >= 1">
-	        <div class="form-group">
-	          <label>Nome</label>
-	          <input type="text" class="form-control" placeholder="Nome completo" />
-	        </div>
-	        <div class="form-group">
-	          <label>Telefone</label>
-	          <input type="text" class="form-control" placeholder="Telefone" />
-	        </div>
-	        <div class="form-group">
-	          <label>Cidade</label>
-	          <input type="text" class="form-control" placeholder="Cidade" />
-	        </div>
-	        <button type="button" class="btn btn-success">Salvar</button>
-	      </form>
+				<form class="form-signin" role="form">
+					<div class="form-group">
+						<label><i>Código Interno</i></label>
+						<p>
+							<label>{{data.usuario.key}}</label>
+						</p>
+					</div>
+					<div class="form-group">
+						<input type="checkbox" disabled=true ng-model="data.usuario.ativo"
+						ng-true-value="true" ng-false-value="false">	
+						<label>Ativo</label>
+					</div>
+					<div class="form-group">
+						<input type="checkbox" disabled=true ng-model="data.usuario.publico"
+						ng-true-value="true" ng-false-value="false">	
+						<label>Perfil disponível p/ associar fazendas</label>
+
+					</div>
+					<div class="form-group">
+						<label>Nome</label>
+						<input type="text" class="form-control" placeholder="Nome completo" ng-model="data.usuario.nome" />
+					</div>
+					<div class="form-group">
+						<label>Telefone</label>
+						<input type="text" class="form-control" placeholder="Telefone" ng-model="data.usuario.telefone" phone />
+					</div>
+					<div class="form-group">
+						<label>Cidade</label>
+						<input type="text" class="form-control" placeholder="Cidade" ng-model="data.usuario.cidade" />
+					</div>
+					<button type="button" class="btn btn-success" ng-click="salvarPerfil(data.usuario)">Salvar</button>
+				</form>
+				
 			</div>
 			<div class="col-sm-4">
 				<form class="form-signin" role="form">
-	        <div class="form-group">
-	          <label>Email</label>
-	          <input type="email" class="form-control" placeholder="Email" ng-model="data.editEmail.email" ng-disabled="true" />
-	        </div>
-	        <div class="form-group">
-	          <label>Novo Email</label>
-	          <input type="email" class="form-control" placeholder="Novo Email" ng-model="data.editEmail.novoemail" />
-	        </div>
-	        <button type="button" class="btn btn-success" ng-click="openModalSalvarEmail(data.editEmail)">Salvar</button>
-	      </form>
+					<div class="form-group">
+						<label>Email</label>
+						<input type="email" class="form-control" placeholder="Email" ng-model="data.editEmail.email" ng-disabled="true" />
+					</div>
+					<div class="form-group">
+						<label>Novo Email</label>
+						<input type="email" class="form-control" placeholder="Novo Email" ng-model="data.editEmail.novoemail" />
+					</div>
+					<button type="button" class="btn btn-success" ng-click="openModalSalvarEmail(data.editEmail)">Salvar</button>
+				</form>
 			</div>
 			<div class="col-sm-4">
 				<form class="form-signin" role="form">
-	        <div class="form-group">
-	          <label>Nova Senha</label>
-	          <input type="password" class="form-control" placeholder="Nova Senha" ng-model="data.editSenha.novasenha" />
-	        </div>
-	        <button type="button" class="btn btn-success" ng-click="openModalSalvarSenha(data.editSenha)">Salvar</button>
-	      </form>
+					<div class="form-group">
+						<label>Nova Senha</label>
+						<input type="password" class="form-control" placeholder="Nova Senha" ng-model="data.editSenha.novasenha" />
+					</div>
+					<button type="button" class="btn btn-success" ng-click="openModalSalvarSenha(data.editSenha)">Salvar</button>
+				</form>
 			</div>
 		</div>
 	</div>
+	<!-- Modal Start here-->
+	<div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"
+	role="dialog" aria-hidden="true" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">
+					<span class="glyphicon glyphicon-time">
+					</span>&nbsp;&nbsp;Aguarde, carregando...
+				</h4>
+			</div>
+			<div class="modal-body">
+				<div class="progress">
+					<div class="progress-bar progress-bar-info
+					progress-bar-striped active"
+					style="width: 100%">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+<!-- Modal ends Here -->
 </div>

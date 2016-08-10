@@ -1,58 +1,100 @@
 <div ng-controller="quadraCtrl">
 	<div class="container container-view">
 		<div class="row">
-			<div class="col-sm-4">
-				<form class="form-signin" role="form">
-	        <div class="form-group">
-	          <label>Nome</label>
-	          <input type="text" class="form-control" placeholder="Nome" ng-model="data.nome" />
-	        </div>
-	        <div class="form-group">
-	          <label>Ativo</label>
-	           <select class="form-control" ng-model="data.ativo">
-	          	<option value="true">Sim</option>
-	          	<option value="false">Nāo</option>
-	          </select>
-	        </div>
-	        <div class="form-group">
-	          <label>Coordenadas</label>
-	          <select class="form-control" ng-model="data.coordenadas">
-	          	<option value="true">Sim</option>
-	          	<option value="false">Nāo</option>
-	          </select>
-	        </div>
-	        <button type="button" class="btn btn-success" ng-show="!edit" ng-click="salvarQuadra(data)">Salvar</button>
-	        <button type="button" class="btn btn-success" ng-show="edit" ng-click="editarQuadra(data)">Atualizar</button>
-	        <button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar</button>
-	      </form>
+			<div class="col-sm-6 col-sm-no-bottom">
+
+				<label>Fazenda</label>
+				<select class="form-control" ng-disabled=desabilitaFazenda ng-options="fazenda.nome for fazenda in fazendas" ng-model="data.fazenda" ng-change="chengeFazenda(data.fazenda)">
+					<option value="">Selecione</option>
+				</select>
+				
 			</div>
-			<div class="col-sm-8">
-				<table class="table table-condensed table-bordered">
-					<thead>
-						<tr>
-								<th>Nome</th>
-								<th class="text-center" width="100px">Ativo</th>
-								<th class="text-center" width="140px">Coordenadas</th>
-								<th class="text-center" width="80px">Ações</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr ng-repeat="quadra in quadras">
-							<td>{{quadra.nome}}</td>
-							<td class="text-center" width="140px">{{(quadra.ativo == true || quadra.ativo == 'true') ? 'Sim' : 'Nāo'}}</td>
-							<td class="text-center" width="100px">{{(quadra.coordenadas == true || quadra.coordenadas == 'true') ? 'Sim' : 'Nāo'}}</td>
-							<td class="text-center" width="70px">
-								<button type="button" class="btn btn-default btn-xs" ng-click="editar(quadra)">
-									<i class="glyphicon glyphicon-pencil"></i>
-								</button>
-								<button type="button" class="btn btn-danger btn-xs" ng-click="excluir(quadra)">
-									<i class="glyphicon glyphicon-remove"></i>
-								</button>
-							</td>
-						</tr>
-					</tbody>
-				</table>
+		</div>
+		<hr/>
+		<div class="row">
+			<div class="col-sm-6">
+				<form class="form-signin" role="form">
+					<div class="form-group">
+						<label><i>Código Interno</i></label>
+						<p>
+							<label>{{data.key}}</label>
+						</p>
+					</div>
+					<div class="form-group">
+						<label>Código</label>
+						<input type="text" class="form-control" placeholder="Código" ng-model="data.codigo" />
+					</div>
+					<div class="form-group">
+						<label>Nome</label>
+						<input type="text" class="form-control" placeholder="Nome" ng-model="data.nome" />
+					</div>					
+					<div class="form-group">
+						<input type="checkbox" ng-model="data.ativo"
+						ng-true-value="true" ng-false-value="false">	<label>Ativo</label>
+						<input type="checkbox" disabled=true ng-model="data.coordenadas"
+						ng-true-value="true" ng-false-value="false">	<label>Coordenadas</label>
+
+					</select>
+
+					
+				</div>
+				<button type="button" class="btn btn-success" ng-show="!edit" ng-click="salvarQuadra(data)">Salvar</button>
+				<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarQuadra(data)">Atualizar</button>
+				<button type="button"  class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar</button>
+			</form>
+		</div>
+		<div class="col-sm-6">
+			<table class="table table-condensed table-bordered">
+				<thead>
+					<tr>
+						<th>Código</th>
+						<th>Nome</th>
+						<th class="text-center" width="100px">Ativo</th>
+						<th class="text-center" width="140px">Coordenadas</th>
+						<th class="text-center" width="80px">Ações</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="quadra in quadras">
+						<td>{{quadra.codigo}}</td>
+						<td>{{quadra.nome}}</td>
+						<td class="text-center" width="140px">{{(quadra.ativo == true  ? 'Sim' : 'Nāo')}}</td>
+						<td class="text-center" width="100px">{{(quadra.coordenadas == true ? 'Sim' : 'Nāo')}}</td>
+						<td class="text-center" width="70px">
+							<button type="button" class="btn btn-default btn-xs" ng-click="editar(quadra)">
+								<i class="glyphicon glyphicon-pencil"></i>
+							</button>
+							<button type="button" class="btn btn-danger btn-xs" ng-click="excluir(quadra)">
+								<i class="glyphicon glyphicon-remove"></i>
+							</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<!-- Modal Start here-->
+<div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"
+role="dialog" aria-hidden="true" data-backdrop="static">
+<div class="modal-dialog modal-sm">
+	<div class="modal-content">
+		<div class="modal-header">
+			<h4 class="modal-title">
+				<span class="glyphicon glyphicon-time">
+				</span>&nbsp;&nbsp;Aguarde, carregando...
+			</h4>
+		</div>
+		<div class="modal-body">
+			<div class="progress">
+				<div class="progress-bar progress-bar-info
+				progress-bar-striped active"
+				style="width: 100%">
 			</div>
 		</div>
 	</div>
+</div>
+</div>
+</div>
+<!-- Modal ends Here -->
 </div>
