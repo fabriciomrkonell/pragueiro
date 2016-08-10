@@ -8,6 +8,7 @@
 
 	function homeCtrl($scope, Constant, Session, $firebaseArray, $firebaseObject, Notify, $routeParams) {
 
+
 		angular.extend($scope, {
 			teste2 : '',
 			edit: false,
@@ -579,5 +580,10 @@ $(document).on('click', '.panel-heading span.clickable', function(e){
 			return retorno;
 		};
 	}
+
+	console.log('Pragueiro iniciado.');
+
+}
+
 
 }());
