@@ -581,9 +581,6 @@ $(document).on('click', '.panel-heading span.clickable', function(e){
 		};
 	}
 
-	console.log('Pragueiro iniciado.');
-
-}
 
 
 }());
