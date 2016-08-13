@@ -179,7 +179,7 @@
 					[baseRef.child("/usuario/"+key_usuario+"/filial/"), "$key"],
 					baseRef.child("/filial")
 					).select(
-					{"key":"$key.$key","alias":"key"},
+					{"key":"$key.$value","alias":"usuario"},
 					{"key":"filial.$value","alias":"filial"}
 					).ref();
 
@@ -321,10 +321,12 @@
 						//console.log('Adicionou filial', snap.name(), snap.val());
 						
 						var obj2= snap.val();
-						var obj=clone(obj2);
-						var count_usuarios=0;
-						for(var propertyName in obj.vistoria) {
-							count_usuarios++;
+						if($scope.fazenda.mosdes==true || obj2.quadra.ativo==true)
+						{
+							var obj=clone(obj2);
+							var count_usuarios=0;
+							for(var propertyName in obj.vistoria) {
+								count_usuarios++;
 							//console.log('Adicionou filial', obj.vistoria[propertyName]);
 
 							var count_dias=0;
@@ -467,7 +469,10 @@
 									$scope.myNumber=pragas_com_valor.length;
 									obj['pragas_com_valor']=pragas_com_valor;
 									obj['id']= new Date().getTime();
+									obj['id']= new Date().getTime();
+									
 									$scope.vistorias.push(clone(obj));
+
 								}
 							}
 
@@ -479,8 +484,8 @@
 							if(!$scope.$$phase) {
 								$scope.$apply();
 							}
-
-						});
+						}
+					});
 
 refVis.on('child_changed', function(snap) {
 	console.log('Houve uma atualização', snap.name(), snap.val());

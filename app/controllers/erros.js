@@ -4,7 +4,8 @@
 
 	angular.module('Pragueiro.controllers').registerCtrl('erroCtrl', erroCtrl);
 
-	erroCtrl.$inject = ['$scope', '$firebase', '$firebaseObject', '$firebaseArray', 'Constant', 'Session', 'Notify'];
+	erroCtrl.$inject = 
+	['$scope', '$firebase', '$firebaseObject', '$firebaseArray', 'Constant', 'Session', 'Notify'];
 
 	function erroCtrl($scope,  $firebase, $firebaseObject, $firebaseArray, Constant, Session, Notify) {
 
@@ -34,12 +35,12 @@
 			});
 		};
 
-		$scope.myHTML="";
+		
 
 
 		atualizaListaFiliais();
 
-		var refUser = new Firebase(Cosnstant.Url + '/usuarioxauth/'+Session.getUser().uid);		
+		var refUser = new Firebase(Constant.Url + '/usuarioxauth/'+Session.getUser().uid);		
 		var obj = $firebaseObject(refUser);
 		var key_usuario;
 		obj.$loaded().then(function() {

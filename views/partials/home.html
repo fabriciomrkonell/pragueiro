@@ -114,7 +114,7 @@
  								</tr>
  								<tr>
  									<th colspan="2" class="text-right">Data do Levantamento</th>
- 									<th class="text-center active-table" ng-repeat="v in vistorias">{{v.dataExtenso}}</th>
+ 									<th class="text-center active-table" ng-repeat="v in vistorias"><a ng-href="https://pragueiroproducao.firebaseio.com/vistoria/{{fazenda.key}}/{{safra.key}}/{{v.quadra.key}}/{{v.usuario.key}}">{{v.dataExtenso}} </a></th>
  								</tr>
  								<tr>
  									<th colspan="2" class="text-right" style="vertical-align:middle;" >Estágio</th>

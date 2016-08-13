@@ -34,10 +34,10 @@
 						<input type="checkbox" disabled=true ng-model="data.coordenadas"
 						ng-true-value="true" ng-false-value="false">	<label>Coordenadas</label>
 
-					</select>
+					</div>
 
 					
-				</div>
+				</form>
 				<button type="button" class="btn btn-success" ng-show="!edit" ng-click="salvarQuadra(data)">Salvar</button>
 				<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarQuadra(data)">Atualizar</button>
 				<button type="button"  class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar</button>

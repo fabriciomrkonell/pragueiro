@@ -33,6 +33,15 @@
 						<label>Email</label>
 						<input type="email" class="form-control" placeholder="Email" ng-model="data.email" />
 					</div>
+					<div class="form-group">
+						<label>Distância entre pontos (em metros)</label>
+						<input type="number" class="form-control" placeholder="10" ng-model="data.distancia_pontos" />
+					</div>
+					<div class="form-group">
+						<input type="checkbox" ng-model="data.mosdes"
+						ng-true-value="true" ng-false-value="false">	<label>Mostrar quadras/regiões desativadas</label>
+
+					</div>
 					<button type="button" class="btn btn-success" ng-show="false" ng-click="salvarFazenda(data)">Salvar</button>
 					<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarFazenda(data)">Atualizar</button>
 					<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar</button>
