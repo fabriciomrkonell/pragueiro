@@ -17,7 +17,7 @@ app.get('/', function(req, res, next) {
 });
 
 app.get('/app', function(req, res, next) {
-	res.sendfile(__dirname + '/views/index.html');
+	res.sendfile(__dirname + '/views/app.html');
 });
 
 app.get('/table', function(req, res, next) {

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="shortcut icon" href="/dist/images/favicon.ico">
+	<link rel="mask-icon" href="/dist/images/favicon.ico" color="black">
+	<title>Pragueiro - 0.5</title>
+	<link rel="stylesheet" type="text/css" href="/app/libraries/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="/app/dist/css/index.css">
+
+	<style type="text/css">
+		[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+			display: none !important;
+		}
+	</style>
+</head>
+<body>
+
+	<nav class="navbar navbar-default navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand">Pragueiro</a>
+			</div>
+			<div id="navbar" class="navbar-collapse collapse">
+				<ul class="nav navbar-nav">
+					<li><a href="#/home">Início</a></li>
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Cadastro <span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="#/fazenda">Fazenda</a></li>
+							<li><a href="#/safra">Safra</a></li>
+							<li><a href="#/quadra">Quadra</a></li>
+						</ul>
+					</li>
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Lançamentos <span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="#/home">Aplicação</a></li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="nav navbar-nav navbar-right">
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Configurações <span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="#/perfil">Meu perfil</a></li>
+							<li><a href="javascript:void(0)" ng-click="logout()">Sair</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<ng-view></ng-view>
+	<script src="/app/libraries/angularjs/js/angular.min.js"></script>
+	<script src="/app/libraries/jquery/js/jquery.min.js"></script>
+	<script src="https://cdn.firebase.com/js/client/2.2.4/firebase.js"></script>
+	<script src="https://cdn.firebase.com/libs/angularfire/1.1.3/angularfire.min.js"></script>
+	<script src="https://cdn.firebase.com/libs/firebase-util/0.2.5/firebase-util.min.js"></script>
+	<script src="https://cdn.firebase.com/libs/firebase-util/0.2.5/firebase-util.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-sanitize/1.5.8/angular-sanitize.min.js"></script>
+	<script src="/app/libraries/notify/js/bootstrap-notify.min.js"></script>
+	<script src="/app/libraries/angularjs/js/angular-route.min.js"></script>
+	<script src="/app/libraries/bootstrap/js/bootstrap.min.js"></script>
+	<script src="/app/libraries/mask/js/jquery-mask.min.js"></script>
+	<script src="/app/app.js"></script>
+	<script src="/app/others/script.js"></script>
+	<script src="/app/others/config.js"></script>
+	<script src="/app/others/util.js"></script>
+	<script src="/app/others/service.js"></script>
+	<script src="/app/others/directive.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-google-chart/0.1.0/ng-google-chart.min.js" type="text/javascript"></script>
+</body>
+</html>
