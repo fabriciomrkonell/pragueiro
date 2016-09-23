@@ -18,9 +18,18 @@ app.get('/arquivos', function(req, res, next) {
 	  if (err) {
 	  	res.send(err);
 	  }else{
-	  	res.send(data);
+	  	var html = '<ul>';
+	  	data.forEach(function(item){
+	  		html = html + '<li><a href="' + item + '">' + item + '</a></li>'
+	  	});
+	  	var html = html + '</ul>'
+	  	res.send(html);
 	  }
 	});
+});
+
+app.get('/arquivos/:file', function(req, res, next) {
+	res.sendfile(__dirname + '/arquivos/' + req.param('file'));
 });
 
 app.get('/', function(req, res, next) {
