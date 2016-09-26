@@ -4,7 +4,8 @@
 
 	angular.module('Pragueiro.controllers').registerCtrl('fazendaCtrl', fazendaCtrl);
 
-	fazendaCtrl.$inject = ['$scope', '$firebase', '$firebaseObject', '$firebaseArray', 'Constant', 'Session', 'Notify'];
+	fazendaCtrl.$inject = 
+	['$scope', '$firebase', '$firebaseObject', '$firebaseArray', 'Constant', 'Session', 'Notify'];
 
 	function fazendaCtrl($scope,  $firebase, $firebaseObject, $firebaseArray, Constant, Session, Notify) {
 
