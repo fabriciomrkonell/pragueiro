@@ -1,16 +1,16 @@
 body {
-  padding-top: 30px;
+	padding-top: 30px;
 }
 
 .label-login{
-  text-align: center;
-  margin-bottom: 20px;
+	text-align: center;
+	margin-bottom: 20px;
 }
 
 .form-signin {
-  max-width: 330px;
-  padding: 15px;
-  margin: -25px auto 0 auto;
+	max-width: 330px;
+	padding: 15px;
+	margin: -25px auto 0 auto;
 }
 
 .logo-singup{
@@ -19,4 +19,8 @@ body {
 
 .btn-create-user{
 	margin-top: 8px;
+}
+
+.logo-actionbar_title{
+	height: 25px;
 }
