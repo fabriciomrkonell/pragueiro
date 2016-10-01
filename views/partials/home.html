@@ -136,11 +136,11 @@
 
  								<tr>
  									<th  colspan="2"  class="text-right">Tecnologia</th>
- 									<th class="text-center" ng-repeat="v in vistorias"> &nbsp;</th>
+ 									<th class="text-center" ng-repeat="v in vistorias"> {{v.variedade.nome_tecnologia}}</th>
  								</tr>
  								<tr>
  									<th colspan="2" class="text-right">Variedade</th>
- 									<th class="text-center" ng-repeat="v in vistorias"> &nbsp;</th>
+ 									<th class="text-center" ng-repeat="v in vistorias"> {{v.variedade.nome}}</th>
  								</tr>
  								<tr>
  									<th colspan="2" class="text-right">Data da última aplicação</th>

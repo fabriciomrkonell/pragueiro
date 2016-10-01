@@ -15,6 +15,7 @@
 			quadras: [],
 			culturas:[],
 			vistorias:[],
+			variedades:[],
 			usuarios:[],
 			pragas:[]
 		});
@@ -77,6 +78,14 @@
 		var refCultura = new Firebase(Constant.Url + '/cultura');
 		refCultura.ref().on('child_added', function(snap) {
 			$scope.culturas.push(snap.val());
+		});
+	}
+
+	function atualizaVariedade(key_filial)
+	{
+		var refCultura = new Firebase(Constant.Url + '/variedade/'+ key_filial);
+		refCultura.ref().on('child_added', function(snap) {
+			$scope.variedades.push(snap.val());
 		});
 	}
 
@@ -245,6 +254,7 @@
 
 		function atualizaListaQuadras()
 		{
+			atualizaVariedade($scope.fazenda.key);
 			$('#myPleaseWait').modal('show');
 			var refUser = new Firebase(Constant.Url + '/usuarioxauth/'+Session.getUser().uid);		
 			var obj = $firebaseObject(refUser);
@@ -265,13 +275,14 @@
 					refNovo.on('child_added', function(snap) {
 						$('#myPleaseWait').modal('hide');
 						//console.log('Adicionou filial', snap.name(), snap.val());
-						if($scope.quadras.length==0)
-						{
-							atualizaVistorias();
-						}
+
 						var obj= snap.val();
 						obj.cultura=$scope.getCulturaNome(obj.quadraxcultura.key_cultura)
 						$scope.quadras.push(obj);
+						if($scope.quadras.length==1)
+						{
+							atualizaVistorias();
+						}
 
 					});
 
@@ -317,40 +328,87 @@
 				{"key":"$key.$value","alias":"vistoria"},
 				{"key":"quadra.$value","alias":"quadra"}
 				).ref();
-				refVis.ref().on('child_added', function(snap) {
-						//console.log('Adicionou filial', snap.name(), snap.val());
-						
-						var obj2= snap.val();
-						if($scope.fazenda.mosdes==true || obj2.quadra.ativo==true)
+				refVis.ref().on('child_added', function(snap) 
+				{
+					var obj2= snap.val();
+					var mListVariedades=[];
+					for(var itemQuadraXsafra in $scope.quadras )
+					{
+						if($scope.quadras[itemQuadraXsafra].quadraxcultura.key==obj2.quadra.key)
 						{
-							var obj=clone(obj2);
-							var count_usuarios=0;
-							for(var propertyName in obj.vistoria) {
-								count_usuarios++;
-							//console.log('Adicionou filial', obj.vistoria[propertyName]);
+							obj2.quadra.ativo=$scope.quadras[itemQuadraXsafra].quadraxcultura.ativo;
+							obj2.quadra['key_cultura']=$scope.quadras[itemQuadraXsafra].quadraxcultura.key_cultura;
+							if($scope.quadras[itemQuadraXsafra].quadraxcultura.hasOwnProperty("separar_variedade")){
+
+								if($scope.quadras[itemQuadraXsafra].quadraxcultura.separar_variedade==true)
+								{
+									for(var var_quadraxsafra in $scope.quadras[itemQuadraXsafra].quadraxcultura.variedades ){
+										console.log("teste");
+										mListVariedades.push(var_quadraxsafra);
+									}
+								}
+							}
+							break;
+						}
+					}
+
+					if($scope.fazenda.mosdes==true || obj2.quadra.ativo==true)
+					{
+						if(mListVariedades.length>0)
+						{
+
+							for(var keyVar in mListVariedades) 
+							{
+
+								var obj=clone(obj2);
+								for(var obj_variedades_cultura in $scope.variedades) 
+								{
+									var obj_varCul=$scope.variedades[obj_variedades_cultura];
+									for(var obj_variedades in obj_varCul) 
+									{
+										{
+											if(obj_varCul[obj_variedades].key == mListVariedades[keyVar])
+											{ 
+												obj.quadra.nome=obj.quadra.nome + ' - ' + obj_varCul[obj_variedades].nome;
+												obj['variedade']=obj_varCul[obj_variedades];
+												break;
+											}
+										};
+									}
+									break;
+								}
+
+								var count_usuarios=0;
+
+						//--------USUARIO-----------------------------------
+						var objeto_vistoria=obj.vistoria[mListVariedades[keyVar]];
+						for(var propertyName in objeto_vistoria) 
+						{
+							count_usuarios++;
 
 							var count_dias=0;
 							var vistoria_dias=[];
 							//-----------DIA---------------------------------------------------------
-							for(var propertyName_Dia in obj.vistoria[propertyName]) {
+							for(var propertyName_Dia in objeto_vistoria[propertyName]) 
+							{
 								count_dias++;
 
 								var vistoria_dia_praga=[];
 								var count_ponto=0;
 								var key_estagio;
 								//-----------PONTO---------------------------------------------------------
-								for(var propertyName_ponto in obj.vistoria[propertyName][propertyName_Dia]) {
+								for(var propertyName_ponto in objeto_vistoria[propertyName][propertyName_Dia]) 
+								{
 									count_ponto++;
 
 									var count_praga=0;
 
-
-									for(var propertyName_vis in obj.vistoria[propertyName][propertyName_Dia][propertyName_ponto]) {
+									for(var propertyName_vis in objeto_vistoria[propertyName][propertyName_Dia][propertyName_ponto]) 
+									{
 										count_praga++;
 
-										vistoria_dia_praga.push(obj.vistoria[propertyName][propertyName_Dia][propertyName_ponto][propertyName_vis]);
+										vistoria_dia_praga.push(objeto_vistoria[propertyName][propertyName_Dia][propertyName_ponto][propertyName_vis]);
 									}
-
 
 									obj.qtde_praga=count_praga;
 								}
@@ -365,7 +423,8 @@
 									var dataMilis=0;
 									var qtde_planta=0;
 									//-----------PERCORRE DIA---------------------------------------------------------
-									for(var vis_det in vistoria_dia_praga ){
+									for(var vis_det in vistoria_dia_praga )
+									{
 										dataExtenso=vistoria_dia_praga[vis_det].dataString;
 										dataMilis=vistoria_dia_praga[vis_det].data;
 										metodo=vistoria_dia_praga[vis_det].tipo == 'PLA' ? 'Planta' : '%';
@@ -395,7 +454,7 @@
 
 									}
 									//FIM PERCORRE DIA---------------------------------------------------------
-									var objetoFinalDia = {ista:lista_agrupada};
+									//var objetoFinalDia = {ista:lista_agrupada};
 									obj['dataExtenso']=dataExtenso;
 									obj['dataMilis']=dataMilis;
 									obj['metodo']=metodo;
@@ -403,17 +462,16 @@
 									obj['qtde_planta']=qtde_planta;
 									obj['lista_pragas_encontradas']=lista_agrupada;
 
-
-
-
-									$scope.usuarios.forEach(function(objInterno){
+									$scope.usuarios.forEach(function(objInterno)
+									{
 										if(objInterno.key === propertyName)
 										{ 
 											obj['usuario']=objInterno;
 										}
 									});
 
-									$scope.quadras.forEach(function(objInterno){
+									$scope.quadras.forEach(function(objInterno)
+									{
 										if(objInterno.quadraxcultura.key === obj.quadra.key)
 										{ 
 											obj['quadraxcultura']=objInterno.quadraxcultura;
@@ -434,7 +492,8 @@
 
 									obj.qtde_dia=count_dias;
 									var pragas_com_valor=[];
-									$scope.pragas2.forEach(function(objPraga){
+									$scope.pragas2.forEach(function(objPraga)
+									{
 										var pragaAtualizada=clone(objPraga);
 										var count_tamanho=0;
 										for(var objInterno_tamanho in pragaAtualizada.tamanho ){
@@ -463,9 +522,173 @@
 												pragas_com_valor.push(newObjeto);
 											}
 										};
-									//pragaAtualizada['qtde_tamanhos']=count_tamanho;
-									//pragas_com_valor.push(pragaAtualizada);
-								});
+									});
+									$scope.myNumber=pragas_com_valor.length;
+									obj['pragas_com_valor']=pragas_com_valor;
+									obj['id']= new Date().getTime();
+									obj['id']= new Date().getTime();
+
+									$scope.vistorias.push(clone(obj));
+
+								}
+							//FIM-----------DIA---------------------------------------------------------
+							$scope.vistorias.sort(compareData);
+							$scope.table_pronta=true;
+							if(!$scope.$$phase) 
+							{
+								$scope.$apply();
+							}
+						}
+						//-----FIM USUARIO-----------------------------------
+					}
+				}
+					else //############################################################################################
+					{
+						var obj=clone(obj2);
+						var count_usuarios=0;
+
+						//--------USUARIO-----------------------------------
+						for(var propertyName in obj.vistoria) 
+						{
+							count_usuarios++;
+
+							var count_dias=0;
+							var vistoria_dias=[];
+							//-----------DIA---------------------------------------------------------
+							for(var propertyName_Dia in obj.vistoria[propertyName]) 
+							{
+								count_dias++;
+
+								var vistoria_dia_praga=[];
+								var count_ponto=0;
+								var key_estagio;
+								//-----------PONTO---------------------------------------------------------
+								for(var propertyName_ponto in obj.vistoria[propertyName][propertyName_Dia]) 
+								{
+									count_ponto++;
+
+									var count_praga=0;
+
+									for(var propertyName_vis in obj.vistoria[propertyName][propertyName_Dia][propertyName_ponto]) 
+									{
+										count_praga++;
+
+										vistoria_dia_praga.push(obj.vistoria[propertyName][propertyName_Dia][propertyName_ponto][propertyName_vis]);
+									}
+
+									obj.qtde_praga=count_praga;
+								}
+								obj.qtde_ponto=count_ponto;
+									//FIM-----------PONTO---------------------------------------------------------
+									vistoria_dia_praga.sort(compare);
+									var key_praga_old="";
+									var key_tamanho_old="";
+									var lista_agrupada=[];
+									var dataExtenso="";
+									var metodo="";									
+									var dataMilis=0;
+									var qtde_planta=0;
+									//-----------PERCORRE DIA---------------------------------------------------------
+									for(var vis_det in vistoria_dia_praga )
+									{
+										dataExtenso=vistoria_dia_praga[vis_det].dataString;
+										dataMilis=vistoria_dia_praga[vis_det].data;
+										metodo=vistoria_dia_praga[vis_det].tipo == 'PLA' ? 'Planta' : '%';
+										qtde_planta=vistoria_dia_praga[vis_det].quapla ;
+										key_estagio=vistoria_dia_praga[vis_det].key_estagio;
+										if(key_praga_old==vistoria_dia_praga[vis_det].key_praga)
+										{
+											if(key_tamanho_old==vistoria_dia_praga[vis_det].key_tamanho)
+											{
+												lista_agrupada[lista_agrupada.length-1].valor=lista_agrupada[lista_agrupada.length-1].valor+vistoria_dia_praga[vis_det].valor;
+												lista_agrupada[lista_agrupada.length-1]['qtde_ponto']=count_ponto;
+											}
+											else
+											{
+												vistoria_dia_praga[vis_det]['qtde_ponto']=count_ponto;
+												lista_agrupada.push(vistoria_dia_praga[vis_det]);
+											}
+
+										}
+										else
+										{
+											vistoria_dia_praga[vis_det]['qtde_ponto']=count_ponto;
+											lista_agrupada.push(vistoria_dia_praga[vis_det]);
+										}
+										key_praga_old=vistoria_dia_praga[vis_det].key_praga;
+										key_tamanho_old=vistoria_dia_praga[vis_det].key_tamanho;
+
+									}
+									//FIM PERCORRE DIA---------------------------------------------------------
+									//var objetoFinalDia = {ista:lista_agrupada};
+									obj['dataExtenso']=dataExtenso;
+									obj['dataMilis']=dataMilis;
+									obj['metodo']=metodo;
+									obj['metodo']=metodo;
+									obj['qtde_planta']=qtde_planta;
+									obj['lista_pragas_encontradas']=lista_agrupada;
+
+									$scope.usuarios.forEach(function(objInterno)
+									{
+										if(objInterno.key === propertyName)
+										{ 
+											obj['usuario']=objInterno;
+										}
+									});
+
+									$scope.quadras.forEach(function(objInterno)
+									{
+										if(objInterno.quadraxcultura.key === obj.quadra.key)
+										{ 
+											obj['quadraxcultura']=objInterno.quadraxcultura;
+											$scope.culturas.forEach(function(objInterno2){
+												if(objInterno2.key+'' === objInterno.quadraxcultura.key_cultura)
+												{ 
+													obj['cultura']=objInterno2;
+
+													for(var objInterno_est in objInterno2.estagios ){
+														if(objInterno_est==key_estagio)
+															obj['estagio']=objInterno2.estagios[objInterno_est];
+													}
+												}
+											});
+										}
+									});
+
+
+									obj.qtde_dia=count_dias;
+									var pragas_com_valor=[];
+									$scope.pragas2.forEach(function(objPraga)
+									{
+										var pragaAtualizada=clone(objPraga);
+										var count_tamanho=0;
+										for(var objInterno_tamanho in pragaAtualizada.tamanho ){
+											count_tamanho++;
+											var encontrou=false;
+											lista_agrupada.forEach(function(objInterno_lista){
+												if(objInterno_lista.key_praga==pragaAtualizada.key && (objInterno_lista.key_tamanho=='' ? 'a' : objInterno_lista.key_tamanho)==pragaAtualizada.tamanho[objInterno_tamanho].key)
+												{
+													encontrou=true;
+													var valor_final;
+													if(objInterno_lista.tipo=='PLA')
+													{
+														valor_final=(objInterno_lista.valor*100) / (objInterno_lista.quapla * objInterno_lista.qtde_ponto);
+													}
+													else
+													{
+														valor_final=objInterno_lista.valor/ objInterno_lista.qtde_ponto;
+													}
+													var newObjeto={valor:valor_final.toFixed(3), tamanho:pragaAtualizada.tamanho[objInterno_tamanho], praga: pragaAtualizada}
+													pragas_com_valor.push(newObjeto);
+												}
+											});
+											if(!encontrou)
+											{
+												var newObjeto={valor:0, tamanho:pragaAtualizada.tamanho[objInterno_tamanho], praga: pragaAtualizada}
+												pragas_com_valor.push(newObjeto);
+											}
+										};
+									});
 									$scope.myNumber=pragas_com_valor.length;
 									obj['pragas_com_valor']=pragas_com_valor;
 									obj['id']= new Date().getTime();
@@ -473,11 +696,8 @@
 									
 									$scope.vistorias.push(clone(obj));
 
+
 								}
-							}
-
-
-							
 							//FIM-----------DIA---------------------------------------------------------
 							$scope.vistorias.sort(compareData);
 							$scope.table_pronta=true;
@@ -485,7 +705,16 @@
 								$scope.$apply();
 							}
 						}
-					});
+						//-----FIM USUARIO-----------------------------------
+					}
+
+
+
+				}
+
+
+
+			});
 
 refVis.on('child_changed', function(snap) {
 	console.log('Houve uma atualização', snap.name(), snap.val());
