@@ -1,0 +1,101 @@
+<div ng-controller="variedadeCtrl">
+	<div class="container container-view">
+		<div class="row">
+			<div class="col-sm-6 col-sm-no-bottom">
+
+				<label>Fazenda</label>
+				<select class="form-control" ng-disabled=desabilitaFazenda ng-options="fazenda.nome for fazenda in fazendas" ng-model="data.fazenda" ng-change="chengeFazenda(data.fazenda)">
+					<option value="">Selecione</option>
+				</select>
+				
+			</div>
+		</div>
+		<hr/>
+		<div class="row">
+			<div class="col-sm-6">
+				<form class="form-signin" role="form">
+					<div class="form-group">
+						<label><i>Código Interno</i></label>
+						<p>
+							<label>{{data.key}}</label>
+						</p>
+					</div>
+					<div class="form-group">
+						<label>Cultura</label>
+						<select class="form-control"  ng-disabled=desabilitaFazenda  ng-model="data.key_cultura">
+							<option value="{{cultura.key}}" ng-repeat="cultura in culturas">{{cultura.nome}}</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label>Nome</label>
+						<input type="text" class="form-control" placeholder="Nome" ng-model="data.nome" />
+					</div>	
+					<div class="form-group">
+						<label>Tecnologia</label>
+
+						<div class="radio">
+							<label><input type="radio" ng-model="data.key_tecnologia" value="-KQkw5zcA_s8e1GizcjZ" name="optradio">Convencional</label>
+							<label><input type="radio" ng-model="data.key_tecnologia" value="-KQl825pGvZvnhE23Ted" name="optradio">Transgênico</label>
+						</div>
+					</div>						
+					
+					
+				</form>
+				<button type="button" class="btn btn-success" ng-show="!edit" ng-click="salvarVariedade(data)">Salvar</button>
+				<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarVariedade(data)">Atualizar</button>
+				<button type="button"  class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar</button>
+			</form>
+		</div>
+		<div class="col-sm-6">
+			<table class="table table-condensed table-bordered">
+				<thead>
+					<tr>
+						<th>Cultura</th>
+						<th>Nome</th>
+						<th>Tecnologia</th>
+						<th class="text-center" width="80px">Ações</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="variedade in variedades">
+						<td>{{variedade.cultura.nome}}</td>
+						<td>{{variedade.nome}}</td>
+						<td>{{variedade.nome_tecnologia}}</td>
+						<td class="text-center" width="70px">
+							<button type="button" class="btn btn-default btn-xs" ng-click="editar(variedade)">
+								<i class="glyphicon glyphicon-pencil"></i>
+							</button>
+							<button type="button" class="btn btn-danger btn-xs" ng-click="excluir(variedade)">
+								<i class="glyphicon glyphicon-remove"></i>
+							</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<!-- Modal Start here-->
+<div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"
+role="dialog" aria-hidden="true" data-backdrop="static">
+<div class="modal-dialog modal-sm">
+	<div class="modal-content">
+		<div class="modal-header">
+			<h4 class="modal-title">
+				<span class="glyphicon glyphicon-time">
+				</span>&nbsp;&nbsp;Aguarde, carregando...
+			</h4>
+		</div>
+		<div class="modal-body">
+			<div class="progress">
+				<div class="progress-bar progress-bar-info
+				progress-bar-striped active"
+				style="width: 100%">
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+</div>
+<!-- Modal ends Here -->
+</div>

@@ -58,6 +58,11 @@
         resolve: {
           deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/perfil.js'])
         }
+      }).when('/variedade', {
+        templateUrl: '/views/partials/variedade.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/variedade.js'])
+        }
       }).when('/usuarios', {
         templateUrl: '/views/partials/user.html',
         resolve: {
