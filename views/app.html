@@ -14,6 +14,11 @@
 		[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
 			display: none !important;
 		}
+
+		.variedade_css{
+			padding-right: 5px; 
+			padding-left: 0px; 
+		}
 	</style>
 </head>
 <body>
@@ -27,7 +32,7 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand">Pragueiro</a>
+				<a class="navbar-brand"><img src="views/img/actionbar_title.png" class="logo-actionbar_title"</a>
 			</div>
 			<div id="navbar" class="navbar-collapse collapse">
 				<ul class="nav navbar-nav">
@@ -36,9 +41,10 @@
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Cadastro <span class="caret"></span></a>
 						<ul class="dropdown-menu">
 							<li><a href="#/fazenda">Fazenda</a></li>
-							<li><a href="#/safra">Safra</a></li>
 							<li><a href="#/quadra">Quadra</a></li>
 							<li><a href="#/variedade">Variedade</a></li>
+							<li><a href="#/safra">Safra</a></li>		
+							<!--<li><a href="#/safra">Planejamento Safra</a></li>-->							
 						</ul>
 					</li>
 					<li class="dropdown">

@@ -9,20 +9,30 @@
 	function safraCtrl($scope, Constant, Session, $firebaseArray, $firebaseObject, Notify) {
 
 		angular.extend($scope, {
-			objModal: {},
-			objModalQuadra: {},
-			objModalHistorico: {},
+			objSafra: {},
+			formPlanejamento: {
+				ativo:true,
+				key:'',
+				key_cultura:'',
+				data_plantio: undefined,
+				variedades:[]
+			},
+			objHistorico: {},
 			edit: false,
 			editQuadra: false,
+			editCultura: true,
 			fazendas: [],
 			safras: [],
 			historico: [],
 			culturas: [],
-			quadras: [],
-			quadra: [],
+			key_var:[],
+			variedades: [],
+			variedadesAdd: [],
+			todasQuadras: [],
+			quadrasPlanejamento: [],
 			data: {
 			},
-			form: {
+			formSafra: {
 				descricao: '',
 				ativo: 'true',
 				key: '',
@@ -30,7 +40,7 @@
 				data_plantio : ''
 			}
 		});
-		$scope.form.data_plantio = new Date();
+		$scope.formSafra.data_plantio = new Date();
 		var ref = new Firebase(Constant.Url + '/filial'),
 		refCultura = new Firebase(Constant.Url + '/cultura'),
 		refQuadra = new Firebase(Constant.Url + '/quadra'),
@@ -46,7 +56,13 @@
 		var todasQuadras = $firebaseArray(refQuadra);
 		
 
-
+		function atualizaVariedade(key_filial)
+		{
+			var refVariedades = new Firebase(Constant.Url + '/variedade/'+ key_filial);
+			refVariedades.ref().on('child_added', function(snap) {
+				$scope.variedades.push(snap.val());
+			});
+		}
 
 		//############################################################################################################################
 		//############################################################################################################################
@@ -112,16 +128,17 @@
 		$scope.chengeFazenda = function(fazenda){
 			if(fazenda === null) return false;
 			refSafra = new Firebase(Constant.Url + '/filial/' + fazenda.key + '/safra');
+			atualizaVariedade(fazenda.key);
 			$scope.safras = $firebaseArray(refSafra);
-			$scope.quadras=[];
-			$scope.quadras.push({nome:'', key:null});
+			$scope.todasQuadras=[];
+			$scope.todasQuadras.push({nome:'', key:null});
 			var filialxquadras = $firebaseArray(new Firebase(Constant.Url + '/filial/'+fazenda.key+'/quadra'));
 			filialxquadras.$loaded(function() {
 				filialxquadras.forEach(function(filxqua){
 					todasQuadras.forEach(function(item){
 						if(item.$id === filxqua.$id)
-						{ 
-							$scope.quadras.push(item);
+						{ 							
+							$scope.todasQuadras.push(item);
 						}
 					});
 				});
@@ -146,30 +163,30 @@
 		// SAFRA
 		//############################################################################################################################
 
-		$scope.salvarSafra = function(fazenda, form){
+		$scope.salvarSafra = function(fazenda, formSafra){
 			
-			if(validFormSafra(form)) return true;
-			$scope.safras.$add(form).then(function(ref) {
-				form.key = ref.key();
+			if(validFormSafra(formSafra)) return true;
+			$scope.safras.$add(formSafra).then(function(ref) {
+				formSafra.key = ref.key();
 				
 				var fazendaTmp=fazenda;
-				var refNovo = new Firebase(Constant.Url + '/filial/' + fazenda.key + '/safra/'+form.key);
-				refNovo.set(form);
+				var refNovo = new Firebase(Constant.Url + '/filial/' + fazenda.key + '/safra/'+formSafra.key);
+				refNovo.set(formSafra);
 				Notify.successBottom('Safra salva com sucesso!');
-				$scope.clear();
+				$scope.clearFormSafra();
 				$scope.setaFazenda(fazendaTmp);		
 			});
 		};
 
-		$scope.atualizarSafra = function(form){
-			if(validFormSafra(form)) return true;
-			$scope.safras.$save(form);
+		$scope.atualizarSafra = function(formSafra){
+			if(validFormSafra(formSafra)) return true;
+			$scope.safras.$save(formSafra);
 			Notify.successBottom('Safra atualizada com sucesso!');
-			$scope.clear();
+			$scope.clearFormSafra();
 		};
 
-		$scope.editarSafra = function(data){
-			$scope.form = data;
+		$scope.ChamarEditarSafra = function(data){
+			$scope.formSafra = data;
 			$scope.edit = true;
 		};
 
@@ -185,71 +202,202 @@
 		// FAZENDA X SAFRA X QUADRA X CULTURA
 		//############################################################################################################################
 
-		$scope.getQuadras = function(fazenda, data){
-			if(data === null) return false;
-			//if($scope.quadras.length === 0) return false;
+		$scope.showQuadras = function(fazenda, safra){
+			if(safra === null) return false;
+			$scope.objSafra=safra;
 			if($scope.culturas.length === 0) return false;
-			if($scope.quadras.length > 0) $scope.clearQuadrasCulturas(fazenda.key, data.$id);			
-			$scope.objModal = data;
-			refHistoricoQuadrasCulturas = new Firebase(Constant.Url + '/filial/' + fazenda.key + '/safra/' + data.$id +'/historicorelacionamento');
+			if($scope.todasQuadras.length > 0) 
+			{
+				$scope.clearFormSafraQuadrasCulturas(fazenda, safra);
+			}	
+			refHistoricoQuadrasCulturas = new Firebase(Constant.Url + '/filial/' + fazenda.key + '/safra/' + safra.$id +'/historicorelacionamento');
 			$scope.historico = $firebaseArray(refHistoricoQuadrasCulturas);
 			$('#modalQuadras').modal('show');
 		};
 
 
-		$scope.salvarQuadrasCulturas = function(fazenda, safra, form){
-			if(validFormQuadraXCultura(form)) return true;
-			var refNovo = new Firebase(Constant.Url + '/filial/' + fazenda.key + '/safra/'+safra+'/quadra/'+form.key);
-			delete form.cultura;
-			delete form.quadra;
-			form.data_plantio=form.data_plantio.getTime();
-			refNovo.set(form);
+		$scope.salvarPlanejamento = function(fazenda, safra, formPlanejamento){
+			if(validFormQuadraXCultura(formPlanejamento)) return true;
+
+			if(isNaN(formPlanejamento.data_plantio) || formPlanejamento.data_plantio==null) 
+			{
+				delete formPlanejamento.data_plantio;
+			}
+			else
+			{		
+				formPlanejamento.data_plantio=new Date(formPlanejamento.data_plantio).getTime();
+			}
+
+			var refNovo = new Firebase(Constant.Url + '/filial/' + fazenda.key + '/safra/'+safra.key+'/quadra/'+formPlanejamento.key);
+			delete formPlanejamento.cultura;
+			delete formPlanejamento.quadra;
+
+			refNovo.set(formPlanejamento);
 
 			Notify.successBottom('Relacionamento salvo com sucesso!');
 			_salvarQuadra = true;
-			//$scope.clearQuadrasCulturas(fazenda.key, safra);
-			$scope.objModalQuadra.key=null;
-			$scope.objModalQuadra.key_cultura=null;
+			$scope.formPlanejamento.key=null;
+			$scope.formPlanejamento.key_cultura=null;
 			$scope.setaFazenda($scope.data.fazenda);	
 		};
 
-		$scope.editarQuadrasCulturas = function(data){
+		$scope.ChamarEditarPlanejamento = function(quadracultura)
+		{
+			$scope.editCultura=true;
+			var data=clone(quadracultura);
+			if(data.variedades!=null)
+			{
+				$scope.editCultura=false;
+				var listVariedades=[];
+				for(var objVar in data.variedades)
+				{
+					for (var i = 0; i < $scope.variedades.length; i++)
+					{
+						for(var obj in $scope.variedades[i])
+						{							
+							if($scope.variedades[i][obj].key==objVar)
+							{
+								listVariedades.push($scope.variedades[i][obj]);
+								break;
+							}							
+						}
+					}
+				}
+				data['variedades']=listVariedades;
+			}
 
-			$scope.objModalQuadra = data;
-			$scope.objModalQuadra.data_plantio = new Date(data.data_plantio);
+			$scope.formPlanejamento = data;
+			$scope.formPlanejamento.data_plantio = new Date(data.data_plantio);
 			$scope.editQuadra = true;
+			$scope.chengeCultura($scope.formPlanejamento.key_cultura);
+
+			return true;
 		};
 
-		$scope.atualizarQuadrasCulturas = function(fazenda, safra, form){
-			if(validFormQuadraXCultura(form)) return true;
-			form.data_plantio=form.data_plantio.getTime();
-			$scope.quadra.$save(form);
-			$scope.addHistorico(form.key, form.key_cultura, 'Atualizou');
+		$scope.atualizarPlanejamento = function(fazenda, safra, formPlanejamento){
+			if(validFormQuadraXCultura(formPlanejamento)) return true;
+
+			if(isNaN(formPlanejamento.data_plantio) || formPlanejamento.data_plantio==null) 
+			{
+				delete formPlanejamento.data_plantio;
+			}
+			else
+			{		
+				formPlanejamento.data_plantio=new Date(formPlanejamento.data_plantio).getTime();
+			}
+			
+			console.log(Constant.Url + '/filial/' + fazenda.key + '/safra/'+safra.key+'/quadra/'+formPlanejamento.key);
+			var refNovo = new Firebase(Constant.Url + '/filial/' + fazenda.key + '/safra/'+safra.key+'/quadra/'+formPlanejamento.key);
+
+			delete formPlanejamento.key_variedade;
+			delete formPlanejamento.cultura;
+			delete formPlanejamento.quadra;
+			delete formPlanejamento.$$hashKey;
+			delete formPlanejamento.$id;
+			delete formPlanejamento.$priority;
+			delete formPlanejamento.variedades;
+
+			refNovo.update(formPlanejamento);
+			//$scope.quadrasPlanejamento.$save(formPlanejamento);
+			$scope.addHistorico(formPlanejamento.key, formPlanejamento.key_cultura, 'Atualizou');
 			Notify.successBottom('Relacionamento atualziado com sucesso!');
-			$scope.clearQuadrasCulturas(fazenda.key, safra);
-			$scope.objModalQuadra.key=null;
-			$scope.objModalQuadra.key_cultura=null;
+			$scope.clearFormSafraQuadrasCulturas(fazenda, safra);
+			$scope.clearFormPlanejamento();
 			$scope.setaFazenda(fazenda);		
 		};
 
-		$scope.excluirQuadrasCulturas = function(data){
+		$scope.excluirPlanejamento = function(data){
 			var fazendaTmp=$scope.data.fazenda;
-			$scope.quadra.$remove(data);
+			$scope.quadrasPlanejamento.$remove(data);
 			$scope.addHistorico(data.key, data.key_cultura, 'Removeu');
 			Notify.successBottom('Relacionamento removido com sucesso!');
 			$scope.setaFazenda(fazendaTmp);
 		};
 
-		$scope.clearQuadrasCulturas = function(fazenda, safra){
-			/*
-			angular.extend($scope.objModalQuadra, {
-				quadra: $scope.quadras[0].$id,
-				cultura: $scope.culturas[0].$id
-			});
-			*/
-			refQuadrasCulturas = new Firebase(Constant.Url + '/filial/' + fazenda + '/safra/' + safra + '/quadra');
-			$scope.quadra = $firebaseArray(refQuadrasCulturas);
+		$scope.clearFormSafraQuadrasCulturas = function(fazenda, safra){
+
+			refQuadrasCulturas = new Firebase(Constant.Url + '/filial/' + fazenda.key + '/safra/' + safra.key + '/quadra');
+			$scope.quadrasPlanejamento = $firebaseArray(refQuadrasCulturas);
 			$scope.editQuadra = false;
+			return true;
+		};
+
+		$scope.chengeCultura = function(key_cultura){
+			if(key_cultura === null) return false;
+			$scope.variedadesAdd=[];
+			for (var i = 0; i < $scope.variedades.length; i++)
+			{						
+				for(var obj in $scope.variedades[i])
+				{	
+					if($scope.variedades[i][obj].key_cultura==key_cultura)
+					{
+						$scope.variedadesAdd.push($scope.variedades[i][obj]);					
+					}
+				}
+			}
+		};
+
+		//############################################################################################################################
+		//############################################################################################################################
+		//VARIEDADE
+		//############################################################################################################################
+
+		$scope.chengeVariedade = function(cultura){
+			//if(cultura === null) return false;
+			$scope.variedadesAdd=[];
+			for (var i = 0; i < $scope.variedades.length; i++)
+			{						
+				for(var obj in $scope.variedades[i])
+				{	
+					if($scope.variedades[i][obj].key_cultura==cultura)
+					{
+						$scope.variedadesAdd.push($scope.variedades[i][obj]);					
+					}
+				}
+			}
+		};
+
+		$scope.excluirVariedade = function(fazenda, safra, formPlanejamento, variedade){
+			var fazendaTmp=fazenda;
+			var refVariedadeNovo = new Firebase(Constant.Url + '/filial/' + fazenda.key + '/safra/' + safra.key + '/quadra/'+formPlanejamento.key+'/variedades/'+variedade.key);
+			refVariedadeNovo.remove();
+			console.log(Constant.Url + '/filial/' + fazenda.key + '/safra/' + safra.key + '/quadra/'+formPlanejamento.key+'/variedades/'+variedade.key);
+			Notify.successBottom('Variedade removida com sucesso!');
+			for (var i = 0; i < $scope.variedadesAdd.length; i++)
+			{			
+				if($scope.variedadesAdd[i].key==variedade.key)
+				{
+					$scope.formPlanejamento.variedades.splice(i);
+					break
+				}
+			}
+			$scope.setaFazenda(fazendaTmp);
+		};
+
+		$scope.salvarVariedade = function(fazenda, safra, formPlanejamento){
+			var fazendaTmp=fazenda;
+			var refVariedadeNovo = new Firebase(Constant.Url + '/filial/' + fazenda.key + '/safra/' + safra.key + '/quadra/'+formPlanejamento.key+'/variedades/'+formPlanejamento.key_variedade);
+			refVariedadeNovo.set(true);
+			console.log(Constant.Url + '/filial/' + fazenda.key + '/safra/' + safra.key + '/quadra/'+formPlanejamento.key+'/variedades/'+formPlanejamento.key_variedade);
+			for (var i = 0; i < $scope.variedadesAdd.length; i++)
+			{			
+				if($scope.variedadesAdd[i].key==formPlanejamento.key_variedade)
+				{
+					if(formPlanejamento.variedades!=null)
+					{
+						formPlanejamento.variedades.push($scope.variedadesAdd[i]);
+					}
+					else
+					{
+						formPlanejamento['variedades']=[]
+						formPlanejamento.variedades.push($scope.variedadesAdd[i]);
+					}
+					break;
+				}
+			}
+			
+			Notify.successBottom('Variedade adicionada com sucesso!');
+			$scope.setaFazenda(fazendaTmp);
 		};
 
 		//############################################################################################################################
@@ -267,7 +415,7 @@
 		};
 
 		$scope.getHistoricoQuadrasCulturas = function(fazenda, safra){
-			$scope.objModalHistorico = safra;
+			$scope.objHistorico = safra;
 			refHistoricoQuadrasCulturas = new Firebase(Constant.Url + '/filial/' + fazenda.key + '/safra/' + safra.$id +'/historicorelacionamento');
 			$scope.historico = $firebaseArray(refHistoricoQuadrasCulturas);
 			$('#modalHistoricoQuadras').modal('show');
@@ -287,7 +435,7 @@
 
 		$scope.getQuadraNome = function(quadraId){
 			var retorno = '';
-			$scope.quadras.forEach(function(item){
+			$scope.todasQuadras.forEach(function(item){
 				if(item.$id === quadraId) retorno = item.nome;
 			});
 			return retorno;
@@ -314,8 +462,6 @@
 			
 			return false;
 		};
-
-
 
 		function validFormQuadraXCultura(data){
 			
@@ -344,12 +490,33 @@
 			return false;
 		};
 
-		$scope.clear = function(){
-			angular.extend($scope.form, {
+		$scope.clearFormSafraFormSafra = function(){
+			angular.extend($scope.formSafra, {
 				descricao: '',
 				ativo: 'true'
 			});			
+			return true;
 		};
+
+		$scope.clearFormPlanejamento= function(){
+			angular.extend($scope.formPlanejamento, {
+				ativo:true,
+				key:'',
+				key_cultura:'',
+				data_plantio: undefined,
+				variedades:[]
+			});			
+			return true;
+		};
+
+		function clone(obj) {
+			if (null == obj || "object" != typeof obj) return obj;
+			var copy = obj.constructor();
+			for (var attr in obj) {
+				if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+			}
+			return copy;
+		}
 
 		$scope.$watch('quadra', function(newValue, oldValue){
 			if(_salvarQuadra){
@@ -358,7 +525,7 @@
 			}
 		});
 
-		$scope.format = 'yyyy/MM/dd';
+		$scope.formSafraat = 'yyyy/MM/dd';
 		$scope.date = new Date();
 	}
 

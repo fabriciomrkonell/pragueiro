@@ -799,11 +799,26 @@ $(document).on('click', '.panel-heading span.clickable', function(e){
 
 		$scope.diferencaData = function(a,b)
 		{
+
+			var date1 = new Date(a);
+			var date2 = new Date(b);
+			var timeDiff = Math.abs(date2.getTime() - date1.getTime());
+			var  resultado= Math.ceil(timeDiff / (1000 * 3600 * 24));
+			if(resultado<0 || isNaN(resultado))
+			{
+				return 0;
+			}
+			else
+			{
+				return resultado 
+			}
+/*
 			var resultado=Math.round((new Date(a)-new Date(b))/(1000*60*60*24));
 			if(resultado<0 || isNaN(resultado))
 				return 0;
 			else
 				resultado;
+			*/
 		}
 
 		$scope.getQuadraNome = function(quadraId){

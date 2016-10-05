@@ -17,17 +17,16 @@
 				<form class="form-signin" role="form" >
 					<div class="form-group">
 						<label>Descriçāo</label>
-						<input type="text" class="form-control" placeholder="Descriçāo" name="descricao" ng-model="form.descricao" />
+						<input type="text" class="form-control" placeholder="Descriçāo" name="descricao" ng-model="formSafra.descricao" />
 					</div>
 					<div class="form-group">
-						<input type="checkbox"  ng-model="form.ativo"
+						<input type="checkbox"  ng-model="formSafra.ativo"
 						ng-true-value="true" ng-false-value="false">	
-						<label>Ativo</label>
-						
+						<label>Ativo</label>						
 					</div>
 					
-					<button type="button" class="btn btn-success pull-left" ng-show="!edit" ng-click="salvarSafra(data.fazenda, form)">Salvar</button>
-					<button type="button" class="btn btn-success pull-left" ng-show="edit" ng-click="atualizarSafra(form)">Atualizar</button>
+					<button type="button" class="btn btn-success pull-left" ng-show="!edit" ng-click="salvarSafra(data.fazenda, formSafra)">Salvar</button>
+					<button type="button" class="btn btn-success pull-left" ng-show="edit" ng-click="atualizarSafra(formSafra)">Atualizar</button>
 					<button type="button" class="btn btn-default btn-cancel" ng-click="clear()">Cancelar</button>
 				</form>
 			</div>
@@ -45,9 +44,9 @@
 							<td>{{safra.descricao}}</td>
 							<td class="text-center">{{safra.ativo == 'true' ? 'Sim' : 'Nāo'}}</td>
 							<td class="text-center" width="130px">
-								<button type="button" class="btn btn-default btn-xs" ng-click="getQuadras(data.fazenda, safra)">Quadras</button>
+								<button type="button" class="btn btn-default btn-xs" ng-click="showQuadras(data.fazenda, safra)">Quadras</button>
 								<button type="button" class="btn btn-default btn-xs" ng-click="getHistoricoQuadrasCulturas(data.fazenda, safra)">Histórico</button>
-								<button type="button" class="btn btn-default btn-xs" ng-click="editarSafra(safra)">
+								<button type="button" class="btn btn-default btn-xs" ng-click="ChamarEditarSafra(safra)">
 									<i class="glyphicon glyphicon-pencil"></i>
 								</button>
 								<button type="button" class="btn btn-danger btn-xs" ng-click="excluirSafra(safra)">
@@ -60,42 +59,103 @@
 			</div>
 		</div>
 	</div>
+
+	<!--########################################################################################-->
+	<!--MODAL QUADRAS-->
+
 	<div class="modal fade" tabindex="-1" role="dialog" id="modalQuadras">
 		<div class="modal-dialog modal-lg">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-					<h4 class="modal-title">Quadras - {{objModal.descricao}}</h4>
+					<h4 class="modal-title">Quadras - {{objSafra.descricao}}</h4>
 				</div>
 				<div class="modal-body">
 					<div class="row">
 						<div class="col-sm-4">
 							<form class="form-signin" role="form" >
 								<div class="form-group">
+
+								</div>
+								<div class="form-group">
 									<label>Quadra</label>
 
-									<select class="form-control" ng-model="objModalQuadra.key">
-										<option value="{{quadra.$id}}" ng-repeat="quadra in quadras">{{quadra.nome}}</option>
+									<select class="form-control" ng-model="formPlanejamento.key">
+										<option value="{{quadra.$id}}" ng-repeat="quadra in todasQuadras">{{quadra.nome}}</option>
 
 									</select>
 								</div>
 								<div class="form-group">
 									<label>Cultura</label>
-									<select class="form-control" ng-model="objModalQuadra.key_cultura">
-										<option value="{{cultura.$id}}" ng-repeat="cultura in culturas">{{cultura.nome}}</option>
+									<select class="form-control" ng-model="formPlanejamento.key_cultura"  ng-change="chengeCultura(formPlanejamento.key_cultura)" ng-disabled=!editCultura>
+										<option value="{{cultura.$id}}" ng-repeat="cultura in culturas" >{{cultura.nome}}</option>
 									</select>
 								</div>
 								<div class="form-group">
 
 									<label>Data do Plantio</label><br>
-									<input type="date" ng-model="objModalQuadra.data_plantio">
+									<input type="date" ng-model="formPlanejamento.data_plantio">
 
-
+									<input type="checkbox" ng-model="formPlanejamento.ativo"
+									ng-true-value="true" ng-false-value="false">	<label>Ativo</label>
+									
 								</div>
-								<button type="button" class="btn btn-success pull-left" ng-show="!editQuadra" ng-click="salvarQuadrasCulturas(data.fazenda, objModal.$id, objModalQuadra)">Salvar</button>
-								<button type="button" class="btn btn-success pull-left" ng-show="editQuadra" ng-click="atualizarQuadrasCulturas(data.fazenda, objModal.$id, objModalQuadra)">Atualizar</button>
-								<button type="button" class="btn btn-default btn-cancel" ng-click="clearQuadrasCulturas(data.fazenda.$id, objModal.$id)">Cancelar</button>
+								<button type="button" class="btn btn-success pull-left" ng-show="!editQuadra" ng-click="salvarPlanejamento(data.fazenda, objSafra, formPlanejamento)">Salvar
+								</button>
+								<button type="button" class="btn btn-success pull-left" ng-show="editQuadra" ng-click="atualizarPlanejamento(data.fazenda, objSafra, formPlanejamento)">Atualizar
+								</button>
+								<button type="button" class="btn btn-default btn-cancel" ng-click="clearFormPlanejamento()">Cancelar
+								</button>
+								<hr class="small">  
 							</form>
+
+							<div class="form-group">
+								<input type="checkbox" ng-disabled=editCultura ng-model="formPlanejamento.separar_variedade"
+								ng-true-value="true" ng-false-value="false">	
+								<label>Separar por variedade</label>
+							</div>
+							<div class="form-group">
+
+							</div>
+							<div class="form-group">
+								<label>Variedades</label>
+
+							</div>
+							<div class="form-group">
+								<div class="col-sm-10 variedade_css">
+									<select class="form-control" ng-model="formPlanejamento.key_variedade"  >
+										<option value="{{variedade.key}}" ng-repeat="variedade in variedadesAdd">{{variedade.nome}}</option>
+									</select>
+								</div>
+								<div class="col-sm-2">
+									<button type="button" class="btn btn-default btn-xs"   ng-disabled="!editQuadra" ng-click="salvarVariedade(data.fazenda, objSafra, formPlanejamento)">
+										<i class="glyphicon glyphicon-plus-sign"></i>												
+									</button>
+								</div>
+							</div>
+							<br>
+							<br>	
+							<table class="table table-condensed table-bordered">
+								<thead>
+									<tr>
+										<th>Nome</th>
+										<th class="text-center" width="10px">Ações</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="variedade in formPlanejamento.variedades">
+										<td>{{variedade.nome}}</td>
+										<td class="text-center" width="130px">
+
+
+											<button type="button" class="btn btn-danger btn-xs" ng-click="excluirVariedade(data.fazenda, objSafra, formPlanejamento, variedade)">
+												<i class="glyphicon glyphicon-remove"></i>
+											</button>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+							
 						</div>
 						<div class="col-sm-8">
 							<table class="table table-condensed table-bordered">
@@ -108,15 +168,15 @@
 									</tr>
 								</thead>
 								<tbody>
-									<tr ng-repeat="quadracultura in quadra">
+									<tr ng-repeat="quadracultura in quadrasPlanejamento">
 										<td>{{getQuadraNome(quadracultura.key)}}</td>
 										<td class="text-center" width="130px">{{getCulturaNome(quadracultura.key_cultura)}}</td>
 										<td class="text-center" width="130px">{{quadracultura.data_plantio | date:'dd/MM/yyyy'}}</td>
 										<td class="text-center" width="70px">
-											<button type="button" class="btn btn-default btn-xs" ng-click="editarQuadrasCulturas(quadracultura)">
+											<button type="button" class="btn btn-default btn-xs" ng-click="ChamarEditarPlanejamento(quadracultura)">
 												<i class="glyphicon glyphicon-pencil"></i>
 											</button>
-											<button type="button" class="btn btn-danger btn-xs" ng-click="excluirQuadrasCulturas(quadracultura)">
+											<button type="button" class="btn btn-danger btn-xs" ng-click="excluirPlanejamento(quadracultura)">
 												<i class="glyphicon glyphicon-remove"></i>
 											</button>
 										</td>
@@ -132,12 +192,17 @@
 			</div>
 		</div>
 	</div>
+
+	<!--########################################################################################-->
+	<!--MODAL HISTORICO-->
+
+
 	<div class="modal fade" tabindex="-1" role="dialog" id="modalHistoricoQuadras">
 		<div class="modal-dialog modal-lg">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-					<h4 class="modal-title">Histórico Safra - {{objModalHistorico.descricao}}</h4>
+					<h4 class="modal-title">Histórico Safra - {{objHistorico.descricao}}</h4>
 				</div>
 				<div class="modal-body">
 					<div class="row">
@@ -169,6 +234,9 @@
 			</div>
 		</div>
 	</div>
+
+	<!--########################################################################################-->
+
 
 	<!-- Modal Start here-->
 	<div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"
