@@ -1,12 +1,14 @@
+//var greetings = require("./../greetings.js");
+
 (function(){
 
 	'use strict';
 
 	angular.module('Pragueiro.controllers').registerCtrl('quadraCtrl', quadraCtrl);
 
-	quadraCtrl.$inject = ['$scope', '$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Notify'];
+	quadraCtrl.$inject = [ '$scope', '$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Coordenadas', 'Notify', ];
 
-	function quadraCtrl($scope, $firebaseArray, $firebaseObject, Session, Constant, Notify) {
+	function quadraCtrl($scope, $firebaseArray, $firebaseObject, Session, Constant, Coordenadas, Notify) {
 
 		angular.extend($scope, {
 			edit: false,
@@ -15,18 +17,22 @@
 			quadras: [],
 			quadraFilial: [],
 			data: {
-				ativo:true
-				
+				ativo:true				
 			}
 		});
 
+
+		
 
 		var ref = new Firebase(Constant.Url + '/quadra');
 		$scope.todasQuadras = $firebaseArray(ref);
 		//var refFazendas = new Firebase(Constant.Url + '/filial');
 
-		atualizaListaFiliais()
+		atualizaListaFiliais();
 
+		console.log('O q tinha:' + Coordenadas.getCoordendas());
+		console.log('Setamdp:' + Coordenadas.setCoordenadas('setandooo'));
+		console.log('O q voltou:' + Coordenadas.getCoordendas());
 		//############################################################################################################################
 		//############################################################################################################################
 		// FAZENDA/FILIAL
@@ -203,6 +209,19 @@
 			$scope.setaFazenda(fazendaTmp);	
 		};
 
+		$scope.subirShape = function(data){
+			console.log("teste");
+			shapefile.open(data)
+			.then(source => source.read()
+				.then(function log(result) {
+					if (result.done) return;
+					console.log(result.value);
+					return source.read().then(log);
+				}))
+			.catch(error => console.error(error.stack));
+		};
+
+
 		$scope.editarQuadra = function(data){
 			if(validForm(data)) return false;
 			var fazendaTmp=data.fazenda;
@@ -212,7 +231,7 @@
 			refQuadra.set(data);
 			data.fazenda=fazendaTmp;
 			$scope.clear();
-			
+
 			Notify.successBottom('Quadra atualizada com sucesso!');
 
 		};
@@ -244,16 +263,16 @@
 					return;
 				}
 			}
-			
+
 			var refQuadraNovo = new Firebase(Constant.Url + '/quadra/'+objeto.key);
 			refQuadraNovo.remove();
 			var refQuadraNovo = new Firebase(Constant.Url + '/filial/'+ $scope.data.fazenda.key + '/quadra/'+objeto.key);
 			refQuadraNovo.remove();
 			Notify.successBottom('Quadra removida com sucesso!');
 			$scope.setaFazenda(fazendaTmp);		
-			
-			
-			
+
+
+
 		};
 
 
@@ -321,6 +340,69 @@
 
 		//$scope.clear();
 
+		$scope.file_changed = function(element) {
+
+			var reader = new FileReader();
+			reader.onload = function() {
+
+				var arrayBuffer = this.result,
+				array = new Uint8Array(arrayBuffer),
+				binaryString = String.fromCharCode.apply(null, array);
+
+				console.log('--:'  + binaryString);
+
+			}
+			reader.readAsArrayBuffer(element.files[0]);
+			var buf = new ArrayBuffer(reader);
+
+
+			$scope.load(element.files[0], 
+				function(res) {
+					console.log('ok', res);
+					shapefile.open(res)
+					.then(source => source.read()
+						.then(function log(result) {
+							if (result.done) return;
+							console.log(result.value);
+							return source.read().then(log);
+						}))
+					.catch(error => console.error(error.stack));
+				},
+				function(res){ console.log('error', res); }
+				)
+
+
+			
+
+			$scope.$apply(function(scope) {
+				var photofile = element.files[0];
+				var reader = new FileReader();
+				reader.onload = function(e) {
+            // handle onload
+
+        };
+        reader.readAsDataURL(photofile);
+
+
+    });
+		};
+
+		$scope.load = function(src, callback, onerror) {
+			var xhr = new XMLHttpRequest();
+			xhr.responseType = 'arraybuffer';
+			xhr.onload = function() {
+				console.log(xhr.response);
+				var d = new SHPParser().parse(xhr.response);
+				callback(d);
+			};
+			xhr.onerror = onerror;
+			xhr.open('GET', src);
+			xhr.send(null);
+		};
+
+
 	}
+
+
 
 }());

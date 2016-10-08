@@ -1,0 +1,98 @@
+<div ng-controller="pragaCtrl">
+	<div class="container container-view">
+		<hr/>
+		<div class="row">
+			<div class="col-sm-6">
+				<form class="form-signin" role="form">
+					<div class="form-group">
+						<label><i>Código Interno</i></label>
+						<p>
+							<input type="text" class="form-control" placeholder="Nome" ng-model="data.key" />
+						</p>
+					</div>
+					
+					<div class="form-group">
+						<label>Nome científico</label>
+						<input type="text" class="form-control" placeholder="Nome" ng-model="data.nome_cientifico" />
+					</div>	
+
+					<div class="form-group">
+						<label>Descrição</label>
+						<input type="text" class="form-control" placeholder="Nome" ng-model="data.descricao" />
+					</div>	
+
+					<div class="form-group">
+						<label>img</label>
+						<input type="text" class="form-control" placeholder="Nome" ng-model="data.img" />
+					</div>	
+
+					<div class="form-group">
+						<input type="checkbox"  ng-model="formSafra.ativo"
+						ng-true-value="true" ng-false-value="false">	
+						<label>Ativo</label>						
+					</div>
+					<div class="form-group">
+						<label>Texto</label>
+						<input type="text" class="form-control" placeholder="Nome" ng-model="data.texto" />
+					</div>	
+					
+					
+				</form>
+				<button type="button" class="btn btn-success" ng-show="!edit" ng-click="salvarPraga(data)">Salvar</button>
+				<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarPraga(data)">Atualizar</button>
+				<button type="button"  class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar</button>
+			</form>
+		</div>
+		<div class="col-sm-6">
+			<table class="table table-condensed table-bordered">
+				<thead>
+					<tr>
+						<th>Key</th>
+						<th>Nome científico</th>
+						<th>Descrição</th>
+						<th class="text-center" width="80px">Ações</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="praga in pragas">
+						<td>{{praga.key}}</td>
+						<td>{{praga.nome_cientifico}}</td>
+						<td>{{praga.descricao}}</td>
+						<td class="text-center" width="70px">
+							<button type="button" class="btn btn-default btn-xs" ng-click="editar(praga)">
+								<i class="glyphicon glyphicon-pencil"></i>
+							</button>
+							<button type="button" class="btn btn-danger btn-xs" ng-click="excluir(praga)">
+								<i class="glyphicon glyphicon-remove"></i>
+							</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<!-- Modal Start here-->
+<div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"
+role="dialog" aria-hidden="true" data-backdrop="static">
+<div class="modal-dialog modal-sm">
+	<div class="modal-content">
+		<div class="modal-header">
+			<h4 class="modal-title">
+				<span class="glyphicon glyphicon-time">
+				</span>&nbsp;&nbsp;Aguarde, carregando...
+			</h4>
+		</div>
+		<div class="modal-body">
+			<div class="progress">
+				<div class="progress-bar progress-bar-info
+				progress-bar-striped active"
+				style="width: 100%">
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+</div>
+<!-- Modal ends Here -->
+</div>

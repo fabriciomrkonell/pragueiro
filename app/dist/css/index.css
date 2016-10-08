@@ -14,3 +14,29 @@
 .col-sm-no-bottom{
 	margin-bottom: -10px;
 }
+
+.logo-actionbar_title{
+	height: 25px;
+}
+
+.button {
+	-moz-appearance: button;
+	/* Firefox */
+	-webkit-appearance: button;
+	/* Safari and Chrome */
+	padding: 10px;
+	margin: 10px;
+	width: 70px;
+}
+.drop-box {
+	background: #F8F8F8;
+	border: 5px dashed #DDD;
+	width: 200px;
+	height: 65px;
+	text-align: center;
+	padding-top: 25px;
+	margin: 10px;
+}
+.dragover {
+	border: 5px dashed blue;
+}

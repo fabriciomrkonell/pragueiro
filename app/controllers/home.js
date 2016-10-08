@@ -20,6 +20,16 @@
 			pragas:[]
 		});
 
+/*
+		shapefile.open("https://cdn.rawgit.com/mbostock/shapefile/master/test/points.shp")
+		.then(source => source.read()
+			.then(function log(result) {
+				if (result.done) return;
+				console.log(result.value);
+				return source.read().then(log);
+			}))
+		.catch(error => console.error(error.stack));
+		*/
 		$scope.myNumber = 5;
 		$scope.table_pronta=false;
 
@@ -83,8 +93,8 @@
 
 	function atualizaVariedade(key_filial)
 	{
-		var refCultura = new Firebase(Constant.Url + '/variedade/'+ key_filial);
-		refCultura.ref().on('child_added', function(snap) {
+		var refVariedades = new Firebase(Constant.Url + '/variedade/'+ key_filial);
+		refVariedades.ref().on('child_added', function(snap) {
 			$scope.variedades.push(snap.val());
 		});
 	}

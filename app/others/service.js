@@ -2,7 +2,7 @@
 
   'use strict';
 
-
+  //var app = require('/.././app.js');
 
   angular.module('Pragueiro.services').service('Notify', ['Constant', function(Constant) {
     this.successBottom = function(message){
@@ -49,6 +49,20 @@
       user = ref.getAuth();
       if(user === null) window.location.href = '/login';
       return user;
+    }
+  }]);
+
+  angular.module('Pragueiro.services').service('Coordenadas', ['Constant', function(Constant) {
+
+    var data='vazio';
+    this.getCoordendas = function(){
+
+      return data;
+    }
+
+    this.setCoordenadas = function(data2){
+      data=data2;
+      return 'atualizado';
     }
   }]);
 

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html ng-app="login">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="/dist/images/favicon.ico">
+  <link rel="mask-icon" href="/dist/images/favicon.ico" color="black">
+  <title>Pragueiro - Erro</title>
+  <link rel="stylesheet" type="text/css" href="app/libraries/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="app/dist/css/login.css">
+</head>
+<body ng-controller="loginCtrl">
+  <nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a href="/"class="navbar-brand"><img src="views/img/actionbar_title.png" class="logo-actionbar_title"></a>
+      </div>
+    </div>
+  </nav>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12 text-center">
+        <img src="app/dist/img/logo/home.png" class="logo-login">
+      </div>
+    </div>
+    <br>
+    <div class="form-group">
+      <label>Pagina nao encontrada -404</label>
+      <</div>
+      
+      
+    </div>
+
+    <!-- Footer -->
+    <footer id="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-10 col-lg-offset-1 text-center">        
+
+            <br>
+            <br>          
+            <br>
+            <br>
+            <br>
+
+            <img src="views/img/img_praga.png">
+          </div>
+        </div>
+      </div>
+      <a id="to-top" href="#top" class="btn btn-dark btn-lg"><i class="fa fa-chevron-up fa-fw fa-1x"></i></a>
+    </footer>
+    <script src="app/libraries/angularjs/js/angular.min.js"></script>
+    <script src="app/libraries/jquery/js/jquery.min.js"></script>
+    <script src="https://cdn.firebase.com/js/client/2.2.4/firebase.js"></script>
+    <script src="https://cdn.firebase.com/libs/angularfire/1.1.3/angularfire.min.js"></script>
+    <script src="app/libraries/notify/js/bootstrap-notify.min.js"></script>
+    <script type="text/javascript">
+      angular.module('login', ['firebase']);
+
+      angular.module('login').controller('loginCtrl', ['$scope', function($scope){
+
+        var messages = {};
+        messages['Error: The specified user does not exist.'] = 'Não existe um usuário cadastrado com esse email ou senha.';
+        messages['Error: The specified password is incorrect.'] = 'A senha está incorreta.';
+
+        function isEmail(email){
+          er = /^[a-zA-Z0-9][a-zA-Z0-9\._-]+@([a-zA-Z0-9\._-]+\.)[a-zA-Z-0-9]{2}/;
+          return !!er.exec(email);
+        };
+
+        function setMessageError(message){
+          console.log(message);
+          $.notify({
+            message: messages[message] || message
+          },{
+            aling: 'center',
+            type: 'danger'
+          });
+        }
+
+        function validForm(data){
+          if(isEmail(data.email) !== true){
+            setMessageError('O campo email é inválido!');
+            return true
+          }
+          if(data.senha === ''){
+            setMessageError('O campo senha é inválido!');
+            return true
+          }
+          return false;
+        };
+
+        var ref = new Firebase("https://pragueiroproducao.firebaseio.com");
+
+        angular.extend($scope, {
+          data: {}
+        })
+
+        $scope.clear = function(){
+          angular.extend($scope.data, {
+            email: '',
+            senha: ''
+          })
+        };
+
+        $scope.clear();
+
+        $scope.login = function(data){
+          if(validForm(data)) return false;
+          ref.authWithPassword({
+            email: data.email,
+            password: data.senha
+          }, function(error, auth) {
+            if(error){
+              setMessageError(error);
+            }else{
+              window.location.href = '/app';
+            }
+          });
+        }
+
+      }]);
+    </script>
+  </body>
+  </html>

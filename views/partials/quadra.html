@@ -1,4 +1,16 @@
 <div ng-controller="quadraCtrl">
+	<style type="text/css">
+		.cropArea {
+			background: #E4E4E4;
+			overflow: hidden;
+			width:500px;
+			height:350px;
+		}
+		form .progress {
+			line-height: 15px;
+		}
+
+	</style>
 	<div class="container container-view">
 		<div class="row">
 			<div class="col-sm-6 col-sm-no-bottom">
@@ -12,7 +24,7 @@
 		</div>
 		<hr/>
 		<div class="row">
-			<div class="col-sm-6">
+			<div class="col-sm-7">
 				<form class="form-signin" role="form">
 					<div class="form-group">
 						<label><i>Código Interno</i></label>
@@ -34,29 +46,50 @@
 
 					</div>
 
+
+
 					
+					<button type="button" class="btn btn-success" ng-show="!edit" ng-click="salvarQuadra(data)">Salvar</button>
+					<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarQuadra(data)">Atualizar</button>
+					<button type="button"  class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar</button>
+
+					<div class="form-group">
+
+						<hr class="small">  
+						<label>Importação de área da quadra/região</label>
+						
+						<input type="file" id="file">
+
+
+						<button type="button" class="btn btn-success" ng-click="subirShape(data)">Carregar</button>
+
+					</form>
+					<form
+					action='/testeform'
+					method='post'
+					encType="multipart/form-data">
+					<input type="file"  name="file" size="1"/>
+					<input  type='submit' value='Upload!' />
 				</form>
-				<button type="button" class="btn btn-success" ng-show="!edit" ng-click="salvarQuadra(data)">Salvar</button>
-				<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarQuadra(data)">Atualizar</button>
-				<button type="button"  class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar</button>
-			</form>
+
+
+			</div>
+			
 		</div>
-		<div class="col-sm-6">
+		<div class="col-sm-5">
 			<table class="table table-condensed table-bordered">
 				<thead>
 					<tr>
 						<th>Código</th>
 						<th>Nome</th>
-						<th class="text-center" width="100px">Ativo</th>
-						<th class="text-center" width="140px">Coordenadas</th>
-						<th class="text-center" width="80px">Ações</th>
+						<th class="text-center" width="60px">Coordenadas</th>
+						<th class="text-center" width="60px">Ações</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr ng-repeat="quadra in quadras">
 						<td>{{quadra.codigo}}</td>
 						<td>{{quadra.nome}}</td>
-						<td class="text-center" width="140px">{{(quadra.ativo == true  ? 'Sim' : 'Nāo')}}</td>
 						<td class="text-center" width="100px">{{(quadra.coordenadas == true ? 'Sim' : 'Nāo')}}</td>
 						<td class="text-center" width="70px">
 							<button type="button" class="btn btn-default btn-xs" ng-click="editar(quadra)">
@@ -93,6 +126,43 @@ role="dialog" aria-hidden="true" data-backdrop="static">
 	</div>
 </div>
 </div>
+<script type="text/javascript">
+	var context = new (window.AudioContext || window.webkitAudioContext)();
+	function playsound(raw) {
+		console.log("now playing a sound, that starts with", new Uint8Array(raw.slice(0, 10)));
+		context.decodeAudioData(raw, function (buffer) {
+			if (!buffer) {
+				console.error("failed to decode:", "buffer null");
+				return;
+			}
+			var source = context.createBufferSource();
+			source.buffer = buffer;
+			source.connect(context.destination);
+			source.start(0);
+			console.log("started...");
+		}, function (error) {
+			console.error("failed to decode:", error);
+		});
+	}
+
+	function onfilechange(then, evt) {
+    var files = evt.target.files; // FileList object
+    var selFile = files[0];
+    var reader = new FileReader();
+    reader.onload = function (e) {
+    	console.log(e);
+    	then(e.target.result);
+    };
+    reader.onerror = function (e) {
+    	console.error(e);
+    };
+    reader.readAsArrayBuffer(selFile);
+}
+
+
+document.getElementById('file').addEventListener('change', onfilechange.bind(null, playsound), false);
+
+</script>
 </div>
 <!-- Modal ends Here -->
 </div>

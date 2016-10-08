@@ -3,7 +3,9 @@
 var ref = new Firebase("https://pragueiroproducao.firebaseio.com");
 if(ref.getAuth() === null) window.location.href = '/login';
 
-angular.module('Pragueiro.controllers', ['firebase', 'ngSanitize', 'googlechart']);
+//var greetings = require("./../controllers/greetings.js");
+//var greetings = '';
+angular.module('Pragueiro.controllers', [ 'firebase', 'ngSanitize', 'googlechart']);
 
 angular.module('Pragueiro.config', ['ngRoute']);
 
