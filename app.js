@@ -7,12 +7,12 @@ firebase = require('./config/firebase'),
 fs = require('fs'),
 app = express();
 
-/*
+
 var tj = require('togeojson'),
 fs = require('fs'),
 DOMParser = require('xmldom').DOMParser,
 multer = require('multer');	
-*/
+
 
 
 app.use(express.static(path.join(__dirname, '/')));
@@ -66,7 +66,7 @@ app.get('/logout', function(req, res){
 	res.redirect('/login');
 });
 
-/*
+
 var upload = multer({ dest: '/tmp/'});
 
 
@@ -90,7 +90,7 @@ app.use(function(req, res, next) {
 	next(err);
 	res.sendfile(__dirname + '/views/erro.html');
 });
-*/
+
 
 
 module.exports = app;
