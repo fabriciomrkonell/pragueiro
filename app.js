@@ -7,12 +7,13 @@ firebase = require('./config/firebase'),
 fs = require('fs'),
 app = express();
 
+/*
 var tj = require('togeojson'),
 fs = require('fs'),
 DOMParser = require('xmldom').DOMParser,
 multer = require('multer');	
+*/
 
-//var greetings = require("/app/controllers/greetings.js");
 
 app.use(express.static(path.join(__dirname, '/')));
 app.use(require('morgan')('combined'));
@@ -38,9 +39,7 @@ app.get('/arquivos', function(req, res, next) {
 });
 
 app.get('/arquivos/:file', function(req, res, next) {
-	//greetings.setCoordenadas(req.param('file'));
 	res.sendfile(__dirname + '/arquivos/' + req.param('file'));
-	//console.log('testeeee: ' + greetings.sayHelloInEnglish());
 });
 
 app.get('/', function(req, res, next) {
@@ -59,12 +58,6 @@ app.get('/login', function(req, res){
 	res.sendfile(__dirname + '/views/login.html');
 });
 
-app.post('/singup', function(req, res){
-	firebase.child("usuario").on("value", function(snapshot) {
-	  console.log(snapshot.val());  // Alerts "San Francisco"
-	});
-});
-
 app.get('/singup', function(req, res){
 	res.sendfile(__dirname + '/views/singup.html');
 });
@@ -73,11 +66,14 @@ app.get('/logout', function(req, res){
 	res.redirect('/login');
 });
 
+/*
 var upload = multer({ dest: '/tmp/'});
+
 
 app.get('/teste', function(req, res, next) {
 	res.render('teste', { title: 'Express' });
 });
+
 app.post('/testeform', upload.single('file'), function(req, res) {
 	var kml = new DOMParser().parseFromString(fs.readFileSync(req.file.path, 'utf8'));
 	var converted = tj.kml(kml);
@@ -94,7 +90,7 @@ app.use(function(req, res, next) {
 	next(err);
 	res.sendfile(__dirname + '/views/erro.html');
 });
-
+*/
 
 
 module.exports = app;
