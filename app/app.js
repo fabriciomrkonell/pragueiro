@@ -6,13 +6,13 @@ if(ref.getAuth() === null) window.location.href = '/login';
 //var greetings = require("./../controllers/greetings.js");
 //var greetings = '';
 angular.module('Pragueiro.controllers', [ 'firebase', 'ngSanitize', 'googlechart', 'uiGmapgoogle-maps', 'angularGeoFire'])
-.config(function(uiGmapGoogleMapApiProvider) {
-	uiGmapGoogleMapApiProvider.configure({
+.config(['uiGmapGoogleMapApiProvider', function (GoogleMapApi) {
+	GoogleMapApi.configure({
 		key: 'AIzaSyDDu-8XiPmbb5QbSlh-Dv4xyHF53iGUPOk',
-		v: '3.17',
+		v: '3.20',
 		libraries: 'weather,geometry,visualization'
 	});
-});
+}])
 
 angular.module('Pragueiro.config', ['ngRoute']);
 

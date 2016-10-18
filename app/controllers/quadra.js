@@ -7,9 +7,9 @@
 
 	angular.module('Pragueiro.controllers').registerCtrl('quadraCtrl', quadraCtrl);
 
-	quadraCtrl.$inject = [ '$scope', '$timeout', '$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Coordenadas', 'Notify', 'uiGmapIsReady', '$geofire'];
+	quadraCtrl.$inject = [ '$scope', '$timeout', '$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Coordenadas', 'Notify', 'uiGmapIsReady', 'uiGmapGoogleMapApi', '$geofire'];
 
-	function quadraCtrl($scope, $timeout, $firebaseArray, $firebaseObject, Session, Constant, Coordenadas, Notify, uiGmapIsReady, $geofire) 
+	function quadraCtrl($scope, $timeout, $firebaseArray, $firebaseObject, Session, Constant, Coordenadas, Notify, uiGmapIsReady, uiGmapGoogleMapApi, $geofire) 
 	{
 
 		angular.extend($scope, {
@@ -322,6 +322,9 @@
 			});
 
 		});
+
+		
+
 
 		$scope.mostrarImportacao = function()
 		{
