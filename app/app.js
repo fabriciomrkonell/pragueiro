@@ -9,7 +9,6 @@ angular.module('Pragueiro.controllers', [ 'firebase', 'ngSanitize', 'googlechart
 .config(['uiGmapGoogleMapApiProvider', function (GoogleMapApi) {
 	GoogleMapApi.configure({
 		key: 'AIzaSyDDu-8XiPmbb5QbSlh-Dv4xyHF53iGUPOk',
-		v: '3.20',
 		libraries: 'weather,geometry,visualization'
 	});
 }])
