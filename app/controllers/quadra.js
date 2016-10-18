@@ -1,38 +1,52 @@
 //var greetings = require("./../greetings.js");
 
-(function(){
+(function()
+{
 
 	'use strict';
 
 	angular.module('Pragueiro.controllers').registerCtrl('quadraCtrl', quadraCtrl);
 
-	quadraCtrl.$inject = [ '$scope', '$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Coordenadas', 'Notify', ];
+	quadraCtrl.$inject = [ '$scope', '$timeout', '$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Coordenadas', 'Notify', 'uiGmapIsReady', '$geofire'];
 
-	function quadraCtrl($scope, $firebaseArray, $firebaseObject, Session, Constant, Coordenadas, Notify) {
+	function quadraCtrl($scope, $timeout, $firebaseArray, $firebaseObject, Session, Constant, Coordenadas, Notify, uiGmapIsReady, $geofire) 
+	{
 
 		angular.extend($scope, {
 			edit: false,
+			arquivoCarregado: false,
 			desabilitaFazenda: false,
+			arquivoCarregado:false,
 			fazendas: [],
 			quadras: [],
+			todascoordenadas:[],
 			quadraFilial: [],
 			data: {
 				ativo:true				
 			}
-		});
-
-
-		
+		});		
 
 		var ref = new Firebase(Constant.Url + '/quadra');
 		$scope.todasQuadras = $firebaseArray(ref);
 		//var refFazendas = new Firebase(Constant.Url + '/filial');
+		//$scope.todascoordenadas = [[25.774252, -80.190262],[18.466465, -66.118292],[32.321384, -64.75737],[25.774252, -80.190262]];
 
+		$scope.center ={latitude: -20, longitude:  -55 };
+
+		$scope.map = { 
+			show: true,
+			control:{},
+			center: {latitude: -20, longitude:  -55 }, 
+			zoom: 3,
+			options: {mapTypeId: google.maps.MapTypeId.SATELLITE }
+		};
+
+		//$scope.center = [];
 		atualizaListaFiliais();
 
-		console.log('O q tinha:' + Coordenadas.getCoordendas());
-		console.log('Setamdp:' + Coordenadas.setCoordenadas('setandooo'));
-		console.log('O q voltou:' + Coordenadas.getCoordendas());
+		//console.log('O q tinha:' + Coordenadas.getCoordendas());
+		//console.log('Setamdp:' + Coordenadas.setCoordenadas('setandooo'));
+		//console.log('O q voltou:' + Coordenadas.getCoordendas());
 		//############################################################################################################################
 		//############################################################################################################################
 		// FAZENDA/FILIAL
@@ -158,7 +172,6 @@
 		// QUADRA
 		//############################################################################################################################
 
-		
 
 		$scope.getDadosQuadra = function(obj, nomeColuna){
 			var retorno = '';
@@ -209,18 +222,6 @@
 			$scope.setaFazenda(fazendaTmp);	
 		};
 
-		$scope.subirShape = function(data){
-			console.log("teste");
-			shapefile.open(data)
-			.then(source => source.read()
-				.then(function log(result) {
-					if (result.done) return;
-					console.log(result.value);
-					return source.read().then(log);
-				}))
-			.catch(error => console.error(error.stack));
-		};
-
 
 		$scope.editarQuadra = function(data){
 			if(validForm(data)) return false;
@@ -233,23 +234,6 @@
 			$scope.clear();
 
 			Notify.successBottom('Quadra atualizada com sucesso!');
-
-		};
-
-		$scope.cancelar = function(){
-			var fazendaTmp=$scope.data.fazenda;
-			$scope.clear();
-			$scope.setaFazenda(fazendaTmp);	
-			$scope.chengeFazenda($scope.data.fazenda);	
-			$scope.edit = false;
-		};
-
-		$scope.editar = function(obj){
-			$scope.desabilitaFazenda=true;
-			var fazendaTmp=$scope.data.fazenda;
-			$scope.data = obj;
-			$scope.data.fazenda=fazendaTmp;
-			$scope.edit = true;
 
 		};
 
@@ -271,15 +255,101 @@
 			Notify.successBottom('Quadra removida com sucesso!');
 			$scope.setaFazenda(fazendaTmp);		
 
-
-
 		};
 
+		$scope.cancelar = function(){
+			var fazendaTmp=$scope.data.fazenda;
+			$scope.clear();
+			$scope.setaFazenda(fazendaTmp);	
+			$scope.chengeFazenda($scope.data.fazenda);	
+			$scope.edit = false;
+			setaCoordenadas();
+		};
+
+		$scope.chamaEditar = function(obj)
+		{			
+			$('#myPleaseWait').modal('show');
+			$scope.map.control.getGMap().setZoom(3);
+			$scope.desabilitaFazenda=true;
+			var fazendaTmp=$scope.data.fazenda;
+			$scope.data = obj;
+			$scope.data.fazenda=fazendaTmp;
+			$scope.edit = true;
+			$scope.todascoordenadas=[];
+			$scope.todascoordenadasCentroid=[];
+			if(!$scope.data.coordenadas)
+			{
+				$('#myPleaseWait').modal('hide');
+			}
+			else
+			{
+				var refCoordenadas = $firebaseArray(new Firebase(Constant.Url + '/coordenada/'+ $scope.data.key));
+				var i=0;
+				
+				$scope.todascoordenadas=[];
+				$scope.todascoordenadasCentroid=[];
+
+				refCoordenadas.$loaded(function() {
+
+					refCoordenadas.forEach(function(coordenadas){
+						var novo=[];
+						novo['latitude']=coordenadas.latitude;
+						novo['longitude']=coordenadas.longitude;
+						$scope.todascoordenadas.push(novo);
+
+						var novoCentroid=[];
+						novoCentroid['x']=coordenadas.latitude;
+						novoCentroid['y']=coordenadas.longitude;
+						$scope.todascoordenadasCentroid.push(novoCentroid);						
+					});
+					console.log('terminou');
+					setaCoordenadas();
+					
+
+					if(!$scope.$$phase) {
+						$scope.$apply();
+					}
+
+					$('#myPleaseWait').modal('hide');
+
+				});
+			}
+		};
+
+		uiGmapIsReady.promise().then(function (maps) {
+
+			$timeout(function(){
+			});
+
+		});
+
+		$scope.mostrarImportacao = function()
+		{
+			$scope.mostrarImportacao=false;
+		}
+
+		$scope.refreshMap = function(novo){
+			$scope.map.show = true;
+
+			uiGmapIsReady.promise()
+			.then(function (map_instances) {
+				$scope.map.control.refresh(novo);
+			});
+		}
 
 		//############################################################################################################################
 		//############################################################################################################################
 		//UTEIS
 		//############################################################################################################################
+
+		function clone(obj) {
+			if (null == obj || "object" != typeof obj) return obj;
+			var copy = obj.constructor();
+			for (var attr in obj) {
+				if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+			}
+			return copy;
+		}
 
 		$scope.setaFazenda = function(fazenda){
 			if(fazenda === null) return false;
@@ -337,72 +407,355 @@
 			//$scope.data.fazenda=fazendaTmp;
 		};
 		
+		//############################################################################################################################
+		//############################################################################################################################
+		//UPLOAD
+		//############################################################################################################################
 
-		//$scope.clear();
+		$scope.salvarArquivo= function(data)
+		{
 
-		$scope.file_changed = function(element) {
+			var refCoordenadasGeoFire = $firebaseArray(new Firebase(Constant.Url + '/coordenadageo/'+data.fazenda.key));
 
-			var reader = new FileReader();
-			reader.onload = function() {
+			refCoordenadasGeoFire.$loaded(function() {
+				refCoordenadasGeoFire.forEach(function(coordenadas){
+					var refCor = new Firebase(Constant.Url + '/coordenadageo/'+data.fazenda.key+'/'+coordenadas.key);
+					refCor.remove();
+				});
+			});
 
-				var arrayBuffer = this.result,
-				array = new Uint8Array(arrayBuffer),
-				binaryString = String.fromCharCode.apply(null, array);
+			var listaProntaSalvar=[];
+			var old;
+			$scope.todascoordenadas.forEach(function(obj){
+				if(old!=null)
+				{
+					//if(getDistanceFromLatLonInKm(old.latitude,  old.longitude, obj.latitude, obj.longitude)>2)
+					//{
+						listaProntaSalvar.push(obj);
+					//	old=obj;
+					//}
+				}
+				else
+				{
+					old=obj;
+					listaProntaSalvar.push(obj);
+				}
+			});
 
-				console.log('--:'  + binaryString);
+			var i=0;
+
+
+			var refCoord = new Firebase(Constant.Url + '/coordenada/'+data.key);
+			refCoord.remove();
+			var refCor = new Firebase(Constant.Url + '/coordenadageo/'+data.fazenda.key);
+
+			var geoFire = new GeoFire(refCor);
+
+			var refQuadra = new Firebase(Constant.Url + '/quadra/'+data.key+'/coordenadas');
+			refQuadra.set(true);
+			listaProntaSalvar.forEach(function(obj)
+			{			
+
+				var key=refCoord.push().key();
+				var refQuadraNovo = new Firebase(Constant.Url + '/coordenada/'+data.key+'/'+key);
+
+				var objCoord=[];
+				objCoord['key']=key;
+				objCoord['key_quadra']=data.key;
+				objCoord['tipo']=i;
+				objCoord['latitude']=obj.latitude;
+				objCoord['longitude']=obj.longitude;
+
+				refQuadraNovo.set(objCoord);
+
+				geoFire.set(data.key + '_pos'+ i, [obj.latitude, obj.longitude]);
+				i++;
+			});
+
+			Notify.successBottom('Coordenadas adicionadas com sucesso!');
+		}
+
+		$scope.limparArquivo= function(data)
+		{
+			$scope.todascoordenadasCentroid=[];
+			$scope.todascoordenadas=[];
+			if(data!= null && data.coordenadas)
+			{
 
 			}
-			reader.readAsArrayBuffer(element.files[0]);
-			var buf = new ArrayBuffer(reader);
+			else
+			{
+				var novoCetro=[];
+				novoCetro['latitude']=-20;
+				novoCetro['longitude']=-55;		
+				$scope.map.control.getGMap().setZoom(3);
+				$scope.map.center=novoCetro;
+				$scope.refreshMap(novoCetro);
+			}
+		}
+
+		function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) 
+		{
+			var R = 6371; 
+			var dLat = deg2rad(lat2-lat1);  
+			var dLon = deg2rad(lon2-lon1); 
+			var a = 
+			Math.sin(dLat/2) * Math.sin(dLat/2) +
+			Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+			Math.sin(dLon/2) * Math.sin(dLon/2)
+			; 
+			var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+			var d = R * c; 
+			return d *1000;
+		}
+
+		function deg2rad(deg) {
+			return deg * (Math.PI/180)
+		}
+
+		function setaCoordenadas()
+		{
+			if($scope.todascoordenadasCentroid.length>0 && $scope.todascoordenadas.length>0)
+			{
+				var region = new Region($scope.todascoordenadasCentroid);
+				var novoCetro=[];
+				novoCetro['latitude']=region.centroid().x;
+				novoCetro['longitude']=region.centroid().y;		
+				$scope.map.control.getGMap().setZoom(14);
+				$scope.map.center=novoCetro;
+				$scope.refreshMap(novoCetro);
+				$scope.polygons = [
+				{
+					id: 1,
+					path: $scope.todascoordenadas,
+					stroke: {
+						color: '#212121',
+						weight: 3
+					},
+					editable: true,
+					draggable: true,
+					geodesic: false,
+					visible: true,
+					fill: {
+						color: '#fd541f',
+						opacity: 0.8
+					}
+				}
+				];
+
+			}
+			else
+			{
+				var novoCetro=[];
+				novoCetro['latitude']=-20;
+				novoCetro['longitude']=-55;		
+				$scope.map.control.getGMap().setZoom(3);
+				$scope.map.center=novoCetro;
+				$scope.refreshMap(novoCetro);
+			}
+			if(!$scope.$$phase) {
+				$scope.$apply();
+			}
+
+			$('#myPleaseWait').modal('hide');
+		}
+
+		$scope.uploadFiles = function(file, errFiles) 
+		{
+			try {
+				var fileInputElement = document.getElementById("fileInputElement");
+				var fr = new FileReader();
+				if(fileInputElement.files[0].name.indexOf("kml") !== -1)
+				{
+					fr.onload = (function(theFile) {
+						return function(e) {
+							var xmlDoc = parseXML(e.target.result);
+							$scope.processaArquivo_KML(xmlDoc);
+						};
+					})(fileInputElement.files[0]);						
+					fr.readAsText(fileInputElement.files[0]);
+				}
+				else
+				{
+					fr.readAsArrayBuffer(fileInputElement.files[0]);
+					fr.onload = function () {
+						var imageData = fr.result;
+						shapefile.open(imageData)
+						.then(source => source.read()
+							.then(function log(result) {
+								if (result.done) return;
+								console.log(result.value);
+								$scope.processaArquivo_SHAPE(result.value["geometry"]["coordinates"]);
+								return source.read().then(log);
+							}))
+						.catch(error => mostrarAlerta(error.stack));
+					};
+				}
+			}
+			catch(err) {
+				mostrarAlerta(err.stack);
+			}
+			return true;
+		}
+
+		function mostrarAlerta(erro)
+		{
+			alert('Houve um problema ao carregar as coordenadas. Verifique as instruções e tente exportar o arquivo novamente e importar. \nCaso o problema persista envie o arquivo para nós verificarmos o problema detalhado.\n\n'+erro)
+			$scope.arquivoCarregado=false;
+		}
+
+		function parseXML(val) {
+			var xmlDoc;
+			if (document.implementation && document.implementation.createDocument) {
+				xmlDoc = new DOMParser().parseFromString(val, 'text/xml');
+			}
+			else if (window.ActiveXObject) {
+				xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+				xmlDoc.loadXML(val);
+			}
+			else
+			{
+				alert('Seu navegador não é compatível. Use um navegador mais atualizado.ß');
+				return null;
+			}
+			return xmlDoc;
+		}
+
+		$scope.processaArquivo_KML = function(xmlDoc) 
+		{
+			var items = xmlDoc.getElementsByTagName('coordinates');
+			var mListCoord;
+			for(var i = 0; i < items.length; i++) 
+			{
+				mListCoord = items[i].childNodes[0].nodeValue.replace(/(?:\r\n|\r|\n)/g, '').replace(" ", "").split(",0");
+			}
+
+			var mListCoord2=[];
+			for(var i = 0; i < mListCoord.length; i++) {
+				var mCoorSep = mListCoord[i].split(",");
+				for(var i2 = 0; i2 < mCoorSep.length; i2++) {
+					var n = Number(mCoorSep[i2]);
+					if(n!=0)
+					{
+						mListCoord2.push(n);
+					}
+				}
+			}
+			var x=0;
+			var old;
+			$scope.todascoordenadas=[];
+			$scope.todascoordenadasCentroid=[];
+
+			for(var i2 = 0; i2 < mListCoord2.length; i2++) {
+				if(x==0)
+				{
+					old=mListCoord2[i2];
+					x++;
+				}
+				else if(x==1)
+				{
+					var novo=[];
+					novo['longitude']=old;
+					novo['latitude']=mListCoord2[i2];
+					$scope.todascoordenadas.push(novo);
+
+					var novoCentroid=[];
+					novoCentroid['y']=old;
+					novoCentroid['x']=mListCoord2[i2];
+					$scope.todascoordenadasCentroid.push(novoCentroid);		
+					x=0;
+				}
+			}
+			console.log('Terminou');
+			setaCoordenadas();
+			$scope.arquivoCarregado=true;
+			alert('As coordenadas foram carregadas! Confira no mapa e clique no botao salvar coordenadas.');
+
+		}
+
+		$scope.processaArquivo_SHAPE = function(arquivoBruto) 
+		{
+			$scope.todascoordenadas=[];
+			$scope.todascoordenadasCentroid=[];
+			console.log("teste");
 
 
-			$scope.load(element.files[0], 
-				function(res) {
-					console.log('ok', res);
-					shapefile.open(res)
-					.then(source => source.read()
-						.then(function log(result) {
-							if (result.done) return;
-							console.log(result.value);
-							return source.read().then(log);
-						}))
-					.catch(error => console.error(error.stack));
-				},
-				function(res){ console.log('error', res); }
-				)
+			var i=0;
+			for(var poligno in arquivoBruto) 
+			{
+				for(var pol in arquivoBruto[poligno]) 
+				{
+					for(var arr in arquivoBruto[poligno][pol]) 
+					{
+						var novo=[];
+						novo['latitude']=arquivoBruto[poligno][pol][arr][1];
+						novo['longitude']=arquivoBruto[poligno][pol][arr][0];
+						$scope.todascoordenadas.push(novo);
 
+						var novoCentroid=[];
+						novoCentroid['y']=arquivoBruto[poligno][pol][arr][0];
+						novoCentroid['x']=arquivoBruto[poligno][pol][arr][1];
+						$scope.todascoordenadasCentroid.push(novoCentroid);	
+					}
+				}
 
-			
+			}
+			console.log('Terminou');
+			setaCoordenadas();
+			$scope.arquivoCarregado=true;
+			alert('As coordenadas foram carregadas! Confira no mapa e clique no botao salvar coordenadas.')
+		}
 
-			$scope.$apply(function(scope) {
-				var photofile = element.files[0];
-				var reader = new FileReader();
-				reader.onload = function(e) {
-            // handle onload
+		function Point(x, y) {
+			this.x = x;
+			this.y = y;
+		}
 
-        };
-        reader.readAsDataURL(photofile);
+		function Region(points) {
+			this.points = points || [];
+			this.length = points.length;
+		}
 
+		Region.prototype.area = function () {
+			var area = 0,
+			i,
+			j,
+			point1,
+			point2;
 
-    });
+			for (i = 0, j = this.length - 1; i < this.length; j = i, i += 1) {
+				point1 = this.points[i];
+				point2 = this.points[j];
+				area += point1.x * point2.y;
+				area -= point1.y * point2.x;
+			}
+			area /= 2;
+
+			return area;
 		};
 
-		$scope.load = function(src, callback, onerror) {
-			var xhr = new XMLHttpRequest();
-			xhr.responseType = 'arraybuffer';
-			xhr.onload = function() {
-				console.log(xhr.response);
-				var d = new SHPParser().parse(xhr.response);
-				callback(d);
-			};
-			xhr.onerror = onerror;
-			xhr.open('GET', src);
-			xhr.send(null);
+		Region.prototype.centroid = function () {
+			var x = 0,
+			y = 0,
+			i,
+			j,
+			f,
+			point1,
+			point2;
+
+			for (i = 0, j = this.length - 1; i < this.length; j = i, i += 1) {
+				point1 = this.points[i];
+				point2 = this.points[j];
+				f = point1.x * point2.y - point2.x * point1.y;
+				x += (point1.x + point2.x) * f;
+				y += (point1.y + point2.y) * f;
+			}
+
+			f = this.area() * 6;
+
+			return new Point(x / f, y / f);
 		};
 
 
 	}
-
-
-
 }());

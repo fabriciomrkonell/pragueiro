@@ -5,7 +5,7 @@ if(ref.getAuth() === null) window.location.href = '/login';
 
 //var greetings = require("./../controllers/greetings.js");
 //var greetings = '';
-angular.module('Pragueiro.controllers', [ 'firebase', 'ngSanitize', 'googlechart']);
+angular.module('Pragueiro.controllers', [ 'firebase', 'ngSanitize', 'googlechart', 'uiGmapgoogle-maps', 'angularGeoFire']);
 
 angular.module('Pragueiro.config', ['ngRoute']);
 

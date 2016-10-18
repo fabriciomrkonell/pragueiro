@@ -8,12 +8,6 @@ fs = require('fs'),
 app = express();
 
 
-var tj = require('togeojson'),
-fs = require('fs'),
-DOMParser = require('xmldom').DOMParser,
-multer = require('multer');	
-
-
 
 app.use(express.static(path.join(__dirname, '/')));
 app.use(require('morgan')('combined'));
@@ -64,23 +58,6 @@ app.get('/singup', function(req, res){
 
 app.get('/logout', function(req, res){
 	res.redirect('/login');
-});
-
-
-var upload = multer({ dest: '/tmp/'});
-
-
-app.get('/teste', function(req, res, next) {
-	res.render('teste', { title: 'Express' });
-});
-
-app.post('/testeform', upload.single('file'), function(req, res) {
-	var kml = new DOMParser().parseFromString(fs.readFileSync(req.file.path, 'utf8'));
-	var converted = tj.kml(kml);
-	console.log('teste: ' + converted.features[0].geometry.coordinates);
-
-	//next();
-	//console.log('testeeee: ' + greetings.setCoordenadas('456'));
 });
 
 // catch 404 and forward to error handler
