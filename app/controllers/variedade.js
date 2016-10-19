@@ -88,7 +88,10 @@
 						//console.log('Houve uma remoção', snap.name(), snap.val());
 						atualizaListaFiliais();
 					});
-
+					if($scope.fazendas.length==0)
+					{
+						$('#myPleaseWait').modal('hide');
+					}
 			});// final do load
 		}		
 

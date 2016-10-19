@@ -81,14 +81,14 @@
 									<label>Quadra</label>
 
 									<select class="form-control" ng-model="formPlanejamento.key">
-										<option value="{{quadra.$id}}" ng-repeat="quadra in todasQuadras">{{quadra.nome}}</option>
+										<option value="{{quadra.$id}}" ng-repeat="quadra in todasQuadras | orderBy:'nome' ">{{quadra.nome}}</option>
 
 									</select>
 								</div>
 								<div class="form-group">
 									<label>Cultura</label>
 									<select class="form-control" ng-model="formPlanejamento.key_cultura"  ng-change="chengeCultura(formPlanejamento.key_cultura)" ng-disabled=!editCultura>
-										<option value="{{cultura.$id}}" ng-repeat="cultura in culturas" >{{cultura.nome}}</option>
+										<option value="{{cultura.$id}}" ng-repeat="cultura in culturas | orderBy:'nome'" >{{cultura.nome}}</option>
 									</select>
 								</div>
 								<div class="form-group">

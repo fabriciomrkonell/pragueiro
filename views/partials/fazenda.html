@@ -96,7 +96,7 @@
 								<div class="form-group">
 									<label>Usuário</label>
 									<select class="form-control" ng-model="objModalUsuario.usuario">
-										<option value="{{usuario.$id}}" ng-repeat="usuario in todoUsuarios">{{usuario.nome}}</option>
+										<option value="{{usuario.$id}}" ng-repeat="usuario in todoUsuarios | orderBy:'nome'">{{usuario.nome}}</option>
 									</select>
 								</div>
 

@@ -27,6 +27,7 @@
 				cidade: '',
 				email: '',
 				key: '',
+				distancia_pontos:10,
 				usuarios:[],
 				todosUsuarios:[],
 				todosFiliais:[],

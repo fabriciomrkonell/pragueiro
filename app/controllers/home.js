@@ -237,7 +237,10 @@
 						//console.log('Houve uma remoção', snap.name(), snap.val());
 						atualizaListaFiliais();
 					});
-
+					if($scope.fazendas.length==0)
+					{
+						$('#myPleaseWait').modal('hide');
+					}
 			});// final do load
 		}
 		
@@ -319,8 +322,8 @@
 						//console.log('Houve uma remoção', snap.name(), snap.val());
 						atualizaListaFiliais();
 					});
-					$('#myPleaseWait').modal('hide');
-			});// final do load
+					
+			});// final do load1
 		}
 
 		function atualizaVistorias()
