@@ -34,7 +34,7 @@
 			});
 		};
 
-
+		var key_usuario;
 
 		var ref = new Firebase(Constant.Url + '/filial');
 		$scope.todosFiliais=$firebaseArray(ref);
@@ -45,7 +45,7 @@
 		{
 			var refUser = new Firebase(Constant.Url + '/usuarioxauth/'+Session.getUser().uid);		
 			var obj = $firebaseObject(refUser);
-			var key_usuario;
+			
 			obj.$loaded().then(function() {
 				key_usuario= obj.$value;
 				

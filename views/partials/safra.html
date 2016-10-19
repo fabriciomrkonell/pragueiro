@@ -42,7 +42,7 @@
 					<tbody>
 						<tr ng-repeat="safra in safras">
 							<td>{{safra.descricao}}</td>
-							<td class="text-center">{{safra.ativo == 'true' ? 'Sim' : 'Nāo'}}</td>
+							<td class="text-center">{{safra.ativo ? 'Sim' : 'Nāo'}}</td>
 							<td class="text-center" width="130px">
 								<button type="button" class="btn btn-default btn-xs" ng-click="showQuadras(data.fazenda, safra)">Quadras</button>
 								<button type="button" class="btn btn-default btn-xs" ng-click="getHistoricoQuadrasCulturas(data.fazenda, safra)">Histórico</button>

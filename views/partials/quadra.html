@@ -42,7 +42,7 @@
 				</div>
 				<div class="form-group col-sm-9">
 					<br>
-					Escolha um arquivo no formato shapefile ou KML clicando no botão abaixo :
+					Escolha um arquivo no formato shapefile ou KML clicando no botão abaixo22:
 
 					<br>
 					<input type="file" id="fileInputElement" accept=".kml,.shp" data-buttonText="teste">
@@ -53,13 +53,15 @@
 			</div>
 			<div class="col-sm-12">
 				<div class="form-group" ng-if="map.show">
+					
 					<ui-gmap-google-map center='map.center' control='map.control' zoom='map.zoom' options="map.options">
 
 						<ui-gmap-polygon static="true" ng-repeat="p in polygons track by p.id" path="p.path" stroke="p.stroke" visible="p.visible"
 						geodesic="p.geodesic" fill="p.fill" fit="false" editable="p.editable" draggable="p.draggable"></ui-gmap-polygon>						
 
 					</ui-gmap-google-map>
-
+					
+					<div id="map"></div>
 				</div>
 			</div>
 		</div>

@@ -31,6 +31,7 @@
 		//var refFazendas = new Firebase(Constant.Url + '/filial');
 		//$scope.todascoordenadas = [[25.774252, -80.190262],[18.466465, -66.118292],[32.321384, -64.75737],[25.774252, -80.190262]];
 
+
 		$scope.center ={latitude: -20, longitude:  -55 };
 
 		$scope.map = { 
@@ -40,6 +41,7 @@
 			zoom: 3,
 			options: {mapTypeId: google.maps.MapTypeId.SATELLITE }
 		};
+		
 
 		//$scope.center = [];
 		atualizaListaFiliais();
@@ -319,11 +321,14 @@
 		uiGmapIsReady.promise().then(function (maps) {
 
 			$timeout(function(){
+
 			});
 
 		});
 
 		
+
+
 
 
 		$scope.mostrarImportacao = function()

@@ -319,7 +319,7 @@
 						//console.log('Houve uma remoção', snap.name(), snap.val());
 						atualizaListaFiliais();
 					});
-
+					$('#myPleaseWait').modal('hide');
 			});// final do load
 		}
 
