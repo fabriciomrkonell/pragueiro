@@ -94,7 +94,9 @@
 						//console.log('Adicionou filial', snap.name(), snap.val());
 						var obj= snap.val();
 						$scope.fazendas.push(obj.filial);
-						$scope.$apply();
+						if(!$scope.$$phase) {
+							$scope.$apply();
+						}
 					});
 
 					refNovo.on('child_changed', function(snap) {
