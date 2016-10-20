@@ -1,120 +1,34 @@
-//var greetings = require("./../greetings.js");
+angular.module("Pragueiro.controllers", ['uiGmapgoogle-maps'])
+.config(['uiGmapGoogleMapApiProvider', function (GoogleMapApi) {
+	GoogleMapApi.configure({
+//    key: 'your api key',
+    // v: '3.20',
+    libraries: 'weather,geometry,visualization'
+});
+}])
 
-var cities = [
-{
-	city : 'Toronto',
-	desc : 'This is the best city in the world!',
-	lat : 43.7000,
-	long : -79.4000
-},
-{
-	city : 'New York',
-	desc : 'This city is aiiiiite!',
-	lat : 40.6700,
-	long : -73.9400
-},
-{
-	city : 'Chicago',
-	desc : 'This is the second best city in the world!',
-	lat : 41.8819,
-	long : -87.6278
-},
-{
-	city : 'Los Angeles',
-	desc : 'This city is live!',
-	lat : 34.0500,
-	long : -118.2500
-},
-{
-	city : 'Las Vegas',
-	desc : 'Sin City...\'nuff said!',
-	lat : 36.0800,
-	long : -115.1522
-}
-];
+.controller('quadraCtrl2',[ '$scope', '$timeout', '$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Coordenadas', 'Notify', 'uiGmapIsReady', 'uiGmapGoogleMapApi', '$geofire',
+	function ($scope, $timeout, $firebaseArray, $firebaseObject, Session, Constant, Coordenadas, Notify, uiGmapIsReady, uiGmapGoogleMapApi, $geofire) {
+		angular.extend($scope, {
+			edit: false,
+			arquivoCarregado: false,
+			desabilitaFazenda: false,
+			arquivoCarregado:false,
+			fazendas: [],
+			quadras: [],
+			todascoordenadas:[],
+			quadraFilial: [],
+			data: {
+				ativo:true				
+			}
+		});		
 
-var map = null;
-
-function initMap() {
-	map = new google.maps.Map(document.getElementById('map'), {
-		zoom: 16,
-		mapTypeId: google.maps.MapTypeId.SATELLITE,
-		mapTypeControl: false,
-		zoomControl: true,
-		mapTypeControl: false,
-		scaleControl: false,
-		streetViewControl: false,
-		rotateControl: false
-	});
-};
-
-(function()
-{
-
-	'use strict';
-
-	angular.module('Pragueiro.controllers').registerCtrl('quadraCtrl', quadraCtrl)
+		var ref = new Firebase(Constant.Url + '/quadra');
+		$scope.todasQuadras = $firebaseArray(ref);
+		//var refFazendas = new Firebase(Constant.Url + '/filial');
+		//$scope.todascoordenadas = [[25.774252, -80.190262],[18.466465, -66.118292],[32.321384, -64.75737],[25.774252, -80.190262]];
 
 
-//'uiGmapIsReady', 'uiGmapGoogleMapApi'
-//uiGmapIsReady, uiGmapGoogleMapApi,
-quadraCtrl.$inject = [ '$scope', '$interval', '$timeout', '$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Coordenadas', 'Notify',  '$geofire'];
-
-function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObject, Session, Constant, Coordenadas, Notify,  $geofire) 
-{
-
-	angular.extend($scope, {
-		edit: false,
-		arquivoCarregado: false,
-		desabilitaFazenda: false,
-		arquivoCarregado:false,
-		fazendas: [],
-		quadras: [],
-		todascoordenadas:[],
-		quadraFilial: [],
-		data: {
-			ativo:true				
-		}
-	});		
-
-/*
-	var interval = $interval(function(){
-		if(map !== null){
-			initMap();
-			$interval.cancel(interval);
-		}
-	});
-	*/
-
-	function initMap(){
-		//map.setCenter(new google.maps.LatLng(-20, -55));
-
-		var mapOptions = {
-			zoom: 4,
-			center: new google.maps.LatLng(40.0000, -98.0000),
-			mapTypeId: google.maps.MapTypeId.TERRAIN
-		}
-
-		map = new google.maps.Map(document.getElementById('map'), mapOptions);
-
-
-		//$scope.printRouter();
-	};
-
-	var ref = new Firebase(Constant.Url + '/quadra');
-	$scope.todasQuadras = $firebaseArray(ref);
-
-
-	var mapOptions = {
-		zoom: 4,
-		center: new google.maps.LatLng(40.0000, -98.0000),
-		mapTypeId: google.maps.MapTypeId.TERRAIN
-	}
-
-	initMap();
-
-
-/*
 		$scope.center ={latitude: -20, longitude:  -55 };
 
 		$scope.map = { 
@@ -125,7 +39,7 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 			options: {mapTypeId: google.maps.MapTypeId.SATELLITE }
 		};
 		
-		*/
+
 		//$scope.center = [];
 		atualizaListaFiliais();
 
@@ -404,7 +318,6 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 			}
 		};
 
-/*
 		uiGmapIsReady.promise().then(function (maps) {
 
 			$timeout(function(){
@@ -412,7 +325,7 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 			});
 
 		});
-		*/
+
 		
 
 
@@ -852,6 +765,5 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 		};
 
 
-	}
-}()
-);
+
+	}]);

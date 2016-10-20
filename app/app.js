@@ -3,16 +3,19 @@
 var ref = new Firebase("https://pragueiroproducao.firebaseio.com");
 if(ref.getAuth() === null) window.location.href = '/login';
 
-//var greetings = require("./../controllers/greetings.js");
-//var greetings = '';
-angular.module('Pragueiro.controllers', [ 'firebase', 'ngSanitize', 'googlechart', 'uiGmapgoogle-maps', 'angularGeoFire'])
-.config(function(uiGmapGoogleMapApiProvider) {
-	uiGmapGoogleMapApiProvider.configure({
+
+angular.module('Pragueiro.controllers', [ 'firebase', 'ngSanitize', 'googlechart',  'angularGeoFire'])
+//'uiGmapgoogle-maps'
+/*
+.config(['uiGmapGoogleMapApiProvider', function (GoogleMapApi) {
+	GoogleMapApi.configure({
 		key: 'AIzaSyDDu-8XiPmbb5QbSlh-Dv4xyHF53iGUPOk',
-        //v: '3.20', //defaults to latest 3.X anyhow
-        libraries: 'weather,geometry,visualization'
-    });
-})
+		libraries: 'weather,geometry,visualization'
+	});
+}])
+*/
+
+
 
 
 angular.module('Pragueiro.config', ['ngRoute']);

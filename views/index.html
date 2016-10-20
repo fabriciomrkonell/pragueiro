@@ -27,381 +27,383 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
         <![endif]-->
+         <!--
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDDu-8XiPmbb5QbSlh-Dv4xyHF53iGUPOk"></script>
+-->
+</head>
 
-      </head>
+<body>
 
-      <body>
-       
-        <nav class="navbar navbar-default navbar-fixed-top">
-          <div class="container-fluid">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              <a class="navbar-brand" href="../"><img src="views/img/actionbar_title.png" class="logo-actionbar_title"></a>
-            </div>
-            <div id="navbar" class="navbar-collapse collapse">
-              <ul class="nav navbar-nav">
-                <li><a href="#top">Início</a></li>
-                <li><a href="#desafio">O que é</a></li>
-                <li><a href="#comofunciona">Como funciona</a></li>
-                <li><a href="#quemestausando">Quem está usando</a></li>
-                <li><a href="#oquehaporvir">O que há por vir</a></li>
-                <li><a href="#apoio">Apoio</a></li>
-              </ul>
-              <ul class="nav navbar-nav navbar-right">        
-                <li><a href="/app">Entre</a></li>                   
-                <li><a href="#footer">Contato</a></li>       
+ <nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="../"><img src="views/img/actionbar_title.png" class="logo-actionbar_title"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li><a href="#top">Início</a></li>
+        <li><a href="#desafio">O que é</a></li>
+        <li><a href="#comofunciona">Como funciona</a></li>
+        <li><a href="#quemestausando">Quem está usando</a></li>
+        <li><a href="#oquehaporvir">O que há por vir</a></li>
+        <li><a href="#apoio">Apoio</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">        
+        <li><a href="/app">Entre</a></li>                   
+        <li><a href="#footer">Contato</a></li>       
 
-              </ul>
-            </div>
-          </div>
-        </nav>
-
-
-
-        <!-- Header -->
-        <header id="top" class="header">
-          <div class="row row_head">
-            <div class="col-sm-12 text-center">
-              <img src="views/img/img_logo.png" class="logo-login">
-            </div>
-          </div>
-
-        </header>
-
-        <!-- About -->
-        <section id="desafio" class="about">
-          <div class="container">
-            <div class="row">
-              <div class="col-lg-12 text-center">
-                <h2>Ferramenta para auxiliar no Manejo Integrado de Pragas (MIP) e outros controles agrícolas.</h2>
-
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-sm-6 text-center">
-                <a href="/singup" class="pull-right btn btn-success register">Cadastre-se gratuítamente</a> 
-              </div>
-              <div class="col-sm-6 text-left">
-                <a href="https://play.google.com/store/apps/details?id=com.br.mpragueiro&hl=pt_BR"> <img src="views/img/disponivel_googleplay.png" > </a>
-                <br><br><br>
-              </div>
-            </div>
-            <div class="row">
-              <p> 
-                Este aplicativo/sistema tem como objetivo auxiliar agricultores na estratégia MIP - Manejo Integrado de Pragas e outros controles agrícolas. Este conceito (MIP) visa manter as pragas em determinados níveis de equilíbrio que não colocam em risco o meio ambiente, a saúde, a plantação e o lucro do agricultor. 
-              </p>
-              <p>
-                Com o aplicativo você têm uma ferramenta prática para inserir levantamentos geo-referenciados, se beneficiando assim de um histórico dos mesmos, um  mapa de infestação, um gráfico de evolução das pragas e alertas para períodos sem levantamento promovendo um melhor controle de pragas evitando aplicações desnecessárias de agrotóxicos contribuindo, assim, para a preservação do meio ambiente.
-              </p>
-              <p>
-                As informações coletadas ficam disponível em um painel de controle privativo na web, onde pode-se acrescentar outras informações relativas ao tema Agricultura.
-              </p>
-            </div>
-            <!-- /.row -->
-          </div>
-          <!-- /.container -->
-        </section>
-
-        <!-- Services -->
-        <!-- The circle icons use Font Awesome's stacked icon classes. For more information, visit http://fontawesome.io/examples/ -->
-        <section id="comofunciona" class="services bg-primary">
-          <div class="container">
-            <div class="row text-center">
-              <div class="col-lg-10 col-lg-offset-1">
-                <h2>Como funciona</h2>
-                <hr class="small">  
-                <div class="row">
-                  <div class="service-item">  
-                    <div class="col-md-6 col-sm-6">
-                      <img src="views/img/ic_add_location_white_48dp_1x.png">
-                      <img src="views/img/layers.png">
-                      <h4>
-                       <strong>1° Definir as quadras/regiões</strong>
-                     </h4>
-                     <div class="text-vertical-just">
-                       <p >Necessário somente uma vez, pode ser feito pelo próprio aplicativo ou importando um arquivo "shape" no painel de controle. É também informado em cada cadastro de quadra/região outras informações como cultura, data de plantio e variedades.   </p>
-                     </div>
-                   </div>
-
-                   <div class="col-md-3 col-sm-6">
-
-
-                    <img src="views/img/area.jpg"  class="img_como"  >
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col-md-5 col-sm-6">
-                  <img src="views/img/lavoura_levantamento.jpg"  class="img_como2"  >
-                  <br>
-                  <br>
-                  <br>
-                  <br>
-                </div>
-                <div class="col-md-6 col-sm-6">
-                  <br>
-                  <img src="views/img/ic_my_location_white_48dp_1x.png">
-                  <img src="views/img/ic_tablet_android_white_48dp_1x.png">
-                  <h4>
-                   <strong>2° Realizar levantamento</strong>
-                 </h4>
-                 <div class="text-vertical-just">
-                   <p> Depois vá a campo e faça os levantamentos! O app identifica a quadra/região e o ponto. Você informa dados adicionais, como estágio, tipo e valor, além de escolher a praga e tamanho. </p>
-                   <p>Não precisa o dispositivo ter sinal de telefone ou internet.</p>
-                   <p>Os levantamentos são geo-referenciados.</p>
-                 </div>
-               </div>
-             </div>
-             <div class="row">
-              <div class="service-item">
-                <div class="col-md-6 col-sm-6">
-                 <img src="views/img/ic_insert_chart_white_48dp_1x.png">
-                 <img src="views/img/ic_laptop_mac_white_48dp_1x.png">
-                 <h4>
-                   <strong>3° Ver resultados</strong>
-                 </h4>
-                 <div class="text-vertical-just">
-                   <p>Vodê pode ver os dados através de relatórios, gráficos e mapas de infestação.</p>
-                   <p>Quando o equipamento usado no levantamento conectar na internet os dados serão automaticamente sincronizados com a central web (não é necessária nenhuma intervenção do usuário) .  </p>
-                 </div>
-               </div>
-
-               <div class="col-md-3 col-sm-6">
-
-                <img src="views/img/dashboard.png"  class="img_como"  >
-                <br>
-                <br>
-                <br>
-                <br>
-              </div>
-            </div>
-
-            <div class="col-lg-11 col-lg-offset-1">
-              <h2>Um melhor controle, o que significa?</h2>
-              <hr class="small">  
-              <div class="row">
-                <div class="service-item">  
-                  <div class="col-md-4 col-sm-6">
-                    <img src="views/img/ic_update_white_48dp_2x.png">
-                    <h4>
-                      <strong>Agilidade</strong>
-                    </h4>
-                    <div>
-                      <p >Muito mais fácil analisar os levantamentos, o que torna a tomada de decisão para controle rápida. </p>
-                    </div>
-                  </div>
-
-                  <div class="col-md-4 col-sm-6">
-                    <img src="views/img/plant-growing_318-41723.png">
-                    <h4>
-                      <strong>Planta saúdável</strong>
-                    </h4>
-                    <div >
-                      <p >Com o controle eficiente a planta sofre menos, é mais saudável e o meio ambiente é beneficiado com menos agrotóxicos.  </p>
-                    </div>
-                  </div>
-
-                  <div class="col-md-4 col-sm-6">
-                   <img src="views/img/ic_monetization_on_white_48dp_2x.png">
-                   <h4>
-                    <strong>Economia</strong>
-                  </h4>
-                  <div>
-                    <p>A produtividade e o lucro aumentam.  </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- /.col-lg-10 -->
-
-
-        </section>
-
-        <!-- Portfolio -->
-        <section id="portfolio" class="about">
-          <div class="container">
-           <div class="row">
-            <div class="col-lg-12 text-center">
-              <h2>O aplicativo</h2>
-              <hr class="small">
-              <div class="row">
-                <div class="col-md-6 col-lg-6 col-centered">
-                  <div class="portfolio-item">
-                    <a href="#">
-                      <img class="views/img-portfolio img-responsive img_screen" src="views/img/Screenshot_20160503-072224.png">
-                    </a>
-                  </div>
-                </div>
-                <div class="col-md-6 col-lg-6">
-                  <div class="portfolio-item">
-                    <a href="#">
-                      <img class="views/img-portfolio img-responsive img_screen" src="views/img/Screenshot_20160503-072232.png"">
-                    </a>
-                  </div>
-                </div>
-                <div class="col-md-6 col-lg-6">
-                  <div class="portfolio-item">
-                    <a href="#">
-                      <img class="views/img-portfolio img-responsive img_screen" src="views/img/Screenshot_20160503-072245.png">
-                    </a>
-                  </div>
-                </div>
-                <div class="col-md-6 col-lg-6">
-                  <div class="portfolio-item">
-                    <a href="#">
-                      <img class="views/img-portfolio img-responsive img_screen" src="views/img/Screenshot_20160503-072403.png"">
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row">
-                <br><br>
-                <iframe width="560" height="315" src="https://www.youtube.com/embed/dneX9ip3A3Y" frameborder="0" allowfullscreen></iframe>
-                <br><br>
-              </div>
-
-            </div>
-            <!-- /.col-lg-10 -->
-          </div>
-          <!-- /.row -->
-        </div>
-        <!-- /.container -->
-      </section>
+      </ul>
+    </div>
+  </div>
+</nav>
 
 
 
-      <!-- Map -->
-      <section id="quemestausando" class="map">
+<!-- Header -->
+<header id="top" class="header">
+  <div class="row row_head">
+    <div class="col-sm-12 text-center">
+      <img src="views/img/img_logo.png" class="logo-login">
+    </div>
+  </div>
+
+</header>
+
+<!-- About -->
+<section id="desafio" class="about">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h2>Ferramenta para auxiliar no Manejo Integrado de Pragas (MIP) e outros controles agrícolas.</h2>
+
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-6 text-center">
+        <a href="/singup" class="pull-right btn btn-success register">Cadastre-se gratuítamente</a> 
+      </div>
+      <div class="col-sm-6 text-left">
+        <a href="https://play.google.com/store/apps/details?id=com.br.mpragueiro&hl=pt_BR"> <img src="views/img/disponivel_googleplay.png" > </a>
+        <br><br><br>
+      </div>
+    </div>
+    <div class="row">
+      <p> 
+        Este aplicativo/sistema tem como objetivo auxiliar agricultores na estratégia MIP - Manejo Integrado de Pragas e outros controles agrícolas. Este conceito (MIP) visa manter as pragas em determinados níveis de equilíbrio que não colocam em risco o meio ambiente, a saúde, a plantação e o lucro do agricultor. 
+      </p>
+      <p>
+        Com o aplicativo você têm uma ferramenta prática para inserir levantamentos geo-referenciados, se beneficiando assim de um histórico dos mesmos, um  mapa de infestação, um gráfico de evolução das pragas e alertas para períodos sem levantamento promovendo um melhor controle de pragas evitando aplicações desnecessárias de agrotóxicos contribuindo, assim, para a preservação do meio ambiente.
+      </p>
+      <p>
+        As informações coletadas ficam disponível em um painel de controle privativo na web, onde pode-se acrescentar outras informações relativas ao tema Agricultura.
+      </p>
+    </div>
+    <!-- /.row -->
+  </div>
+  <!-- /.container -->
+</section>
+
+<!-- Services -->
+<!-- The circle icons use Font Awesome's stacked icon classes. For more information, visit http://fontawesome.io/examples/ -->
+<section id="comofunciona" class="services bg-primary">
+  <div class="container">
+    <div class="row text-center">
+      <div class="col-lg-10 col-lg-offset-1">
+        <h2>Como funciona</h2>
+        <hr class="small">  
         <div class="row">
-          <div class="col-lg-12 text-center">
-            <br>
-            <br>
-            <h2>Quem está usando</h2>
-            <hr class="small">         
-          </div>
-
-          <div class="row map">
-            
-            <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://www.google.com/maps/embed/v1/place?q=Brasil&key=AIzaSyDDu-8XiPmbb5QbSlh-Dv4xyHF53iGUPOk"></iframe>
-
-          </div>
-        </div>
-      </section>
-
-      <!-- Call to Action -->
-      <section id="oquehaporvir" class="oquehaporvir bg-primary">
-        <div class="container">
-          <div class="row">
-            <div class="col-lg-12">
-              <br>
-              <br>
-              <h2 class="text-center">O que há por vir</h2>
-              <hr class="small">  
-              <div class="col-md-12 col-md-offset-2">
-                <ul class="list-style-type:circle lista">
-                 <li>Importação de shapefile para área</li>
-                 <li>Controle de aplicação</li>
-                 <li>Inclusão de foto e observação</li>
-                 <li>Relatórios gerais</li>
-                 <li>Outros controles de campo</li>
-               </ul>
-               <br>   
-               <br>                     
+          <div class="service-item">  
+            <div class="col-md-6 col-sm-6">
+              <img src="views/img/ic_add_location_white_48dp_1x.png">
+              <img src="views/img/layers.png">
+              <h4>
+               <strong>1° Definir as quadras/regiões</strong>
+             </h4>
+             <div class="text-vertical-just">
+               <p >Necessário somente uma vez, pode ser feito pelo próprio aplicativo ou importando um arquivo "shape" no painel de controle. É também informado em cada cadastro de quadra/região outras informações como cultura, data de plantio e variedades.   </p>
              </div>
            </div>
-         </div>
-       </div>
-     </section>
 
-     <!-- About -->
-     <section id="apoio" class="about">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12 text-center">
-           <br>
-           <br>
-           <h2 class="text-center">Apoio</h2>
-           <hr class="small">  
-         </div>
-       </div>
-       <div class="row">
-        <div class="col-sm-12 text-center">
-          <img src="views/img/img_inovapps.png">
-          <img src="views/img/img_ministeriodascomunicacoes.png">
-          <img src="views/img/img_governofederal.png">
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-        </div>
-      </div>
-
-      <!-- /.row -->
-    </div>
-    <!-- /.container -->
-  </section>
+           <div class="col-md-3 col-sm-6">
 
 
-  <!-- Footer -->
-  <footer id="footer">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-10 col-lg-offset-1 text-center">
-          <br>
-          <br>
-          <h4><strong>Pragueiro - Controle Agrícola</strong>
-          </h4>
-          <p>Chapadãdo do Sul - MS
-            <br>Sapezal - MT</p>
-            <br>Jonas Orlando Rotilli</p>
-            <ul class="list-unstyled">
-              <li><i class="fa fa-phone fa-fw"></i> (67) 9 8147-8550</li>
-              <li><i class="fa fa-envelope-o fa-fw"></i> <a href="pragueiro@gmail.com">pragueiro@gmail.com</a>
-              </li>
-            </ul>
+            <img src="views/img/area.jpg"  class="img_como"  >
             <br>
-            <ul class="list-inline">
-              <li>
-                <a href="#"><i class="fa fa-facebook fa-fw fa-3x"></i></a>
-              </li>
-              <li>
-                <a href="#"><i class="fa fa-twitter fa-fw fa-3x"></i></a>
-              </li>
-              <li>
-                <a href="#"><i class="fa fa-dribbble fa-fw fa-3x"></i></a>
-              </li>
-            </ul>
-            <hr class="small">
-            <p class="text-muted">Copyright &copy; 2016</p>
-            <img src="views/img/img_praga.png">
+            <br>
+            <br>
+            <br>
           </div>
         </div>
       </div>
-      <a id="to-top" href="#top" class="btn btn-dark btn-lg"><i class="fa fa-chevron-up fa-fw fa-1x"></i></a>
-    </footer>
 
-    <!-- jQuery -->
-    <script src="views/js/jquery.js"></script>
+      <div class="row">
+        <div class="col-md-5 col-sm-6">
+          <img src="views/img/lavoura_levantamento.jpg"  class="img_como2"  >
+          <br>
+          <br>
+          <br>
+          <br>
+        </div>
+        <div class="col-md-6 col-sm-6">
+          <br>
+          <img src="views/img/ic_my_location_white_48dp_1x.png">
+          <img src="views/img/ic_tablet_android_white_48dp_1x.png">
+          <h4>
+           <strong>2° Realizar levantamento</strong>
+         </h4>
+         <div class="text-vertical-just">
+           <p> Depois vá a campo e faça os levantamentos! O app identifica a quadra/região e o ponto. Você informa dados adicionais, como estágio, tipo e valor, além de escolher a praga e tamanho. </p>
+           <p>Não precisa o dispositivo ter sinal de telefone ou internet.</p>
+           <p>Os levantamentos são geo-referenciados.</p>
+         </div>
+       </div>
+     </div>
+     <div class="row">
+      <div class="service-item">
+        <div class="col-md-6 col-sm-6">
+         <img src="views/img/ic_insert_chart_white_48dp_1x.png">
+         <img src="views/img/ic_laptop_mac_white_48dp_1x.png">
+         <h4>
+           <strong>3° Ver resultados</strong>
+         </h4>
+         <div class="text-vertical-just">
+           <p>Vodê pode ver os dados através de relatórios, gráficos e mapas de infestação.</p>
+           <p>Quando o equipamento usado no levantamento conectar na internet os dados serão automaticamente sincronizados com a central web (não é necessária nenhuma intervenção do usuário) .  </p>
+         </div>
+       </div>
 
-    <!-- Bootstrap Core JavaScript -->
-    <script src="views/js/bootstrap.min.js"></script>
+       <div class="col-md-3 col-sm-6">
 
-    <!-- Custom Theme JavaScript -->
-    <script>
+        <img src="views/img/dashboard.png"  class="img_como"  >
+        <br>
+        <br>
+        <br>
+        <br>
+      </div>
+    </div>
+
+    <div class="col-lg-11 col-lg-offset-1">
+      <h2>Um melhor controle, o que significa?</h2>
+      <hr class="small">  
+      <div class="row">
+        <div class="service-item">  
+          <div class="col-md-4 col-sm-6">
+            <img src="views/img/ic_update_white_48dp_2x.png">
+            <h4>
+              <strong>Agilidade</strong>
+            </h4>
+            <div>
+              <p >Muito mais fácil analisar os levantamentos, o que torna a tomada de decisão para controle rápida. </p>
+            </div>
+          </div>
+
+          <div class="col-md-4 col-sm-6">
+            <img src="views/img/plant-growing_318-41723.png">
+            <h4>
+              <strong>Planta saúdável</strong>
+            </h4>
+            <div >
+              <p >Com o controle eficiente a planta sofre menos, é mais saudável e o meio ambiente é beneficiado com menos agrotóxicos.  </p>
+            </div>
+          </div>
+
+          <div class="col-md-4 col-sm-6">
+           <img src="views/img/ic_monetization_on_white_48dp_2x.png">
+           <h4>
+            <strong>Economia</strong>
+          </h4>
+          <div>
+            <p>A produtividade e o lucro aumentam.  </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /.col-lg-10 -->
+
+
+</section>
+
+<!-- Portfolio -->
+<section id="portfolio" class="about">
+  <div class="container">
+   <div class="row">
+    <div class="col-lg-12 text-center">
+      <h2>O aplicativo</h2>
+      <hr class="small">
+      <div class="row">
+        <div class="col-md-6 col-lg-6 col-centered">
+          <div class="portfolio-item">
+            <a href="#">
+              <img class="views/img-portfolio img-responsive img_screen" src="views/img/Screenshot_20160503-072224.png">
+            </a>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-6">
+          <div class="portfolio-item">
+            <a href="#">
+              <img class="views/img-portfolio img-responsive img_screen" src="views/img/Screenshot_20160503-072232.png"">
+            </a>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-6">
+          <div class="portfolio-item">
+            <a href="#">
+              <img class="views/img-portfolio img-responsive img_screen" src="views/img/Screenshot_20160503-072245.png">
+            </a>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-6">
+          <div class="portfolio-item">
+            <a href="#">
+              <img class="views/img-portfolio img-responsive img_screen" src="views/img/Screenshot_20160503-072403.png"">
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <br><br>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/dneX9ip3A3Y" frameborder="0" allowfullscreen></iframe>
+        <br><br>
+      </div>
+
+    </div>
+    <!-- /.col-lg-10 -->
+  </div>
+  <!-- /.row -->
+</div>
+<!-- /.container -->
+</section>
+
+
+
+<!-- Map -->
+<section id="quemestausando" class="map">
+  <div class="row">
+    <div class="col-lg-12 text-center">
+      <br>
+      <br>
+      <h2>Quem está usando</h2>
+      <hr class="small">         
+    </div>
+
+    <div class="row map">
+<!--
+      <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://www.google.com/maps/embed/v1/place?q=Brasil&key=AIzaSyDDu-8XiPmbb5QbSlh-Dv4xyHF53iGUPOk"></iframe>
+    -->
+  </div>
+</div>
+</section>
+
+<!-- Call to Action -->
+<section id="oquehaporvir" class="oquehaporvir bg-primary">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <br>
+        <br>
+        <h2 class="text-center">O que há por vir</h2>
+        <hr class="small">  
+        <div class="col-md-12 col-md-offset-2">
+          <ul class="list-style-type:circle lista">
+           <li>Importação de shapefile para área</li>
+           <li>Controle de aplicação</li>
+           <li>Inclusão de foto e observação</li>
+           <li>Relatórios gerais</li>
+           <li>Outros controles de campo</li>
+         </ul>
+         <br>   
+         <br>                     
+       </div>
+     </div>
+   </div>
+ </div>
+</section>
+
+<!-- About -->
+<section id="apoio" class="about">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+       <br>
+       <br>
+       <h2 class="text-center">Apoio</h2>
+       <hr class="small">  
+     </div>
+   </div>
+   <div class="row">
+    <div class="col-sm-12 text-center">
+      <img src="views/img/img_inovapps.png">
+      <img src="views/img/img_ministeriodascomunicacoes.png">
+      <img src="views/img/img_governofederal.png">
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+    </div>
+  </div>
+
+  <!-- /.row -->
+</div>
+<!-- /.container -->
+</section>
+
+
+<!-- Footer -->
+<footer id="footer">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-10 col-lg-offset-1 text-center">
+        <br>
+        <br>
+        <h4><strong>Pragueiro - Controle Agrícola</strong>
+        </h4>
+        <p>Chapadãdo do Sul - MS
+          <br>Sapezal - MT</p>
+          <br>Jonas Orlando Rotilli</p>
+          <ul class="list-unstyled">
+            <li><i class="fa fa-phone fa-fw"></i> (67) 9 8147-8550</li>
+            <li><i class="fa fa-envelope-o fa-fw"></i> <a href="pragueiro@gmail.com">pragueiro@gmail.com</a>
+            </li>
+          </ul>
+          <br>
+          <ul class="list-inline">
+            <li>
+              <a href="#"><i class="fa fa-facebook fa-fw fa-3x"></i></a>
+            </li>
+            <li>
+              <a href="#"><i class="fa fa-twitter fa-fw fa-3x"></i></a>
+            </li>
+            <li>
+              <a href="#"><i class="fa fa-dribbble fa-fw fa-3x"></i></a>
+            </li>
+          </ul>
+          <hr class="small">
+          <p class="text-muted">Copyright &copy; 2016</p>
+          <img src="views/img/img_praga.png">
+        </div>
+      </div>
+    </div>
+    <a id="to-top" href="#top" class="btn btn-dark btn-lg"><i class="fa fa-chevron-up fa-fw fa-1x"></i></a>
+  </footer>
+
+  <!-- jQuery -->
+  <script src="views/js/jquery.js"></script>
+
+  <!-- Bootstrap Core JavaScript -->
+  <script src="views/js/bootstrap.min.js"></script>
+
+  <!-- Custom Theme JavaScript -->
+  <script>
     // Closes the sidebar menu
     $("#menu-close").click(function(e) {
       e.preventDefault();
