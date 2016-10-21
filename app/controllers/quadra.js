@@ -528,11 +528,7 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 			$scope.todascoordenadas.forEach(function(obj){
 				if(old!=null)
 				{
-					//if(getDistanceFromLatLonInKm(old.latitude,  old.longitude, obj.latitude, obj.longitude)>2)
-					//{
-						listaProntaSalvar.push(obj);
-					//	old=obj;
-					//}
+					listaProntaSalvar.push(obj);
 				}
 				else
 				{
@@ -615,66 +611,37 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 				var region = new Region($scope.todascoordenadasCentroid);			
 				initMap(new google.maps.LatLng(region.centroid().x, region.centroid().y), 14);
 
-
-				 // Construct the polygon.
-				 var bermudaTriangle = new google.maps.Polygon({
-				 	paths: $scope.todascoordenadas,
-				 	strokeColor: '#212121',
-				 	strokeOpacity: 0.8,
-				 	strokeWeight: 3,
-				 	fillColor: '#fd541f',
-				 	fillOpacity: 0.90
-				 });
-				 bermudaTriangle.setMap(map);
-
-				 
+				var bermudaTriangle = new google.maps.Polygon({
+					paths: $scope.todascoordenadas,
+					strokeColor: '#212121',
+					strokeOpacity: 0.8,
+					strokeWeight: 3,
+					fillColor: '#fd541f',
+					fillOpacity: 0.90
+				});
+				bermudaTriangle.setMap(map);
 
 
-				 /*
-				  var novoCetro=[];
-				  novoCetro['latitude']=region.centroid().x;
-				 novoCetro['longitude']=region.centroid().y;		
-				 $scope.map.control.getGMap().setZoom(14);
-				 $scope.map.center=novoCetro;
-				 $scope.refreshMap(novoCetro);
-				 $scope.polygons = [
-				 {
-				 	id: 1,
-				 	path: $scope.todascoordenadas,
-				 	stroke: {
-				 		color: '#212121',
-				 		weight: 3
-				 	},
-				 	editable: true,
-				 	draggable: true,
-				 	geodesic: false,
-				 	visible: true,
-				 	fill: {
-				 		color: '#fd541f',
-				 		opacity: 0.8
-				 	}
-				 }
-				 ];
-				 */
-				}
-				else
-				{
-					initMap(new google.maps.LatLng(-20, -55), 4 );
-				}
-				if(!$scope.$$phase) {
-					$scope.$apply();
-				}
-
-				$('#myPleaseWait').modal('hide');
+			}
+			else
+			{
+				initMap(new google.maps.LatLng(-20, -55), 4 );
+			}
+			if(!$scope.$$phase) 
+			{
+				$scope.$apply();
 			}
 
-			$scope.uploadFiles = function(file, errFiles) 
-			{
-				try {
-					var fileInputElement = document.getElementById("fileInputElement");
-					var fr = new FileReader();
-					if(fileInputElement.files[0].name.indexOf("shp") !== -1)
-					{
+			$('#myPleaseWait').modal('hide');
+		}
+
+		$scope.uploadFiles = function(file, errFiles) 
+		{
+			try {
+				var fileInputElement = document.getElementById("fileInputElement");
+				var fr = new FileReader();
+				if(fileInputElement.files[0].name.indexOf(".kml") >-1)
+				{
 						//var xml = new KmlMapParser({ map: map, kml: fileInputElement.files[0], });
 
 						fr.onload = (function(theFile) {
@@ -685,7 +652,7 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 						})(fileInputElement.files[0]);						
 						fr.readAsText(fileInputElement.files[0]);
 					}
-					else
+					else if(fileInputElement.files[0].name.indexOf(".shp") > -1)
 					{
 						
 
@@ -702,6 +669,11 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 								}))
 							.catch(error => mostrarAlerta(error.stack));
 						};
+					}
+					else
+					{
+						alert('ATENÇÂO \n\n Fomato não suportado. Veja as instruções.')
+						return true;
 					}
 				}
 				catch(err) {
