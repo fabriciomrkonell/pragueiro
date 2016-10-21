@@ -55,9 +55,12 @@
 				</div>
 				<div class="form-group col-sm-9">
 					<br>
-					Escolha um arquivo no formato shapefile ou KML clicando no botão abaixo22:
-
+					Escolha um arquivo no formato shapefile ou KML clicando no botão abaixo.
+					Obs.: A quadra/região precisa estar salva. 
 					<br>
+					<a href="javascript:showDicas()" >Clique aqui para dicas & Intruções.</a>
+					<br>
+
 					<input type="file" id="fileInputElement" accept=".kml,.shp" data-buttonText="teste">
 				</p>
 				<button type="button" class="btn btn-primary" ng-show="edit" ng-click="uploadFiles()">Carregar</button>
@@ -74,9 +77,9 @@
 
 					</ui-gmap-google-map>
 				-->
-				antes
+
 				<div id="map"></div>
-				123
+
 				<div id="class" ng-repeat="marker in markers | orderBy : 'title'">
 					<a href="#" ng-click="openInfoWindow($event, marker)">{{marker.title}}</a>
 				</div>
@@ -87,7 +90,7 @@
 		<table class="table table-condensed table-bordered">
 			<thead>
 				<tr>
-					<th>Código</th>
+					<th>Códigso</th>
 					<th>Nome</th>
 					<th class="text-center" width="60px">Coordenadas</th>
 					<th class="text-center" width="60px">Ações</th>
@@ -116,6 +119,64 @@
 
 </div>
 </div>
+
+<!--########################################################################################-->
+<!--MODAL HISTORICO-->
+
+
+<div class="modal fade" tabindex="-1" role="dialog" id="modalInstrucoes">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">Dicas & Instruções para importação arquivo</h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-sm-12">
+						<ul>
+							
+							<p> Formatos aceitos:
+							</p>
+							<li>
+								<p> <a href="https://pt.wikipedia.org/wiki/Shapefile"> ShapeFile </a>- Somente o arquivo .SHP &eacute; necess&aacute;rio.</p>
+							</li>
+							<li>
+								<p><a href="https://pt.wikipedia.org/wiki/Keyhole_Markup_Language">  KML.</a>&nbsp; - não confuda com KMZ. Há essas 2 opções na hora de salvar/exportar do Google Earth.</p>
+							</li>
+
+						</ul>
+						<br>
+						<br>
+						<ul>
+							<li>
+								<p>A quadra/regi&atilde;o precisa estar salva, se n&atilde;o o bot&atilde;o de "<strong>carregar</strong>"&nbsp;n&atilde;o ficar&aacute; vis&iacute;vel.</p>
+							</li>
+
+							<li>
+								<p>N&atilde;o &eacute; necess&aacute;rio&nbsp;muitos pontos, pontos a cada 5 metros &eacute; o suficiente para a maioria dos casos. Quanto mais pontos mais preciso.</p>
+							</li>
+							<li>
+								<p>O arquivo precisa ter somente latitude e longitude em graus, mais nada (<strong>respeitando as diretrizes do formato do arquivo -ShapeFile e KML</strong>).</p>
+							</li>
+							<li>
+								<p>Se seu mapa não aparecer corretamente não salve.</p>
+							</li>
+						</ul>
+						<p>&nbsp;</p>
+						<p><strong>Caso apresente erro ou n&atilde;o apare&ccedil;a no mapa envie o arquivo por e-mail com seu e-mail e nome da quadra para o e-mail:&nbsp;<a href="mailto:pragueirovistoriaagricola@gmail.com">pragueirovistoriaagricola@gmail.com</a>&nbsp;que iremos verificar seu arquivo e tentar import&aacute;-lo.</strong></p>
+						<p>Envie sugestões para outros formatos para o e-mail:&nbsp;<a href="mailto:pragueirovistoriaagricola@gmail.com">pragueirovistoriaagricola@gmail.com</a>&nbsp;que iremos verificar e implementar a importação.</strong></p>
+
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 <!-- Modal Start here-->
 <div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"
 role="dialog" aria-hidden="true" data-backdrop="static">

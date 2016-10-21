@@ -48,6 +48,11 @@ function initMap() {
 	});
 };
 
+function showDicas()
+{
+	$('#modalInstrucoes').modal('show');
+};
+
 (function()
 {
 
@@ -86,13 +91,13 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 	});
 	*/
 
-	function initMap(){
+	function initMap(center, zoom){
 		//map.setCenter(new google.maps.LatLng(-20, -55));
 
 		var mapOptions = {
-			zoom: 4,
-			center: new google.maps.LatLng(40.0000, -98.0000),
-			mapTypeId: google.maps.MapTypeId.TERRAIN
+			zoom: zoom,
+			center: center,
+			mapTypeId: google.maps.MapTypeId.HYBRID
 		}
 
 		map = new google.maps.Map(document.getElementById('map'), mapOptions);
@@ -105,13 +110,8 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 	$scope.todasQuadras = $firebaseArray(ref);
 
 
-	var mapOptions = {
-		zoom: 4,
-		center: new google.maps.LatLng(40.0000, -98.0000),
-		mapTypeId: google.maps.MapTypeId.TERRAIN
-	}
 
-	initMap();
+	initMap(new google.maps.LatLng(-20, -55), 4 );
 
 
 /*
@@ -351,13 +351,14 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 			$scope.setaFazenda(fazendaTmp);	
 			$scope.chengeFazenda($scope.data.fazenda);	
 			$scope.edit = false;
-			setaCoordenadas();
+			setaCoordenadas();		
 		};
 
 		$scope.chamaEditar = function(obj)
 		{			
 			$('#myPleaseWait').modal('show');
-			$scope.map.control.getGMap().setZoom(3);
+
+			//$scope.map.control.getGMap().setZoom(3);
 			$scope.desabilitaFazenda=true;
 			var fazendaTmp=$scope.data.fazenda;
 			$scope.data = obj;
@@ -368,6 +369,8 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 			if(!$scope.data.coordenadas)
 			{
 				$('#myPleaseWait').modal('hide');
+				setaCoordenadas();
+				return true;
 			}
 			else
 			{
@@ -383,7 +386,9 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 						var novo=[];
 						novo['latitude']=coordenadas.latitude;
 						novo['longitude']=coordenadas.longitude;
-						$scope.todascoordenadas.push(novo);
+						$scope.todascoordenadas.push(new google.maps.LatLng(coordenadas.latitude, coordenadas.longitude));
+
+						//$scope.todascoordenadas.push(novo);
 
 						var novoCentroid=[];
 						novoCentroid['x']=coordenadas.latitude;
@@ -392,7 +397,7 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 					});
 					console.log('terminou');
 					setaCoordenadas();
-					
+					return true;
 
 					if(!$scope.$$phase) {
 						$scope.$apply();
@@ -509,7 +514,6 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 
 		$scope.salvarArquivo= function(data)
 		{
-
 			var refCoordenadasGeoFire = $firebaseArray(new Firebase(Constant.Url + '/coordenadageo/'+data.fazenda.key));
 
 			refCoordenadasGeoFire.$loaded(function() {
@@ -558,12 +562,12 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 				objCoord['key']=key;
 				objCoord['key_quadra']=data.key;
 				objCoord['tipo']=i;
-				objCoord['latitude']=obj.latitude;
-				objCoord['longitude']=obj.longitude;
+				objCoord['latitude']=obj.lat();
+				objCoord['longitude']=obj.lng();
 
 				refQuadraNovo.set(objCoord);
 
-				geoFire.set(data.key + '_pos'+ i, [obj.latitude, obj.longitude]);
+				geoFire.set(data.key + '_pos'+ i, [obj.lat(), obj.lng()]);
 				i++;
 			});
 
@@ -576,16 +580,11 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 			$scope.todascoordenadas=[];
 			if(data!= null && data.coordenadas)
 			{
-
+				$scope.chamaEditar(data);
 			}
 			else
 			{
-				var novoCetro=[];
-				novoCetro['latitude']=-20;
-				novoCetro['longitude']=-55;		
-				$scope.map.control.getGMap().setZoom(3);
-				$scope.map.center=novoCetro;
-				$scope.refreshMap(novoCetro);
+				setaCoordenadas();
 			}
 		}
 
@@ -612,246 +611,316 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 		{
 			if($scope.todascoordenadasCentroid.length>0 && $scope.todascoordenadas.length>0)
 			{
-				var region = new Region($scope.todascoordenadasCentroid);
-				var novoCetro=[];
-				novoCetro['latitude']=region.centroid().x;
-				novoCetro['longitude']=region.centroid().y;		
-				$scope.map.control.getGMap().setZoom(14);
-				$scope.map.center=novoCetro;
-				$scope.refreshMap(novoCetro);
-				$scope.polygons = [
-				{
-					id: 1,
-					path: $scope.todascoordenadas,
-					stroke: {
-						color: '#212121',
-						weight: 3
-					},
-					editable: true,
-					draggable: true,
-					geodesic: false,
-					visible: true,
-					fill: {
-						color: '#fd541f',
-						opacity: 0.8
-					}
-				}
-				];
 
-			}
-			else
-			{
-				var novoCetro=[];
-				novoCetro['latitude']=-20;
-				novoCetro['longitude']=-55;		
-				$scope.map.control.getGMap().setZoom(3);
-				$scope.map.center=novoCetro;
-				$scope.refreshMap(novoCetro);
-			}
-			if(!$scope.$$phase) {
-				$scope.$apply();
-			}
+				var region = new Region($scope.todascoordenadasCentroid);			
+				initMap(new google.maps.LatLng(region.centroid().x, region.centroid().y), 14);
 
-			$('#myPleaseWait').modal('hide');
-		}
 
-		$scope.uploadFiles = function(file, errFiles) 
-		{
-			try {
-				var fileInputElement = document.getElementById("fileInputElement");
-				var fr = new FileReader();
-				if(fileInputElement.files[0].name.indexOf("kml") !== -1)
-				{
-					fr.onload = (function(theFile) {
-						return function(e) {
-							var xmlDoc = parseXML(e.target.result);
-							$scope.processaArquivo_KML(xmlDoc);
-						};
-					})(fileInputElement.files[0]);						
-					fr.readAsText(fileInputElement.files[0]);
+				 // Construct the polygon.
+				 var bermudaTriangle = new google.maps.Polygon({
+				 	paths: $scope.todascoordenadas,
+				 	strokeColor: '#212121',
+				 	strokeOpacity: 0.8,
+				 	strokeWeight: 3,
+				 	fillColor: '#fd541f',
+				 	fillOpacity: 0.90
+				 });
+				 bermudaTriangle.setMap(map);
+
+				 
+
+
+				 /*
+				  var novoCetro=[];
+				  novoCetro['latitude']=region.centroid().x;
+				 novoCetro['longitude']=region.centroid().y;		
+				 $scope.map.control.getGMap().setZoom(14);
+				 $scope.map.center=novoCetro;
+				 $scope.refreshMap(novoCetro);
+				 $scope.polygons = [
+				 {
+				 	id: 1,
+				 	path: $scope.todascoordenadas,
+				 	stroke: {
+				 		color: '#212121',
+				 		weight: 3
+				 	},
+				 	editable: true,
+				 	draggable: true,
+				 	geodesic: false,
+				 	visible: true,
+				 	fill: {
+				 		color: '#fd541f',
+				 		opacity: 0.8
+				 	}
+				 }
+				 ];
+				 */
 				}
 				else
 				{
-					fr.readAsArrayBuffer(fileInputElement.files[0]);
-					fr.onload = function () {
-						var imageData = fr.result;
-						shapefile.open(imageData)
-						.then(source => source.read()
-							.then(function log(result) {
-								if (result.done) return;
-								console.log(result.value);
-								$scope.processaArquivo_SHAPE(result.value["geometry"]["coordinates"]);
-								return source.read().then(log);
-							}))
-						.catch(error => mostrarAlerta(error.stack));
-					};
+					initMap(new google.maps.LatLng(-20, -55), 4 );
 				}
-			}
-			catch(err) {
-				mostrarAlerta(err.stack);
-			}
-			return true;
-		}
+				if(!$scope.$$phase) {
+					$scope.$apply();
+				}
 
-		function mostrarAlerta(erro)
-		{
-			alert('Houve um problema ao carregar as coordenadas. Verifique as instruções e tente exportar o arquivo novamente e importar. \nCaso o problema persista envie o arquivo para nós verificarmos o problema detalhado.\n\n'+erro)
-			$scope.arquivoCarregado=false;
-		}
+				$('#myPleaseWait').modal('hide');
+			}
 
-		function parseXML(val) {
-			var xmlDoc;
-			if (document.implementation && document.implementation.createDocument) {
-				xmlDoc = new DOMParser().parseFromString(val, 'text/xml');
-			}
-			else if (window.ActiveXObject) {
-				xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
-				xmlDoc.loadXML(val);
-			}
-			else
+			$scope.uploadFiles = function(file, errFiles) 
 			{
-				alert('Seu navegador não é compatível. Use um navegador mais atualizado.ß');
-				return null;
-			}
-			return xmlDoc;
-		}
-
-		$scope.processaArquivo_KML = function(xmlDoc) 
-		{
-			var items = xmlDoc.getElementsByTagName('coordinates');
-			var mListCoord;
-			for(var i = 0; i < items.length; i++) 
-			{
-				mListCoord = items[i].childNodes[0].nodeValue.replace(/(?:\r\n|\r|\n)/g, '').replace(" ", "").split(",0");
-			}
-
-			var mListCoord2=[];
-			for(var i = 0; i < mListCoord.length; i++) {
-				var mCoorSep = mListCoord[i].split(",");
-				for(var i2 = 0; i2 < mCoorSep.length; i2++) {
-					var n = Number(mCoorSep[i2]);
-					if(n!=0)
+				try {
+					var fileInputElement = document.getElementById("fileInputElement");
+					var fr = new FileReader();
+					if(fileInputElement.files[0].name.indexOf("shp") !== -1)
 					{
-						mListCoord2.push(n);
+						//var xml = new KmlMapParser({ map: map, kml: fileInputElement.files[0], });
+
+						fr.onload = (function(theFile) {
+							return function(e) {
+								var xmlDoc = parseXML(e.target.result);
+								$scope.processaArquivo_KML(xmlDoc);
+							};
+						})(fileInputElement.files[0]);						
+						fr.readAsText(fileInputElement.files[0]);
+					}
+					else
+					{
+						
+
+						fr.readAsArrayBuffer(fileInputElement.files[0]);
+						fr.onload = function () {
+							var imageData = fr.result;
+							shapefile.open(imageData)
+							.then(source => source.read()
+								.then(function log(result) {
+									if (result.done) return;
+									console.log(result.value);
+									$scope.processaArquivo_SHAPE(result.value["geometry"]["coordinates"]);
+									return source.read().then(log);
+								}))
+							.catch(error => mostrarAlerta(error.stack));
+						};
 					}
 				}
-			}
-			var x=0;
-			var old;
-			$scope.todascoordenadas=[];
-			$scope.todascoordenadasCentroid=[];
-
-			for(var i2 = 0; i2 < mListCoord2.length; i2++) {
-				if(x==0)
-				{
-					old=mListCoord2[i2];
-					x++;
+				catch(err) {
+					mostrarAlerta(err.stack);
 				}
-				else if(x==1)
-				{
-					var novo=[];
-					novo['longitude']=old;
-					novo['latitude']=mListCoord2[i2];
-					$scope.todascoordenadas.push(novo);
-
-					var novoCentroid=[];
-					novoCentroid['y']=old;
-					novoCentroid['x']=mListCoord2[i2];
-					$scope.todascoordenadasCentroid.push(novoCentroid);		
-					x=0;
-				}
+				return true;
 			}
-			console.log('Terminou');
-			setaCoordenadas();
-			$scope.arquivoCarregado=true;
-			alert('As coordenadas foram carregadas! Confira no mapa e clique no botao salvar coordenadas.');
-
-		}
-
-		$scope.processaArquivo_SHAPE = function(arquivoBruto) 
-		{
-			$scope.todascoordenadas=[];
-			$scope.todascoordenadasCentroid=[];
-			console.log("teste");
 
 
-			var i=0;
-			for(var poligno in arquivoBruto) 
+
+			function mostrarAlerta(erro)
 			{
-				for(var pol in arquivoBruto[poligno]) 
-				{
-					for(var arr in arquivoBruto[poligno][pol]) 
-					{
-						var novo=[];
-						novo['latitude']=arquivoBruto[poligno][pol][arr][1];
-						novo['longitude']=arquivoBruto[poligno][pol][arr][0];
-						$scope.todascoordenadas.push(novo);
+				alert('Houve um problema ao carregar as coordenadas. Verifique as instruções e tente exportar o arquivo novamente e importar. \nCaso o problema persista envie o arquivo para nós verificarmos o problema detalhado.\n\n'+erro)
+				$scope.arquivoCarregado=false;
+			}
 
+			function parseXML(val) {
+				var xmlDoc;
+				if (document.implementation && document.implementation.createDocument) {
+					xmlDoc = new DOMParser().parseFromString(val, 'text/xml');
+				}
+				else if (window.ActiveXObject) {
+					xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+					xmlDoc.loadXML(val);
+				}
+				else
+				{
+					alert('Seu navegador não é compatível. Use um navegador mais atualizado.ß');
+					return null;
+				}
+				return xmlDoc;
+			}
+
+			$scope.processaArquivo_KML = function(xmlDoc) 
+			{
+				
+
+				var items = xmlDoc.getElementsByTagName('coordinates');
+				var mListCoord;
+				for(var i = 0; i < items.length; i++) 
+				{
+					mListCoord = items[i].childNodes[0].nodeValue.replace(/\n/g, "###").split(",0");
+				}
+
+				var mListCoord2=[];
+				for(var i = 0; i < mListCoord.length; i++) {
+					var mCoorSep = mListCoord[i].split(",");
+					for(var i2 = 0; i2 < mCoorSep.length; i2++) {
+						var valorCorrente=mCoorSep[i2];
+						if(valorCorrente.indexOf('###')==0)
+						{
+							valorCorrente= valorCorrente.replace("###" , "");
+						}
+						else if(valorCorrente.indexOf('###')>0)
+						{
+							valorCorrente= valorCorrente.substring(valorCorrente.indexOf('###')+3, valorCorrente.length);
+						}
+
+						var n = Number(valorCorrente);
+						if(n!=0)
+						{
+							mListCoord2.push(n);
+						}
+					}
+				}
+
+
+				var x=0;
+				var old;
+				$scope.todascoordenadas=[];
+				$scope.todascoordenadasCentroid=[];
+
+				for(var i2 = 0; i2 < mListCoord2.length; i2++) {
+					if(x==0)
+					{
+						old=mListCoord2[i2];
+						x++;
+					}
+					else if(x==1)
+					{
+
+						var longitude=old;
+						var latitude=mListCoord2[i2];
+						
+						$scope.todascoordenadas.push(new google.maps.LatLng(latitude, longitude ));
+						
 						var novoCentroid=[];
-						novoCentroid['y']=arquivoBruto[poligno][pol][arr][0];
-						novoCentroid['x']=arquivoBruto[poligno][pol][arr][1];
-						$scope.todascoordenadasCentroid.push(novoCentroid);	
+						novoCentroid['y']=longitude;
+						novoCentroid['x']=latitude;
+						$scope.todascoordenadasCentroid.push(novoCentroid);		
+						x=0;
 					}
 				}
-
-			}
-			console.log('Terminou');
-			setaCoordenadas();
-			$scope.arquivoCarregado=true;
-			alert('As coordenadas foram carregadas! Confira no mapa e clique no botao salvar coordenadas.')
-		}
-
-		function Point(x, y) {
-			this.x = x;
-			this.y = y;
-		}
-
-		function Region(points) {
-			this.points = points || [];
-			this.length = points.length;
-		}
-
-		Region.prototype.area = function () {
-			var area = 0,
-			i,
-			j,
-			point1,
-			point2;
-
-			for (i = 0, j = this.length - 1; i < this.length; j = i, i += 1) {
-				point1 = this.points[i];
-				point2 = this.points[j];
-				area += point1.x * point2.y;
-				area -= point1.y * point2.x;
-			}
-			area /= 2;
-
-			return area;
-		};
-
-		Region.prototype.centroid = function () {
-			var x = 0,
-			y = 0,
-			i,
-			j,
-			f,
-			point1,
-			point2;
-
-			for (i = 0, j = this.length - 1; i < this.length; j = i, i += 1) {
-				point1 = this.points[i];
-				point2 = this.points[j];
-				f = point1.x * point2.y - point2.x * point1.y;
-				x += (point1.x + point2.x) * f;
-				y += (point1.y + point2.y) * f;
+				console.log('Terminou');
+				setaCoordenadas();
+				$scope.arquivoCarregado=true;
+				alert('As coordenadas foram carregadas! Confira no mapa e clique no botao salvar coordenadas.');
+				if(!$scope.$$phase) {
+					$scope.$apply();
+				}
 			}
 
-			f = this.area() * 6;
+			$scope.processaArquivo_SHAPE = function(arquivoBruto) 
+			{
+				$scope.todascoordenadas=[];
+				$scope.todascoordenadasCentroid=[];
+				console.log("teste");
 
-			return new Point(x / f, y / f);
-		};
+
+				var i=0;
+				for(var poligno in arquivoBruto) 
+				{
+					if( Object.prototype.toString.call( arquivoBruto[poligno][0] ) != "[object Number]" )
+					{
+						for(var pol in arquivoBruto[poligno]) 
+						{
+							if( Object.prototype.toString.call( arquivoBruto[poligno][pol][0] ) != "[object Number]" )
+							{
+								for(var arr in arquivoBruto[poligno][pol]) 
+								{
+									if( Object.prototype.toString.call( arquivoBruto[poligno][pol][arr][0] ) !="[object Number]" )
+									{
+										for(var arr2 in arquivoBruto[poligno][pol][arr]) 
+										{
+											if( Object.prototype.toString.call( arquivoBruto[poligno][pol][arr][arr2][0] ) == "[object Number]" )
+											{
+												$scope.todascoordenadas.push(new google.maps.LatLng(arquivoBruto[poligno][pol][arr][arr2][1], arquivoBruto[poligno][pol][arr][arr2][0]));
+
+												var novoCentroid=[];
+												novoCentroid['y']=arquivoBruto[poligno][pol][arr][arr2][0];
+												novoCentroid['x']=arquivoBruto[poligno][pol][arr][arr2][1];
+												$scope.todascoordenadasCentroid.push(novoCentroid);	
+											}
+										}
+									}
+									else
+									{
+										$scope.todascoordenadas.push(new google.maps.LatLng(arquivoBruto[poligno][pol][arr][1], arquivoBruto[poligno][pol][arr][0]));
+
+										var novoCentroid=[];
+										novoCentroid['y']=arquivoBruto[poligno][pol][arr][0];
+										novoCentroid['x']=arquivoBruto[poligno][pol][arr][1];
+										$scope.todascoordenadasCentroid.push(novoCentroid);	
+									}
+								}
+							}
+							else
+							{
+								$scope.todascoordenadas.push(new google.maps.LatLng(arquivoBruto[poligno][pol][1], arquivoBruto[poligno][pol][0]));
+
+								var novoCentroid=[];
+								novoCentroid['y']=arquivoBruto[poligno][pol][0];
+								novoCentroid['x']=arquivoBruto[poligno][pol][1];
+								$scope.todascoordenadasCentroid.push(novoCentroid);	
+							}
+						}
+					}
+
+				}
+				console.log('Terminou');
+				setaCoordenadas();
+				$scope.arquivoCarregado=true;
+				alert('As coordenadas foram carregadas! Confira no mapa e clique no botao salvar coordenadas.');
+				if(!$scope.$$phase) {
+					$scope.$apply();
+				}
+			}
+
+			function Point(x, y) {
+				this.x = x;
+				this.y = y;
+			}
+
+			function Region(points) {
+				this.points = points || [];
+				this.length = points.length;
+			}
+
+			Region.prototype.area = function () {
+				var area = 0,
+				i,
+				j,
+				point1,
+				point2;
+
+				for (i = 0, j = this.length - 1; i < this.length; j = i, i += 1) {
+					point1 = this.points[i];
+					point2 = this.points[j];
+					area += point1.x * point2.y;
+					area -= point1.y * point2.x;
+				}
+				area /= 2;
+
+				return area;
+			};
+
+			Region.prototype.centroid = function () {
+				var x = 0,
+				y = 0,
+				i,
+				j,
+				f,
+				point1,
+				point2;
+
+				for (i = 0, j = this.length - 1; i < this.length; j = i, i += 1) {
+					point1 = this.points[i];
+					point2 = this.points[j];
+					f = point1.x * point2.y - point2.x * point1.y;
+					x += (point1.x + point2.x) * f;
+					y += (point1.y + point2.y) * f;
+				}
+
+				f = this.area() * 6;
+
+				return new Point(x / f, y / f);
+			};
 
 
-	}
-}()
-);
+		}
+	}()
+	);
