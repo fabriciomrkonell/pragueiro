@@ -1,38 +1,3 @@
-//var greetings = require("./../greetings.js");
-
-var cities = [
-{
-	city : 'Toronto',
-	desc : 'This is the best city in the world!',
-	lat : 43.7000,
-	long : -79.4000
-},
-{
-	city : 'New York',
-	desc : 'This city is aiiiiite!',
-	lat : 40.6700,
-	long : -73.9400
-},
-{
-	city : 'Chicago',
-	desc : 'This is the second best city in the world!',
-	lat : 41.8819,
-	long : -87.6278
-},
-{
-	city : 'Los Angeles',
-	desc : 'This city is live!',
-	lat : 34.0500,
-	long : -118.2500
-},
-{
-	city : 'Las Vegas',
-	desc : 'Sin City...\'nuff said!',
-	lat : 36.0800,
-	long : -115.1522
-}
-];
-
 var map = null;
 
 function initMap() {
@@ -60,47 +25,37 @@ function showDicas()
 
 	angular.module('Pragueiro.controllers').registerCtrl('quadraCtrl', quadraCtrl)
 
+	quadraCtrl.$inject = [ '$scope', '$interval', '$timeout', '$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Coordenadas', 'Notify',  '$geofire'];
 
-//'uiGmapIsReady', 'uiGmapGoogleMapApi'
-//uiGmapIsReady, uiGmapGoogleMapApi,
-quadraCtrl.$inject = [ '$scope', '$interval', '$timeout', '$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Coordenadas', 'Notify',  '$geofire'];
+	function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObject, Session, Constant, Coordenadas, Notify,  $geofire) 
+	{
 
-function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObject, Session, Constant, Coordenadas, Notify,  $geofire) 
-{
+		angular.extend($scope, {
+			edit: false,
+			arquivoCarregado: false,
+			desabilitaFazenda: false,
+			arquivoCarregado:false,
+			fazendas: [],
+			quadras: [],
+			todascoordenadas:[],
+			todascoordenadasgeo:[],
+			quadraFilial: [],
+			data: {
+				ativo:true				
+			}
+		});		
 
-	angular.extend($scope, {
-		edit: false,
-		arquivoCarregado: false,
-		desabilitaFazenda: false,
-		arquivoCarregado:false,
-		fazendas: [],
-		quadras: [],
-		todascoordenadas:[],
-		quadraFilial: [],
-		data: {
-			ativo:true				
-		}
-	});		
 
-/*
-	var interval = $interval(function(){
-		if(map !== null){
-			initMap();
-			$interval.cancel(interval);
-		}
-	});
-	*/
 
-	function initMap(center, zoom){
-		//map.setCenter(new google.maps.LatLng(-20, -55));
+		function initMap(center, zoom){
 
-		var mapOptions = {
-			zoom: zoom,
-			center: center,
-			mapTypeId: google.maps.MapTypeId.HYBRID
-		}
+			var mapOptions = {
+				zoom: zoom,
+				center: center,
+				mapTypeId: google.maps.MapTypeId.HYBRID
+			}
 
-		map = new google.maps.Map(document.getElementById('map'), mapOptions);
+			map = new google.maps.Map(document.getElementById('map'), mapOptions);
 
 
 		//$scope.printRouter();
@@ -109,25 +64,11 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 	var ref = new Firebase(Constant.Url + '/quadra');
 	$scope.todasQuadras = $firebaseArray(ref);
 
-
-
+	
 	initMap(new google.maps.LatLng(-20, -55), 4 );
 
 
-/*
-		$scope.center ={latitude: -20, longitude:  -55 };
-
-		$scope.map = { 
-			show: true,
-			control:{},
-			center: {latitude: -20, longitude:  -55 }, 
-			zoom: 3,
-			options: {mapTypeId: google.maps.MapTypeId.SATELLITE }
-		};
-		
-		*/
-		//$scope.center = [];
-		atualizaListaFiliais();
+	atualizaListaFiliais();
 
 		//console.log('O q tinha:' + Coordenadas.getCoordendas());
 		//console.log('Setamdp:' + Coordenadas.setCoordenadas('setandooo'));
@@ -205,6 +146,34 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 			}
 			else
 			{
+				$scope.todascoordenadasgeo =[];
+
+				var refCoordenadageo= new Firebase(Constant.Url + '/coordenadageo/'+fazenda.key);
+				refCoordenadageo.on('child_added', function(snap) {
+					var objNovo= snap.val();
+					objNovo['key']=snap.key();
+					$scope.todascoordenadasgeo.push(objNovo);
+				});
+
+				refCoordenadageo.on('child_removed', function(snap) {
+					var objNovo= snap.val();
+
+					var x=0;
+					var posicao=null;
+					$scope.todascoordenadasgeo.forEach(function(obj){
+						if(obj.key === snap.key())
+						{ 
+							posicao=x;
+						}
+						x++;
+
+					});
+
+					if(posicao!=null)
+						$scope.todascoordenadasgeo.splice(posicao, 1);
+
+				});
+
 				$scope.quadras=[];
 
 				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
@@ -251,7 +220,7 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 					});
 
 
-					
+
 				}
 			};
 
@@ -325,7 +294,8 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 
 		};
 
-		$scope.excluir = function(objeto){
+		$scope.excluir = function(objeto)
+		{
 			var fazendaTmp=$scope.data.fazenda;
 			if(objeto.data_ultalt!=null)
 			{
@@ -514,6 +484,7 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 
 		$scope.salvarArquivo= function(data)
 		{
+			excluirCoordenadasGeo(data.fazenda.key, data.key);
 			var refCoordenadasGeoFire = $firebaseArray(new Firebase(Constant.Url + '/coordenadageo/'+data.fazenda.key));
 
 			refCoordenadasGeoFire.$loaded(function() {
@@ -548,25 +519,21 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 
 			var refQuadra = new Firebase(Constant.Url + '/quadra/'+data.key+'/coordenadas');
 			refQuadra.set(true);
+			var listaProntaSalvarFirebase={};
 			listaProntaSalvar.forEach(function(obj)
 			{			
 
 				var key=refCoord.push().key();
 				var refQuadraNovo = new Firebase(Constant.Url + '/coordenada/'+data.key+'/'+key);
 
-				var objCoord=[];
-				objCoord['key']=key;
-				objCoord['key_quadra']=data.key;
-				objCoord['tipo']=i;
-				objCoord['latitude']=obj.lat();
-				objCoord['longitude']=obj.lng();
-
-				refQuadraNovo.set(objCoord);
-
-				geoFire.set(data.key + '_pos'+ i, [obj.lat(), obj.lng()]);
+				listaProntaSalvarFirebase[key]={};
+				listaProntaSalvarFirebase[key]['key_quadra']=data.key;
+				listaProntaSalvarFirebase[key]['tipo']=i;
+				listaProntaSalvarFirebase[key]['latitude']=obj.lat();
+				listaProntaSalvarFirebase[key]['longitude']=obj.lng();				
 				i++;
 			});
-
+			refCoord.set(listaProntaSalvarFirebase);
 			Notify.successBottom('Coordenadas adicionadas com sucesso!');
 		}
 
@@ -582,6 +549,20 @@ function quadraCtrl($scope,  $interval, $timeout, $firebaseArray, $firebaseObjec
 			{
 				setaCoordenadas();
 			}
+		}
+
+		function excluirCoordenadasGeo(key_fazenda, key_quadra)
+		{
+			var listaDeletar=[];
+			for(var i in $scope.todascoordenadasgeo) 
+			{
+				if($scope.todascoordenadasgeo[i].key.indexOf(key_quadra + '_pos')>-1)
+				{
+					listaDeletar[$scope.todascoordenadasgeo[i].key] = null;
+				}
+			}
+			var refQuadraNovo = new Firebase(Constant.Url + '/coordenadageo/'+key_fazenda + '/' );
+			refQuadraNovo.set(listaDeletar);						
 		}
 
 		function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) 
