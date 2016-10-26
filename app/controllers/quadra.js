@@ -484,6 +484,7 @@ function showDicas()
 
 		$scope.salvarArquivo= function(data)
 		{
+			$('#myPleaseWait').modal('show');
 			excluirCoordenadasGeo(data.fazenda.key, data.key);
 			var refCoordenadasGeoFire = $firebaseArray(new Firebase(Constant.Url + '/coordenadageo/'+data.fazenda.key));
 
@@ -520,21 +521,31 @@ function showDicas()
 			var refQuadra = new Firebase(Constant.Url + '/quadra/'+data.key+'/coordenadas');
 			refQuadra.set(true);
 			var listaProntaSalvarFirebase={};
+			var listaProntaSalvarFirebaseGEOFIRE={};
 			listaProntaSalvar.forEach(function(obj)
 			{			
+				geoFire.set(data.key + '_pos'+ i, [obj.lat(), obj.lng()]);
 
 				var key=refCoord.push().key();
 				var refQuadraNovo = new Firebase(Constant.Url + '/coordenada/'+data.key+'/'+key);
 
 				listaProntaSalvarFirebase[key]={};
+				listaProntaSalvarFirebase[key]['key'] = key;
 				listaProntaSalvarFirebase[key]['key_quadra']=data.key;
 				listaProntaSalvarFirebase[key]['tipo']=i;
 				listaProntaSalvarFirebase[key]['latitude']=obj.lat();
 				listaProntaSalvarFirebase[key]['longitude']=obj.lng();				
 				i++;
+			});		
+
+			refCoord.set(listaProntaSalvarFirebase, function (err) {
+				if (err) {
+					Notify.errorBottom('Houve um problema ao salvar:' + err);
+				} else {
+					Notify.successBottom('Coordenadas adicionadas com sucesso!');
+				}
+				$('#myPleaseWait').modal('hide');
 			});
-			refCoord.set(listaProntaSalvarFirebase);
-			Notify.successBottom('Coordenadas adicionadas com sucesso!');
 		}
 
 		$scope.limparArquivo= function(data)
