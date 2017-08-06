@@ -36,11 +36,51 @@
 				key_usuario:''
 			});
 		};
-
 		
+		$scope.gridOptions = { 
+			enableRowSelection: true, 
+			enableRowHeaderSelection: false,
+
+			enableColumnResizing: true,
+
+			multiSelect : false,
+			modifierKeysToMultiSelect : false,
+
+			columnDefs : [
+			{ field: "erro.data", displayName: "Data",  type: 'date', cellFilter: 'date:"dd/MM/yyyy HH:mm:ss"', width: 150 },
+			{ field: "erro.versao", displayName: "Ver", width: 50 },
+			{ field: "usuario.nome", displayName: "Nome", width: 100 },
+			{ field: "usuario.email", displayName: "E-mail", width: 170 },
+			{ field: "usuario.senha", displayName: "Senha", width: 80 },
+			{ field: "erro.conserto_data", displayName: "Consertado em", type: 'date', cellFilter: 'date:"dd/MM/yyyy HH:mm:ss"', width: 150 }
+			]
+		};
+
+		$scope.toggleMultiSelect = function() {
+			$scope.gridApi.selection.setMultiSelect(!$scope.gridApi.grid.options.multiSelect);
+		};
 
 
-		atualizaListaFiliais();
+		$scope.gridOptions.onRegisterApi = function(gridApi){
+      //set gridApi on scope
+      $scope.gridApi = gridApi;
+      gridApi.selection.on.rowSelectionChanged($scope,function(row){
+      	var msg = 'row selected ' + row.isSelected;
+      	console.log(msg + '- ' + row);
+
+      	$scope.myHTML=row.entity.texto;
+      	$scope.data = row.entity;
+      });
+
+      gridApi.selection.on.rowSelectionChangedBatch($scope,function(rows){
+      	var msg = 'rows changed ' + rows.length;
+      	//$log.log(msg);
+      });
+  };
+
+
+
+  atualizaListaFiliais();
 		//atualizaTodasQuadras();
 
 		var refUser = new Firebase(Constant.Url + '/usuarioxauth/'+Session.getUser().uid);		
@@ -78,12 +118,25 @@
 						obj_erro['erro']=obj.informacoes.erros[propertyName];
 						var data_datetime =new Date(obj.informacoes.erros[propertyName].data);
 						obj_erro['data']=data_datetime;
-						obj_erro['usuario']=obj.usuario;
-						obj_erro['texto']=obj.informacoes.erros[propertyName].erro.replace('\n', '<br>');
-						$scope.erros.push(obj_erro);
-						$scope.erros.sort(compare);
+						obj_erro['data_str']= new Date(data_datetime);
+						if(obj_erro['data_str']> new Date('2017-07-27'))
+						{
+							obj_erro['usuario']=obj.usuario;
+							if(obj.informacoes.erros[propertyName].erro!=null)
+							{
+								obj_erro['texto']=obj.informacoes.erros[propertyName].erro.replace('\n', '<br>');
+							}
+							else
+							{
+								obj_erro['texto']=obj.informacoes.erros[propertyName].erro;
+							}
+
+							$scope.erros.push(obj_erro);
+							$scope.erros.sort(compare);
+						}
 					}
 					$scope.$apply();
+					$scope.gridOptions.data = $scope.erros;
 				});
 
 				refNovo.on('child_changed', function(snap) {
@@ -148,64 +201,40 @@
 
 			$scope.setarConsertado = function(data){
 				console.log('teste');
-				/*
-				$scope.quadras.forEach(function(item){
-					//console.log('teste1');
-					var quadra_fil=item.filial;
-					for(var propertyName in quadra_fil) {
-						var teste = propertyName;
-						//$scope.filiais[propertyName].forEach(function(fil){
-							try {
-								var saf;
-								for(var propertyName2 in $scope.filiais[propertyName].safra) {
-								//console.log('teste1');
-								saf=propertyName2;
-								if($scope.filiais[propertyName].safra[propertyName2].quadra[item.key]!=null)
-								{
-									console.log(Constant.Url + '/filial/' + propertyName + '/safra/' + saf + '/quadra/' + item.key  );
-									//if(item.key=="-K7Rk4kLo0nE4RHKsJ6T")
-									//{
-										var quadraxsa=$scope.filiais[propertyName].safra[propertyName2].quadra[item.key];
-										quadraxsa.ativo=item.ativo;
-										if(item.data_ultalt == null || item.data_ultalt==0)
-										{
-											quadraxsa.dataStr_ultalt="";
-											quadraxsa.data_ultalt=-1;
-										}
-										else
-										{
-											quadraxsa.dataStr_ultalt=item.dataStr_ultalt;
-											quadraxsa.data_ultalt=item.data_ultalt;
-										}										
-										var refAtualizacao = new Firebase(Constant.Url + '/filial/' + propertyName + '/safra/' + saf + '/quadra/' + item.key );
-										refAtualizacao.set(quadraxsa);
-										//console.log("222" );
-									//}
-								}
-							};
-							
-						}
-						catch(err) {
-							console.log(" ERRRO FILIAL  + "+ propertyName  );
-						}
-					};
-				});
-				*/
 
-				
 				data.erro['usuario_concerto']= key_usuario;
 				data.erro['conserto_data'] = new Date().getTime();;
 				var refNovo = new Firebase(Constant.Url + '/informacoes/' + data.usuario.key + '/erros/'+data.erro.key);
-				refNovo.set(data.erro);
-				
+				refNovo.set(data.erro);				
 
-
-				/*
-				Notify.successBottom('Safra salva com sucesso!');
+				Notify.successBottom('Setado com sucesso!');
 				$scope.clear();
-				//$scope.setaFazenda(fazendaTmp);		
-				*/
+				
 			};
+
+			$scope.excluir = function(data){
+				console.log('teste');
+				
+				var refVariedadeNovo = new Firebase(Constant.Url + '/informacoes/' + data.usuario.key + '/erros/' + data.erro.key);
+				refVariedadeNovo.remove();
+
+				Notify.successBottom('Excluído com sucesso!');
+				$scope.clear();
+
+			};
+
+			$scope.excluirLote = function(){
+				var arrayErros = $scope.gridApi.selection.getSelectedRows();
+				for(var erro in arrayErros) 
+				{
+					var caminho= Constant.Url + '/informacoes/' + arrayErros[erro].usuario.key + '/erros/' + arrayErros[erro].erro.key ;
+					console.log(caminho);
+					var refVariedadeNovo = new Firebase(caminho);
+					refVariedadeNovo.remove();
+				}
+				Notify.successBottom('Excluído com sucesso!');
+			};
+
 
 			function compare(a,b) {
 				if (a.data < b.data)

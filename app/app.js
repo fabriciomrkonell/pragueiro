@@ -4,7 +4,8 @@ var ref = new Firebase("https://pragueiroproducao.firebaseio.com");
 if(ref.getAuth() === null) window.location.href = '/login';
 
 
-angular.module('Pragueiro.controllers', [ 'firebase', 'ngSanitize', 'googlechart',  'angularGeoFire'])
+angular.module('Pragueiro.controllers', [ 'firebase', 'ngSanitize', 'googlechart',  'angularGeoFire', 
+	'ui.grid', 'ui.grid.pagination', 'ui.grid.selection', 'ui.grid.edit', 'ui.grid.resizeColumns'])
 //'uiGmapgoogle-maps'
 /*
 .config(['uiGmapGoogleMapApiProvider', function (GoogleMapApi) {

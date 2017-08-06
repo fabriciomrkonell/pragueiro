@@ -10,6 +10,7 @@
 
 		angular.extend($scope, {
 			edit: false,
+			save:true,
 			desabilitaFazenda: false,
 			fazendas: [],
 			variedades: [],
@@ -17,7 +18,13 @@
 			culturas:[],
 			variedadeFilial: [],
 			data: {
-				ativo:true
+				key_cultura: '',
+				ativo: true,
+				key_tecnologia: '',
+				nome_tecnologia: '',
+				nome: '',
+				qtd:0,
+				key:''
 				
 			}
 		});
@@ -28,6 +35,36 @@
 		//var refFazendas = new Firebase(Constant.Url + '/filial');
 		atualizaCulturas();
 		atualizaListaFiliais();
+
+
+		$scope.gridOptions = { 
+			enableRowSelection: true, 
+			enableRowHeaderSelection: false,
+
+			enableColumnResizing: true,
+
+			multiSelect : false,
+			modifierKeysToMultiSelect : false,
+
+			columnDefs : [
+			{ field: "cultura.nome", displayName: "Cultura", width: 150 },
+			{ field: "nome", displayName: "Variedade", width: 200 },
+			{ field: "nome_tecnologia", displayName: "Tecnologia", width: 150 },
+			]
+		};
+
+		$scope.toggleMultiSelect = function() {
+			$scope.gridApi.selection.setMultiSelect(!$scope.gridApi.grid.options.multiSelect);
+		};
+
+
+		$scope.gridOptions.onRegisterApi = function(gridApi){
+			$scope.gridApi = gridApi;
+			gridApi.selection.on.rowSelectionChanged($scope,function(row){
+				$scope.editar(row.entity);
+			});
+		};
+
 
 		//############################################################################################################################
 		//############################################################################################################################
@@ -117,11 +154,12 @@
 							{
 								objVar['cultura']=$scope.culturas[objCul];
 								$scope.variedades.push(variedades_brutas[obj]);
+								$scope.gridOptions.data = $scope.variedades;
 								break;
 							}
 						}		
 					};
-				});
+				}); 
 			}
 		};
 
@@ -189,6 +227,7 @@
 			data['nome_tecnologia']=nome_tecnologia;
 
 			delete data.fazenda;
+			delete data.cultura;
 			delete data.$$hashKey;	
 
 			var refVariedade = new Firebase(Constant.Url + '/variedade/'+fazendaTmp.key+'/'+ data.key_cultura);
@@ -220,9 +259,7 @@
 			data['nome_tecnologia']=nome_tecnologia;
 			var refVariedade = new Firebase(Constant.Url + '/variedade/'+fazendaTmp.key+'/'+data.key_cultura+'/'+data.key);
 			refVariedade.set(data);
-			data.fazenda=fazendaTmp;
-			
-			
+			data.fazenda=fazendaTmp;		
 			Notify.successBottom('Variedade atualizada com sucesso!');
 			$scope.chengeFazenda(fazendaTmp);
 			$scope.clear();
@@ -235,14 +272,17 @@
 			$scope.setaFazenda(fazendaTmp);	
 			$scope.chengeFazenda($scope.data.fazenda);	
 			$scope.edit = false;
+			$scope.save=true;
 		};
 
 		$scope.editar = function(obj){
+
 			$scope.desabilitaFazenda=true;
 			var fazendaTmp=$scope.data.fazenda;
 			$scope.data = obj;
 			$scope.data.fazenda=fazendaTmp;
 			$scope.edit = true;
+			$scope.save = false;
 			/*
 			$scope.culturas.forEach(function(item){
 				if(item.key === $scope.data.key_cultura) 	
@@ -257,6 +297,12 @@
 		};
 
 		$scope.excluir = function(objeto){
+			$('#modalDelete').modal('show');
+			return true;			
+		};
+
+		$scope.excluirVariedade = function(objeto){
+			$('#modalDelete').modal('hide');
 			var fazendaTmp=$scope.data.fazenda;
 			if(objeto.qtd!=null)
 			{
@@ -272,6 +318,7 @@
 			
 			Notify.successBottom('Variedade removida com sucesso!');
 			$scope.chengeFazenda(fazendaTmp);
+			$scope.cancelar();
 			return true;
 			
 		};
@@ -341,6 +388,7 @@
 			//$scope.data.fazenda=fazendaTmp;
 			$scope.desabilitaFazenda=false;
 			$scope.edit=false;
+			$scope.save=true;
 			if(!$scope.$$phase) {
 				$scope.$apply();
 			}

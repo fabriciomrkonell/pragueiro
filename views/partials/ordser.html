@@ -1,0 +1,496 @@
+<div ng-controller="ordserCtrl" class="ng-scope ng_scope">
+
+	<div class="container container-view">
+		<div class="row">
+			<div class="col-sm-6 col-sm-no-bottom">
+				<p>Você está em <a href="#home">Início</a> / <a href="#lancamento">Lançamentos</a>  / <a href="#ordser">Ordem de Serviço/Atividade</a></p>
+
+				<br />
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-6 col-sm-no-bottom">
+
+				<label>Fazenda</label>
+				<select class="form-control" ng-disabled=desabilitaFazenda ng-options="fazenda.nome for fazenda in fazendas" ng-model="data.fazenda" ng-change="chengeFazenda(data.fazenda)">
+					<option value="">Selecione</option>
+				</select>
+
+			</div>
+		</div>
+		<hr/>
+		
+		<div class="row">
+			<div class="col-sm-6">
+				<form class="form-signin" role="form">
+					<button type="button" class="btn btn-success" ng-disabled="finalizado" ng-show="save" ng-click="salvarOrdser(data)">Salvar</button>
+					<button type="button" class="btn btn-success" ng-disabled="finalizado" ng-show="edit" ng-click="editarOrdser
+					(data)">Atualizar</button>
+					<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar/Novo</button>
+					<button type="button" class="btn btn-default btn-danger" ng-disabled="temquadras"  ng-show="edit" ng-click="excluir()">Excluir</button>
+					<button type="button" class="btn btn-success" ng-disabled="finalizado"   ng-show="temexecucoes" ng-click="finalizarOrdser(data)">Finalizar</button>
+					<br />
+					<br />
+					<div class="row">
+						<div class="col-sm-6 col-sm-no-bottom">
+							<div class="form-group">
+								<label><i>Código Interno</i></label>
+								<p>
+									<label>{{data.key}}</label>
+								</p>
+							</div>
+						</div>
+						<div class="col-sm-5 col-sm-no-bottom">
+							<div class="form-group">
+								<label>Situação</label>
+
+								<select class="form-control" ng-disabled=true chengeSafra ng-model="data.situacao" ng-options="o as o for o in situacoes" >							
+									<option></option>
+								</select>
+
+								
+
+							</div>	
+						</div>
+						<div class="col-sm-1 col-sm-no-bottom">
+							<div class="form-group">
+								<label>&nbsp;</label>
+								<button type="button" class="btn btn-default btn-xm"  ng-click="helpSituacao()">
+									<i class="glyphicon glyphicon-info-sign"></i>												
+								</button>
+
+								
+
+							</div>	
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-6 col-sm-no-bottom">
+							<div class="form-group">
+								<label>Código*</label>
+								<input type="text" class="form-control" ng-disabled="editarcodigo" placeholder="Código" ng-model="data.codigo" />
+							</div>	
+
+						</div>
+						<div class="col-sm-6 col-sm-no-bottom">
+							<div class="form-group">
+								<label>Data Prevista*</label>
+								<input type="date" class="form-control" ng-disabled="temexecucoes"  ng-model="data.datpre">
+							</div>	
+						</div>
+					</div>		
+					<div class="form-group">
+						<label>Safra*</label>
+						<select class="form-control"  ng-disabled="temquadras" ng-change="chengeSafra(data.key_safra)"  chengeSafra ng-model="data.key_safra"  ng-options="safra.key as (safra.descricao) for safra in safras"> >							
+							<option></option>
+						</select>
+					</div>					
+					<div class="row">
+						<div class="col-sm-6 col-sm-no-bottom">
+							<div class="form-group">
+								<label>Tipo Ordem de Serviço/Atividade*</label>
+								<select class="form-control" ng-model="data.key_tipati"  ng-options="tipati.key as (tipati.nome) for tipati in tipatis"> >							
+									<option></option>
+								</select>
+							</div>				
+						</div>
+						<div class="col-sm-6 col-sm-no-bottom">
+							<div class="form-group">
+								<label>Equipe</label>
+								<select class="form-control" ng-model="data.key_equipe" ng-disabled="temexecucoes" ng-options="equipe.key as (equipe.nome) for equipe in equipes">
+									<option></option>
+								</select>
+							</div>		
+						</div>
+					</div>			
+
+					<div class="form-group">
+						<label>Observação</label>
+						<input type="text" class="form-control" placeholder="Observação" ng-disabled="temexecucoes" ng-model="data.obs" />
+					</div>	
+					<div class="row">
+						<div class="col-sm-6 col-sm-no-bottom">
+							<div class="form-group">
+
+								<label>Área Total</label>
+								<br />
+								<label>{{area_total.toFixed(2)}}</label>
+
+							</div>	
+						</div>
+						<div class="col-sm-6 col-sm-no-bottom">
+							<div class="form-group">
+
+								<label>Horas Trabalhadas</label>
+								<br />
+								<label>{{horas_total.toFixed(2)}}</label>
+
+							</div>	
+						</div>
+					</div>
+
+
+				</form>
+
+			</div>
+			<div class="col-sm-6">
+
+
+				<div ui-grid="gridOptions" ui-grid-selection class="gridOrdser"></div>	
+
+			</div>
+		</div>
+		<hr/>
+
+		<div id="exTab1" class="container_tab">	
+			<ul  class="nav nav-tabs">
+				<li class="active"><a  href="#1a" data-toggle="tab">Quadras/Regiões</a></li>
+				<li><a href="#2a" data-toggle="tab">Produtos</a></li>
+				<li><a href="#3a" data-toggle="tab">Equipamentos</a></li>
+				<li><a href="#4a" data-toggle="tab">Execução</a></li>
+			</ul>
+
+			<div class="tab-content clearfix">
+
+				<div class="tab-pane active " id="1a">
+					<div class="row">
+
+						<div class="form-group col-sm-2">
+							<b><p class="alinhado_direito">Quadra/Região</p></b>
+						</div>
+						<div class="form-group col-sm-4">
+							<select class="form-control" ng-model="data_quadra" ng-disabled="desabilitaQuadras" ng-options="pl as (pl.quadra.nome) for pl in todosPlanejamento">
+								<option></option>
+							</select>
+						</div>
+						<button type="button" class="btn btn-default btn-xm"   ng-disabled="desabilitaQuadras" ng-click="adicionarQuadra(data, data_quadra)">
+							<i class="glyphicon glyphicon-plus-sign"></i>												
+						</button>
+					</div>
+
+					<div class="row">
+						<div ui-grid="gridOptionsQuadras" ui-grid-selection class="gridOrdserQuadras"></div>	
+					</div>
+				</div>
+				<div class="tab-pane" id="2a">
+					<div class="row">
+
+						<div class="form-group col-sm-2">
+							<b><p class="alinhado_direito">Produto</p></b>
+						</div>
+						<div class="form-group col-sm-4">
+							<select class="form-control" ng-model="data_produto" ng-disabled="desabilitaQuadras" ng-options="produto as (produto.nome) for produto in todosProdutos">
+								<option></option>
+							</select>
+						</div>
+						<button type="button" class="btn btn-default btn-xm"   ng-disabled="desabilitaQuadras" ng-click="adicionarProduto(data, data_produto)">
+							<i class="glyphicon glyphicon-plus-sign"></i>												
+						</button>
+					</div>
+
+					<div class="row">
+						<div ui-grid="gridOptionsProdutos" ui-grid-selection class="gridOrdserProdutos"></div>	
+					</div>
+				</div>
+
+				<div class="tab-pane" id="3a">
+					<div class="row">
+						<div class="form-group col-sm-2">
+							<b><p class="alinhado_direito">Equipamentos</p></b>
+						</div>
+						<div class="form-group col-sm-4">
+							<select class="form-control" ng-model="data_equipamento" ng-disabled="desabilitaQuadras" ng-options="equipamento as (equipamento.nome) for equipamento in todosEquipamentos">
+								<option></option>
+							</select>
+						</div>
+						<button type="button" class="btn btn-default btn-xm"   ng-disabled="desabilitaQuadras" ng-click="adicionarEquipamento(data, data_equipamento)">
+							<i class="glyphicon glyphicon-plus-sign"></i>												
+						</button>
+					</div>
+
+					<div class="row">
+						<div ui-grid="gridOptionsEquipamentos" ui-grid-selection class="gridOrdserEquipamentos"></div>	
+					</div>
+				</div>
+
+
+				<div class="tab-pane" id="4a">
+					<div class="row">
+						<div class="col-sm-2 col-sm-no-bottom">
+							<b><p class="alinhado_direito">Data</p></b>
+						</div>
+						<div class="form-group col-sm-2 col-sm-no-bottom">
+							<input type="date" class="form-control" ng-model="data_execucao.data">
+						</div>	
+						<div class="form-group col-sm-2">
+							<b><p class="alinhado_direito">Equipamentos</p></b>
+						</div>
+						<div class="form-group col-sm-2 col-sm-no-bottom">
+							<select class="form-control" ng-model="data_execucao.equipamento" ng-disabled="desabilitaQuadras" ng-options="equipamento as (equipamento.nome) for equipamento in todosEquipamentosOrdser">
+								<option></option>
+							</select>
+						</div>
+						<div class="col-sm-1 col-sm-no-bottom">
+							<b><p class="alinhado_direito">Operador</p></b>
+						</div>
+						<div class="form-group col-sm-2 col-sm-no-bottom">
+							<select class="form-control" ng-model="data_execucao.funcionario" ng-disabled="desabilitaQuadras" ng-options="funcionario as (funcionario.nome) for funcionario in todosFuncionarios">
+								<option></option>
+							</select>
+						</div>
+					</div>
+					<div class="row">
+
+						<div class="form-group col-sm-2 col-sm-no-bottom">
+							<b><p class="alinhado_direito">Quantidade Horas</p></b>
+						</div>
+						<div class="form-group col-sm-2 col-sm-no-bottom">
+							<input type="number" class="form-control" placeholder="ha" ng-model="data_execucao.quahor" />
+						</div>
+
+						<button type="button" class="btn btn-default btn-xm"   ng-disabled="finalizado" ng-click="adicionarExecucao(data, data_execucao)">
+							<i class="glyphicon glyphicon-plus-sign"></i>												
+						</button>
+
+					</div>
+					<br />
+					<div class="row">
+						<div ui-grid="gridOptionsExecucoes" ui-grid-selection class="gridOrdserExecucao"></div>	
+					</div>
+				</div>
+
+
+
+			</div>
+		</div>
+
+
+
+
+
+
+
+	</div>
+	<!-- Modal DELETE-->
+	<div class="modal fade" id="modalDeleteExe" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Confirmação Exclusão</h4>
+				</div>
+
+				<div class="modal-body">
+					<p>Têm certeza que deseja excluir o lcto de execução desta Ordem de Serviço/Atividade?</p>
+					<p class="debug-url"></p>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+					<button type="button" class="btn btn-default btn-danger" ng-click="excluirExecucao()">Excluir</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Modal DELETE-->
+	<div class="modal fade" id="modalDeleteProduto" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Confirmação Exclusão</h4>
+				</div>
+
+				<div class="modal-body">
+					<p>Têm certeza que deseja excluir o Produto desta Ordem de Serviço/Atividade?</p>
+					<p class="debug-url"></p>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+					<button type="button" class="btn btn-default btn-danger" ng-click="excluirProduto()">Excluir</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Modal DELETE-->
+	<div class="modal fade" id="modalDeleteQuadra" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Confirmação Exclusão</h4>
+				</div>
+
+				<div class="modal-body">
+					<p>Têm certeza que deseja excluir a Quadra/Região desta Ordem de Serviço/Atividade?</p>
+					<p class="debug-url"></p>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+					<button type="button" class="btn btn-default btn-danger" ng-click="excluirQuadra()">Excluir</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Modal Mensagem-->
+	<div class="modal fade" id="modalMensagem" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Aviso!</h4>
+				</div>
+
+				<div class="modal-body">
+					<p>{{mensagem_aviso}}</p>
+					<p class="debug-url"></p>
+				</div>
+
+
+			</div>
+		</div>
+	</div>
+	<!-- Modal Help-->
+	<div class="modal fade" id="modalHelp" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Entendendo</h4>
+				</div>
+
+				<div class="modal-body">
+					<p> Existem 3 status:</p>
+					<br />
+					<ul>
+						<li>Aberto - Quando a ordem está apenas inserida, sem execuções.</li>
+						<li>Iniciado - Quando a ordem já possui ao menos 1 execução.</li>
+						<li>Finalizado - Quando a ordem está finalizada.</li>
+					</ul>
+				</div>
+
+
+			</div>
+		</div>
+	</div>
+	<!-- Modal DELETE-->
+	<div class="modal fade" id="modalDeleteEquipamento" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Confirmação Exclusão</h4>
+				</div>
+
+				<div class="modal-body">
+					<p>Têm certeza que deseja excluir o Equipamento desta Ordem de Serviço/Atividade?</p>
+					<p class="debug-url"></p>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+					<button type="button" class="btn btn-default btn-danger" ng-click="excluirEquipamento()">Excluir</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Modal DELETE-->
+	<div class="modal fade" id="modalDeleteExecucao" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Confirmação Exclusão</h4>
+				</div>
+
+				<div class="modal-body">
+					<p>Têm certeza que deseja excluir a Execução desta Ordem de Serviço/Atividade?</p>
+					<p class="debug-url"></p>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+					<button type="button" class="btn btn-default btn-danger" ng-click="excluirExecucao()">Excluir</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Modal DELETE-->
+	<div class="modal fade" id="modalDeleteOrdser" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Confirmação Exclusão</h4>
+				</div>
+
+				<div class="modal-body">
+					<p>Têm certeza que deseja excluir a Ordem de Serviço/Atividade '{{data.codigo}}'?</p>
+					<p class="debug-url"></p>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+					<button type="button" class="btn btn-default btn-danger" ng-click="excluirOrdser()">Excluir</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Modal DELETE-->
+	<div class="modal fade" id="modalFinalizar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Confirmação Finalização</h4>
+				</div>
+
+				<div class="modal-body">
+					<p>Têm certeza que deseja Finalizar esta Ordem de serviço/Atividade? </p>
+					<br />
+					<p>Esta operação é irreversível, depois de finalizado não será possível alterações. </p>
+					<p class="debug-url"></p>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+					<button type="button" class="btn btn-default btn-success" ng-click="efetuarFinalizar()">Finalizar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Modal Start here-->
+	<div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"
+	role="dialog" aria-hidden="true" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">
+					<span class="glyphicon glyphicon-time">
+					</span>&nbsp;&nbsp;Aguarde, carregando...
+				</h4>
+			</div>
+			<div class="modal-body">
+				<div class="progress">
+					<div class="progress-bar progress-bar-info
+					progress-bar-striped active"
+					style="width: 100%">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+<!-- Modal ends Here -->

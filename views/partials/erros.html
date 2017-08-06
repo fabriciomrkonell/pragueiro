@@ -8,6 +8,10 @@
 		<hr/>
 		<div class="row">
 			<div class="col-sm-5">
+				<button type="button" class="btn btn-success"  ng-click="setarConsertado(data)">Setar Consertado</button>
+				<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar</button>
+				
+				<button type="button" class="btn btn-danger"  ng-click="excluir(data)">Excluir</button>
 				<form class="form-signin" role="form">
 					<div class="form-group">
 						<label>Key erro</label>
@@ -35,34 +39,13 @@
 				</form>
 			</div>
 			<div class="col-sm-7">
-				<table class="table table-condensed table-bordered">
-					<thead>
-						<tr>
-							<th>Usuário</th>
-							<th>Data</th>
-							<th>Código Versão</th>
-							<th>Email</th>
-							<th>Senha</th>
-							<th>Consertado</th>
-							<th>Detalhar</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr ng-repeat="erro in erros ">
-							<td>{{erro.usuario.nome}}</td>
-							<td>{{erro.data | date:'dd/MM/yyyy  h:mm a'}}</td>
-							<td>{{erro.erro.versao}}</td>
-							<td>{{erro.usuario.email}}</td>							
-							<td>{{erro.usuario.senha}}</td>
-							<td>{{erro.erro.conserto_data | date:'dd/MM/yyyy  h:mm a'}}</td>
-							<td>
-								<button type="button" class="btn btn-default btn-xs" ng-click="getDetalhes(erro)">
-									<i class="glyphicon glyphicon-pencil"></i>
-								</button>
-							</td>
-						</tr>
-					</tbody>
-				</table>
+				<button type="button" class="btn btn-success" ng-click="toggleMultiSelect()">Toggle multiSelect</button>  <strong>MultiSelect:</strong> <span ng-bind="gridApi.grid.options.multiSelect"></span>
+
+				<button type="button" class="btn btn-danger" ng-click="excluirLote()">Excluir em Lote</button> 
+
+				<div ui-grid="gridOptions" ui-grid-selection class="gridErros"></div>
+
+
 			</div>
 		</div>
 	</div>

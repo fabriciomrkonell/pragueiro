@@ -1,0 +1,84 @@
+{
+  "name": "angular-ui-grid",
+  "description": "A data grid for Angular",
+  "main": "index.js",
+  "ignore": [],
+  "dependencies": {
+    "angular": ">=1.4.0 1.5.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/angular-ui/ui-grid.git"
+  },
+  "homepage": "http://ui-grid.info",
+  "bugs": {
+    "url": "https://github.com/angular-ui/ui-grid/issues"
+  },
+  "keywords": [
+    "angular",
+    "ng-grid",
+    "nggrid",
+    "grid",
+    "angularjs",
+    "slickgrid",
+    "kogrid",
+    "ui-grid",
+    "ui grid",
+    "data grid"
+  ],
+  "license": "MIT",
+  "version": "4.0.6",
+  "files": [
+    "less",
+    "ui-grid.css",
+    "ui-grid.eot",
+    "ui-grid.js",
+    "ui-grid.min.css",
+    "ui-grid.min.js",
+    "ui-grid.svg",
+    "ui-grid.ttf",
+    "ui-grid.woff"
+  ],
+  "_id": "angular-ui-grid@4.0.6",
+  "scripts": {},
+  "_shasum": "5eaaa67f23cf063d99b218ec58ae5c15161005ce",
+  "_from": "angular-ui-grid@latest",
+  "_npmVersion": "3.10.10",
+  "_nodeVersion": "6.10.1",
+  "_npmUser": {
+    "name": "mportuga",
+    "email": "marceloquarion@gmail.com"
+  },
+  "dist": {
+    "shasum": "5eaaa67f23cf063d99b218ec58ae5c15161005ce",
+    "tarball": "https://registry.npmjs.org/angular-ui-grid/-/angular-ui-grid-4.0.6.tgz"
+  },
+  "maintainers": [
+    {
+      "name": "c0bra",
+      "email": "emailc0bra@gmail.com"
+    },
+    {
+      "name": "dlgski",
+      "email": "dana.greenberg@kronos.com"
+    },
+    {
+      "name": "jlleitschuh",
+      "email": "Jlleitschuh@wpi.edu"
+    },
+    {
+      "name": "mportuga",
+      "email": "marceloquarion@gmail.com"
+    },
+    {
+      "name": "swalters",
+      "email": "swalters@singletreetech.com"
+    }
+  ],
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages",
+    "tmp": "tmp/angular-ui-grid-4.0.6.tgz_1497453871141_0.5207356729079038"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/angular-ui-grid/-/angular-ui-grid-4.0.6.tgz"
+}

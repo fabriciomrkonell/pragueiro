@@ -2,17 +2,18 @@
 
 	'use strict';
 
-	angular.module('Pragueiro.controllers').registerCtrl('aplicacaoCtrl', aplicacaoCtrl);
+	angular.module('Pragueiro.controllers').registerCtrl('ordser2Ctrl', ordser2Ctrl);
 
-	aplicacaoCtrl.$inject = ['$scope', 'Constant', 'Session', '$firebaseArray', '$firebaseObject', 'Notify'];
+	ordser2Ctrl.$inject = ['$scope', 'Constant', 'Session', '$firebaseArray', '$firebaseObject', 'Notify'];
 
-	function aplicacaoCtrl($scope, Constant, Session, $firebaseArray, $firebaseObject, Notify) {
+	function ordser2Ctrl($scope, Constant, Session, $firebaseArray, $firebaseObject, Notify) {
 
 		angular.extend($scope, {
 			objModal: {},
 			objModalQuadra: {},
 			objModalHistorico: {},
 			edit: false,
+			save: true,
 			editQuadra: false,
 			fazendas: [],
 			safras: [],
@@ -47,6 +48,39 @@
 		
 
 
+		$scope.gridOptions = { 
+			enableRowSelection: true, 
+			enableRowHeaderSelection: false,
+
+			enableColumnResizing: true,
+
+			multiSelect : false,
+			modifierKeysToMultiSelect : false,
+
+			columnDefs : [
+			{ field: "codigo", displayName: "Código", width: 80 },
+			{ field: "data", displayName: "datpre", width: 200 },
+			{ field: "ativo", displayName: "Ativo", width: 80,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" },
+			],
+			appScopeProvider: {
+				mapValue: function(row) {
+					return row.entity.ativo ? 'Sim' : 'Não';
+				}
+			}
+			
+		};
+
+		$scope.toggleMultiSelect = function() {
+			$scope.gridApi.selection.setMultiSelect(!$scope.gridApi.grid.options.multiSelect);
+		};
+
+
+		$scope.gridOptions.onRegisterApi = function(gridApi){
+			$scope.gridApi = gridApi;
+			gridApi.selection.on.rowSelectionChanged($scope,function(row){
+				$scope.editar(row.entity);
+			});
+		};
 
 		//############################################################################################################################
 		//############################################################################################################################
@@ -110,36 +144,177 @@
 		
 
 		$scope.chengeFazenda = function(fazenda){
-			if(fazenda === null) return false;
-			refSafra = new Firebase(Constant.Url + '/filial/' + fazenda.key + '/safra');
-			$scope.safras = $firebaseArray(refSafra);
-			$scope.quadras=[];
-			$scope.quadras.push({nome:'', key:null});
-			var filialxquadras = $firebaseArray(new Firebase(Constant.Url + '/filial/'+fazenda.key+'/quadra'));
-			filialxquadras.$loaded(function() {
-				filialxquadras.forEach(function(filxqua){
-					todasQuadras.forEach(function(item){
-						if(item.$id === filxqua.$id)
-						{ 
-							$scope.quadras.push(item);
+			if(fazenda === null) 
+			{
+				$scope.ordsers =null;
+			}
+			else
+			{				
+
+				$scope.ordsers=[];
+
+				var refOrdser= new Firebase(Constant.Url + '/ordser/'+fazenda.key);
+
+				refOrdser.ref().on('child_added', function(snap) {
+					var ordser=snap.val();
+					$scope.ordsers.push(ordser);
+					if(!$scope.$$phase) {
+						$scope.$apply();
+					}
+					$scope.gridOptions.data = $scope.ordsers;
+				}); 
+/*
+
+				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
+				var refNovoQuadra = new Firebase.util.NormalizedCollection(
+					baseRef.child("/ordser/"+fazenda.key),
+					[baseRef.child("/ordser"), "$key"]
+					).select(
+					{"key":"ordser.$value","alias":"filial"},
+					{"key":"$key.$value","alias":"ordsers"}
+					).ref();
+
+					refNovoQuadra.on('child_added', function(snap) {
+						$('#myPleaseWait').modal('hide');
+						var objNovo= snap.val();
+						$scope.ordsers.push(objNovo['ordsers']);
+						if(!$scope.$$phase) {
+							$scope.$apply();
+						}
+						$scope.gridOptions.data = $scope.ordsers;
+					});
+
+					refNovoQuadra.on('child_changed', function(snap) {
+						$('#myPleaseWait').modal('hide');
+						var objNovo= snap.val();
+						var x=0;
+						var posicao=null;
+						$scope.ordsers.forEach(function(obj){
+							if(obj.key === objNovo['ordsers'].key)
+							{ 
+								posicao=x;
+							}
+							x++;
+
+						});
+						if(posicao!=null)
+							$scope.ordsers[posicao]=objNovo['ordsers'];
+
+						if(!$scope.$$phase) {
+							$scope.$apply();
 						}
 					});
+
+					refNovoQuadra.on('child_removed', function(snap) {
+						$scope.chengeFazenda($scope.data.fazenda);
+					});
+
+					*/
+
+				}
+			};
+
+			$scope.setaFazenda = function(fazenda){
+				if(fazenda === null) return false;
+
+				$scope.fazendas.forEach(function(item){
+					if(item.key === fazenda.key) 	
+					{
+						$scope.data.fazenda = item;		
+					}
 				});
-			});
+
+			};
+
+		//############################################################################################################################
+		//############################################################################################################################
+		// ORDSER
+		//############################################################################################################################
+
+
+		$scope.salvarOrdser = function(data){
+			if(validForm(data)) return false;
+
+			var fazendaTmp=data.fazenda;
+			delete data.fazenda;
+			delete data.$$hashKey;	
+			data['key_fazenda']=fazendaTmp.key;
+			var refOrdser = new Firebase(Constant.Url + '/ordser/' + fazendaTmp.key);
+			var key=refOrdser.push().key();
+			var refOrdserNovo = new Firebase(Constant.Url + '/ordser/' + fazendaTmp.key +'/'+ key);
+			data.key=key;
+			refOrdserNovo.set(data);
+
+			$scope.chengeFazenda(fazendaTmp);
+			$scope.clear();						
+			$scope.setaFazenda(fazendaTmp);	
+
+			Notify.successBottom('Ordem de Serviço/Atividade inserida com sucesso!');		
 		};
 
-		$scope.setaFazenda = function(fazenda){
-			if(fazenda === null) return false;
+		$scope.editarOrdser = function(data){
+			if(validForm(data)) return false;
+			var fazendaTmp=data.fazenda;
+			delete data.fazenda;
+			delete data.$$hashKey;		
+			var refOrdser = new Firebase(Constant.Url + '/ordser/' + fazendaTmp.key +'/'+ data.key);
+			refOrdser.set(data);
+			data.fazenda=fazendaTmp;
+			$scope.clear();
 
-			$scope.fazendas.forEach(function(item){
-				if(item.key === fazenda.key) 	
+			Notify.successBottom('Ordem de Serviço/Atividade atualizada com sucesso!');
+		};
+
+		$scope.cancelar = function(){
+			var fazendaTmp=$scope.data.fazenda;
+			$scope.clear();
+			$scope.setaFazenda(fazendaTmp);	
+			$scope.chengeFazenda($scope.data.fazenda);	
+			$scope.edit = false;
+			$scope.save = true;
+		};
+
+		$scope.editar = function(obj){
+			$scope.desabilitaFazenda=true;
+			var fazendaTmp=$scope.data.fazenda;
+			$scope.data = obj;
+			$scope.data.fazenda=fazendaTmp;
+			$scope.edit = true;
+			$scope.save = false;
+
+			$scope.desabilitaFazenda=true;		
+
+		};
+
+		$scope.excluir = function(objeto){
+			$('#modalDelete').modal('show');
+		};
+
+		$scope.excluirOrdser = function(objeto){
+			$('#modalDelete').modal('hide');
+			if(objeto!=null && $scope.data.fazenda!=null)
+			{
+				var fazendaTmp=$scope.data.fazenda;
+				if(objeto.qtd!=null)
 				{
-					$scope.data.fazenda = item;		
-				}
-			});
+					if(objeto.qtd>0)
+					{
+						setMessageError('Já foi associado em ordser. Impossível continuar.');
+						return true;
+					}
+				}			
+
+				var refOrdserNovo = new Firebase(Constant.Url + '/ordser/'+objeto.key);
+				refOrdserNovo.remove();
+				var refOrdserNovo = new Firebase(Constant.Url + '/filial/'+ $scope.data.fazenda.key + '/ordser/'+objeto.key);
+				refOrdserNovo.remove();						
+				Notify.successBottom('Ordser removida com sucesso!');
+				$scope.chengeFazenda(fazendaTmp);
+				$scope.cancelar();
+			}
+			return true;
 			
 		};
-
 
 		//############################################################################################################################
 		//############################################################################################################################

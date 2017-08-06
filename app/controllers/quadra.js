@@ -32,6 +32,7 @@ function showDicas()
 
 		angular.extend($scope, {
 			edit: false,
+			save: true,
 			arquivoCarregado: false,
 			desabilitaFazenda: false,
 			arquivoCarregado:false,
@@ -41,7 +42,13 @@ function showDicas()
 			todascoordenadasgeo:[],
 			quadraFilial: [],
 			data: {
-				ativo:true				
+				nome: '',
+				coordenadas: false,
+				ativo: true,
+				codigo: '',
+				dataStr_ultalt:'',
+				data_ultalt:0,
+				key:''			
 			}
 		});		
 
@@ -56,15 +63,63 @@ function showDicas()
 			}
 
 			map = new google.maps.Map(document.getElementById('map'), mapOptions);
+		};
+		$scope.gridOptions = { 
+			enableRowSelection: true, 
+			enableRowHeaderSelection: false,
+
+			enableColumnResizing: true,
+
+			multiSelect : false,
+			modifierKeysToMultiSelect : false,
+
+			columnDefs : [
+			{ field: "codigo", displayName: "Código", width: 80 },
+			{ field: "nome", displayName: "Nome", width: 200 },
+			{ field: "coordenadas", displayName: "Coordenadas", width: 150,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" },
+			],
+			appScopeProvider: {
+				mapValue: function(row) {
+					return row.entity.coordenadas ? 'Sim' : 'Não';
+				}
+			}
+		};
+
+		$scope.toggleMultiSelect = function() {
+			$scope.gridApi.selection.setMultiSelect(!$scope.gridApi.grid.options.multiSelect);
+		};
+
+
+		$scope.gridOptions.onRegisterApi = function(gridApi){
+			$scope.gridApi = gridApi;
+			gridApi.selection.on.rowSelectionChanged($scope,function(row){
+				$scope.chamaEditar(row.entity);
+			});
+		};
 
 
 		//$scope.printRouter();
-	};
 
-	var ref = new Firebase(Constant.Url + '/quadra');
-	$scope.todasQuadras = $firebaseArray(ref);
 
+		var ref = new Firebase(Constant.Url + '/coordenada');
+		$scope.todasQuadras = $firebaseArray(ref);
+
+		var ref = new Firebase('https://pragueirodebug.firebaseio.com/raiz/coordenada/');
+		$scope.todasQuadrasBKP = $firebaseArray(ref);
+
+	//var ref2 = new Firebase(Constant.Url + '/quadra');
+	//$scope.todasQuadrasMesmo = $firebaseArray(ref2);
 	
+
+	$scope.todasQuadrasMesmo =[];
+
+	var refCoordenadageo= new Firebase(Constant.Url + '/quadra');
+	refCoordenadageo.on('child_added', function(snap) {
+		var objNovo= snap.val();
+		$scope.todasQuadrasMesmo.push(objNovo);
+	});
+
+
 	initMap(new google.maps.LatLng(-20, -55), 4 );
 
 
@@ -140,6 +195,7 @@ function showDicas()
 		}		
 
 		$scope.chengeFazenda = function(fazenda){
+			$('#myPleaseWait').modal('show');
 			if(fazenda === null) 
 			{
 				$scope.quadras =null;
@@ -173,7 +229,7 @@ function showDicas()
 						$scope.todascoordenadasgeo.splice(posicao, 1);
 
 				});
-
+				
 				$scope.quadras=[];
 
 				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
@@ -192,6 +248,7 @@ function showDicas()
 						if(!$scope.$$phase) {
 							$scope.$apply();
 						}
+						$scope.gridOptions.data = $scope.quadras;
 					});
 
 					refNovoQuadra.on('child_changed', function(snap) {
@@ -228,8 +285,48 @@ function showDicas()
 		//############################################################################################################################
 		// QUADRA
 		//############################################################################################################################
+		$scope.check = function(){
+			var quadrasAdd=[];
+			
+			$scope.todasQuadrasBKP.forEach(function(bkp){
+				var tem=false;
+				$scope.todasQuadras.forEach(function(item){
+					if(bkp.$id==item.$id)
+					{
+						tem=true;
+
+					}
+				});
+				if(!tem)
+				{
+
+					quadrasAdd.push(bkp);
+				}
+			});
+			
+
+			quadrasAdd.forEach(function(item){
+
+				if(item!=null)
+				{
+
+						//if(tem)
+						//{
+							var caminho=Constant.Url + '/coordenada/'+item.$id;
 
 
+
+							delete item.$$hashKey;	
+							delete item.$id;	
+							delete item.$priority;	
+							//console.log('');
+							var refQuadraNovo = new Firebase(caminho);
+							refQuadraNovo.set(item);
+						//}
+					//	
+				}
+			});
+		}
 		$scope.getDadosQuadra = function(obj, nomeColuna){
 			var retorno = '';
 			if(nomeColuna=='nome')
@@ -273,10 +370,12 @@ function showDicas()
 			data.key=key;
 			refQuadraNovo.set(data);
 			var refQuadraNovo = new Firebase(Constant.Url + '/filial/'+fazendaTmp.key + '/quadra/'+key);
-			refQuadraNovo.set(true);
-			$scope.clear();			
+			refQuadraNovo.set(true);	
 			Notify.successBottom('Quadra inserida com sucesso!');
-			$scope.setaFazenda(fazendaTmp);	
+			data.fazenda=fazendaTmp;
+			$scope.cancelar();
+
+			$('#modalAviso').modal('show');
 		};
 
 
@@ -288,45 +387,60 @@ function showDicas()
 			var refQuadra = new Firebase(Constant.Url + '/quadra/'+data.key);
 			refQuadra.set(data);
 			data.fazenda=fazendaTmp;
-			$scope.clear();
-
+			$scope.cancelar();
 			Notify.successBottom('Quadra atualizada com sucesso!');
 
 		};
 
-		$scope.excluir = function(objeto)
+		$scope.excluir = function()
 		{
-			var fazendaTmp=$scope.data.fazenda;
-			if(objeto.data_ultalt!=null)
-			{
-				if(objeto.data_ultalt!='')
-				{
-					setMessageError('Já foi feito vistoria. Apenas desative a quadra/região!');
-					return;
-				}
-			}
+			$('#modalDelete').modal('show');
+			return true;
 
-			var refQuadraNovo = new Firebase(Constant.Url + '/quadra/'+objeto.key);
-			refQuadraNovo.remove();
+		};
+
+		$scope.excluirQuadra = function(objeto)
+		{
+			$('#modalDelete').modal('hide');
+
+			if(objeto!=null && objeto.key!=null)
+			{
+				var fazendaTmp=$scope.data.fazenda;
+				if(objeto.data_ultalt!=null)
+				{
+					if(objeto.data_ultalt!='')
+					{
+						setMessageError('Já foi feito vistoria. Apenas desative a quadra/região!');
+						return;
+					}
+				}
+
+				var refQuadraNovo = new Firebase(Constant.Url + '/quadra/'+objeto.key);
+			//refQuadraNovo.remove();
 			var refQuadraNovo = new Firebase(Constant.Url + '/filial/'+ $scope.data.fazenda.key + '/quadra/'+objeto.key);
 			refQuadraNovo.remove();
 			Notify.successBottom('Quadra removida com sucesso!');
-			$scope.setaFazenda(fazendaTmp);		
+			$scope.cancelar();	
+		}
 
-		};
+	};
 
-		$scope.cancelar = function(){
-			var fazendaTmp=$scope.data.fazenda;
-			$scope.clear();
-			$scope.setaFazenda(fazendaTmp);	
+	$scope.cancelar = function(){
+		var fazendaTmp=$scope.data.fazenda;
+		$scope.clear();
+		$scope.setaFazenda(fazendaTmp);	
+		if(fazendaTmp!=null)
+		{
 			$scope.chengeFazenda($scope.data.fazenda);	
-			$scope.edit = false;
-			setaCoordenadas();		
-		};
+		}
+		$scope.edit = false;
+		$scope.save = true;
+		setaCoordenadas();		
+	};
 
-		$scope.chamaEditar = function(obj)
-		{			
-			$('#myPleaseWait').modal('show');
+	$scope.chamaEditar = function(obj)
+	{			
+		$('#myPleaseWait').modal('show');
 
 			//$scope.map.control.getGMap().setZoom(3);
 			$scope.desabilitaFazenda=true;
@@ -334,6 +448,7 @@ function showDicas()
 			$scope.data = obj;
 			$scope.data.fazenda=fazendaTmp;
 			$scope.edit = true;
+			$scope.save = false;
 			$scope.todascoordenadas=[];
 			$scope.todascoordenadasCentroid=[];
 			if(!$scope.data.coordenadas)
@@ -459,21 +574,26 @@ function showDicas()
 		
 		$scope.clear = function(){
 			//var fazendaTmp=$scope.data.fazenda;
+			$scope.todascoordenadas=[];
+			$scope.todascoordenadasCentroid=[];
 			angular.extend($scope.data, {
 				nome: '',
 				coordenadas: false,
 				ativo: true,
 				codigo: '',
 				dataStr_ultalt:'',
-				data_ultalt:'',
+				data_ultalt:0,
 				key:''
 			});
 			//$scope.data.fazenda=fazendaTmp;
 			$scope.desabilitaFazenda=false;
+			$scope.edit=false;
+			$scope.save=true;
+
 			if(!$scope.$$phase) {
 				$scope.$apply();
 			}
-			//$scope.chengeFazenda($scope.fazenda);
+			//$scope.chengeFazenda(fazendaTmp);
 			//$scope.data.fazenda=fazendaTmp;
 		};
 		
@@ -484,14 +604,21 @@ function showDicas()
 
 		$scope.salvarArquivo= function(data)
 		{
+			if(data==null || data.fazenda.key == null || data.key == null)
+			{
+				return true;
+			}
 			$('#myPleaseWait').modal('show');
 			excluirCoordenadasGeo(data.fazenda.key, data.key);
 			var refCoordenadasGeoFire = $firebaseArray(new Firebase(Constant.Url + '/coordenadageo/'+data.fazenda.key));
 
 			refCoordenadasGeoFire.$loaded(function() {
 				refCoordenadasGeoFire.forEach(function(coordenadas){
-					var refCor = new Firebase(Constant.Url + '/coordenadageo/'+data.fazenda.key+'/'+coordenadas.key);
-					refCor.remove();
+					if(coordenadas.key!=null)
+					{
+						var refCor = new Firebase(Constant.Url + '/coordenadageo/'+data.fazenda.key+'/'+coordenadas.key);
+						refCor.remove();
+					}
 				});
 			});
 
@@ -597,7 +724,7 @@ function showDicas()
 
 		function setaCoordenadas()
 		{
-			if($scope.todascoordenadasCentroid.length>0 && $scope.todascoordenadas.length>0)
+			if($scope.todascoordenadasCentroid != null && $scope.todascoordenadasCentroid.length>0 && $scope.todascoordenadas.length>0)
 			{
 
 				var region = new Region($scope.todascoordenadasCentroid);			

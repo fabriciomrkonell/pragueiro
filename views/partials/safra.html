@@ -1,5 +1,13 @@
-<div ng-controller="safraCtrl">
+<div ng-controller="safraCtrl" class="ng-scope ng_scope">
 	<div class="container container-view">
+		<div class="row">
+			<div class="col-sm-6 col-sm-no-bottom">
+				<p>Você está em <a href="#home">Início</a> / <a href="#cadastro">Cadastro</a>  / <a href="#safra">Safra</a></p>
+
+				<br />
+			</div>
+		</div>
+
 		<div class="row">
 			<div class="col-sm-4 col-sm-no-bottom">
 				<form class="form-signin" role="form" action="/login" method="post">
@@ -13,8 +21,17 @@
 		</div>
 		<hr/>
 		<div class="row">
-			<div class="col-sm-4">
+			<div class="col-sm-6">
+				
+				<button type="button" class="btn btn-success" ng-show="save" ng-click="salvarSafra(data.fazenda, formSafra)">Salvar</button>
+				<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarSafra(formSafra)">Atualizar</button>
+				<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar/Novo</button>
+				<button type="button" class="btn btn-default btn-warning" ng-disabled="!edit" ng-click="showQuadras(data.fazenda, formSafra)">Quadra</button>
+				<button type="button" class="btn btn-default btn-warning" ng-disabled="!edit" ng-click="getHistoricoQuadrasCulturas(data.fazenda, formSafra)">Histórico</button>
+				<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="chamaExcluirSafra(formSafra)">Excluir</button>
+				<br />
 				<form class="form-signin" role="form" >
+					
 					<div class="form-group">
 						<label>Descriçāo</label>
 						<input type="text" class="form-control" placeholder="Descriçāo" name="descricao" ng-model="formSafra.descricao" />
@@ -25,37 +42,10 @@
 						<label>Ativo</label>						
 					</div>
 					
-					<button type="button" class="btn btn-success pull-left" ng-show="!edit" ng-click="salvarSafra(data.fazenda, formSafra)">Salvar</button>
-					<button type="button" class="btn btn-success pull-left" ng-show="edit" ng-click="atualizarSafra(formSafra)">Atualizar</button>
-					<button type="button" class="btn btn-default btn-cancel" ng-click="clear()">Cancelar</button>
 				</form>
 			</div>
-			<div class="col-sm-8">
-				<table class="table table-condensed table-bordered">
-					<thead>
-						<tr>
-							<th>Descriçāo</th>
-							<th class="text-center" width="100px">Ativo</th>
-							<th class="text-center" width="190px">Ações</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr ng-repeat="safra in safras">
-							<td>{{safra.descricao}}</td>
-							<td class="text-center">{{safra.ativo ? 'Sim' : 'Nāo'}}</td>
-							<td class="text-center" width="130px">
-								<button type="button" class="btn btn-default btn-xs" ng-click="showQuadras(data.fazenda, safra)">Quadras</button>
-								<button type="button" class="btn btn-default btn-xs" ng-click="getHistoricoQuadrasCulturas(data.fazenda, safra)">Histórico</button>
-								<button type="button" class="btn btn-default btn-xs" ng-click="ChamarEditarSafra(safra)">
-									<i class="glyphicon glyphicon-pencil"></i>
-								</button>
-								<button type="button" class="btn btn-danger btn-xs" ng-click="excluirSafra(safra)">
-									<i class="glyphicon glyphicon-remove"></i>
-								</button>
-							</td>
-						</tr>
-					</tbody>
-				</table>
+			<div class="col-sm-6">
+				<div ui-grid="gridOptions" ui-grid-selection class="gridVariedade"></div>	
 			</div>
 		</div>
 	</div>
@@ -84,7 +74,7 @@
 										<option value="{{quadra.$id}}" ng-repeat="quadra in todasQuadras | orderBy:'nome' ">{{quadra.nome}}</option>
 
 									</select>
-								</div>
+								</div> 
 								<div class="form-group">
 									<label>Cultura</label>
 									<select class="form-control" ng-model="formPlanejamento.key_cultura"  ng-change="chengeCultura(formPlanejamento.key_cultura)" ng-disabled=!editCultura>
@@ -98,6 +88,13 @@
 
 									<input type="checkbox" ng-model="formPlanejamento.ativo"
 									ng-true-value="true" ng-false-value="false">	<label>Ativo</label>
+									
+								</div>
+								<div class="form-group">
+
+									<label>Area</label><br>
+
+									<input type="number" class="form-control" placeholder="ha" ng-model="formPlanejamento.area" />
 									
 								</div>
 								<button type="button" class="btn btn-success pull-left" ng-show="!editQuadra" ng-click="salvarPlanejamento(data.fazenda, objSafra, formPlanejamento)">Salvar
@@ -158,6 +155,8 @@
 							
 						</div>
 						<div class="col-sm-8">
+
+
 							<table class="table table-condensed table-bordered">
 								<thead>
 									<tr>
@@ -176,7 +175,7 @@
 											<button type="button" class="btn btn-default btn-xs" ng-click="ChamarEditarPlanejamento(quadracultura)">
 												<i class="glyphicon glyphicon-pencil"></i>
 											</button>
-											<button type="button" class="btn btn-danger btn-xs" ng-click="excluirPlanejamento(quadracultura)">
+											<button type="button" class="btn btn-danger btn-xs" ng-click="chamaExcluirPlanejamento(quadracultura)">
 												<i class="glyphicon glyphicon-remove"></i>
 											</button>
 										</td>
@@ -236,7 +235,74 @@
 	</div>
 
 	<!--########################################################################################-->
+	<!-- Modal DELETE-->
+	<div class="modal fade" id="modalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
 
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Confirmação Exclusão</h4>
+				</div>
+
+				<div class="modal-body">
+					<p>Têm certeza que deseja excluir a Variedade '{{formSafra.descricao}}'?</p>
+					<p class="debug-url"></p>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+					<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="excluirSafra(formSafra)">Excluir</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="modal fade" id="modalDeletePlanejamento" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Confirmação Exclusão</h4>
+				</div>
+
+				<div class="modal-body">
+					<p>Têm certeza que deseja excluir a Quadra '{{getQuadraNome(planejamentoExcluir.key)}}' da Safra?</p>
+					<p class="debug-url"></p>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+					<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="excluirPlanejamento()">Excluir</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="modal fade" id="modalDeleteVariedade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Confirmação Exclusão</h4>
+				</div>
+
+				<div class="modal-body">
+					<p>Têm certeza que deseja excluir a Variedade '{{data.nome}}' da Safra?</p>
+					<p class="debug-url"></p>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+					<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="excluirVariedade(data)">Excluir</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	<!-- Modal Start here-->
 	<div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"

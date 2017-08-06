@@ -6,9 +6,11 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="shortcut icon" href="/dist/images/favicon.ico">
 	<link rel="mask-icon" href="/dist/images/favicon.ico" color="black">
-	<title>Pragueiro - 0.9.3</title>
+	<title>Pragueiro - 0.9.4</title>
+
 	<link rel="stylesheet" type="text/css" href="/app/libraries/bootstrap/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="/app/dist/css/index.css">
+	<link rel="stylesheet" type="text/css" href="/app/libraries/angular-ui-grid/ui-grid.css" /> 
 	<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDDu-8XiPmbb5QbSlh-Dv4xyHF53iGUPOk"></script>
 	<style type="text/css">
 		[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
@@ -19,6 +21,9 @@
 			padding-right: 5px; 
 			padding-left: 0px; 
 		}
+
+		
+
 	</style>
 </head>
 <body>
@@ -44,13 +49,25 @@
 							<li><a href="#/quadra">Quadra</a></li>
 							<li><a href="#/variedade">Variedade</a></li>
 							<li><a href="#/safra">Safra</a></li>		
+							<li>---------------</li>	
+							<li><a href="#/equipe">Equipe</a></li>	
+							<li><a href="#/funcionario">Funcionário</a></li>	
+							<li><a href="#/tipati">Tipo Ordem de Serviço/Atividade</a></li>	
+							<li><a href="#/equipamento">Equipamento</a></li>	
+							<li><a href="#/produto">Produto</a></li>	
 							<!--<li><a href="#/safra">Planejamento Safra</a></li>-->							
 						</ul>
 					</li>
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Lançamentos <span class="caret"></span></a>
 						<ul class="dropdown-menu">
-							<li><a href="#/home">Aplicação</a></li>
+							<li><a href="#/ordser">Ordem de Serviço/Atividade</a></li>
+						</ul>
+					</li>
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Relatórios <span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="#/home">Relatório de atividades</a></li>
 						</ul>
 					</li>
 				</ul>
@@ -60,7 +77,7 @@
 						<ul class="dropdown-menu">
 							<li><a href="#/perfil">Meu perfil</a></li>
 							<li><a href="javascript:void(0)" ng-click="logout()">Sair</a></li>
-							<!--<li><a href="#/erros">Erros</a></li>-->	
+							<!--<li><a href="#/erros">Erros</a></li>-->
 						</ul>
 					</li>
 				</ul>
@@ -82,9 +99,13 @@
 	<script src='//maps.googleapis.com/maps/api/js?sensor=false'></script>
 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-sanitize/1.5.8/angular-sanitize.min.js"></script>
+
 <script src="/app/libraries/notify/js/bootstrap-notify.min.js"></script>
-<script src="/app/libraries/angularjs/js/angular-route.min.js"></script>
 <script src="/app/libraries/bootstrap/js/bootstrap.min.js"></script>
+
+<script src="/app/libraries/angularjs/js/angular-route.min.js"></script>
+
+
 <script src="/app/libraries/mask/js/jquery-mask.min.js"></script>
 <script src="/app/libraries/kmlmapparser/KmlMapParser.js"></script>
 <script src="/app/app.js"></script>
@@ -97,5 +118,6 @@
 <script src="/app/libraries/angularfire/angularGeoFire.js"></script>
 <script src="/app/libraries/angularfire/geofire.min.js"></script>
 <script src="https://unpkg.com/shapefile@0.5"></script>
+<script type="text/javascript" src="/app/libraries/angular-ui-grid/ui-grid.min.js"></script>  
 </body>
 </html>

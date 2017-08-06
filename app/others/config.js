@@ -68,10 +68,50 @@
         resolve: {
           deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/variedade.js'])
         }
+      }).when('/equipe', {
+        templateUrl: '/views/partials/equipe.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/equipe.js'])
+        }
+      }).when('/tipati', {
+        templateUrl: '/views/partials/tipati.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/tipati.js'])
+        }
+      }).when('/equipamento', {
+        templateUrl: '/views/partials/equipamento.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/equipamento.js'])
+        }
+      }).when('/produto', {
+        templateUrl: '/views/partials/produto.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/produto.js'])
+        }
+      }).when('/funcionario', {
+        templateUrl: '/views/partials/funcionario.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/funcionario.js'])
+        }
       }).when('/usuarios', {
         templateUrl: '/views/partials/user.html',
         resolve: {
           deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/user.js'])
+        }
+      }).when('/cadastro', {
+        templateUrl: '/views/partials/cadastro.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/cadastro.js'])
+        }
+      }).when('/lancamento', {
+        templateUrl: '/views/partials/lancamento.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/lancamento.js'])
+        }
+      }).when('/ordser', {
+        templateUrl: '/views/partials/ordser.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/ordser.js'])
         }
       }).otherwise({
         redirectTo: '/home'

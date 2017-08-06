@@ -1,12 +1,12 @@
 (function(){
 
-	'use strict';
+	'use strict'; 
 
 	angular.module('Pragueiro.controllers').registerCtrl('safraCtrl', safraCtrl);
 
-	safraCtrl.$inject = ['$scope', 'Constant', 'Session', '$firebaseArray', '$firebaseObject', 'Notify'];
+	safraCtrl.$inject = ['$scope', 'Constant', 'Session', '$firebaseArray', '$firebaseObject', 'Notify', '$interval'];
 
-	function safraCtrl($scope, Constant, Session, $firebaseArray, $firebaseObject, Notify) {
+	function safraCtrl($scope, Constant, Session, $firebaseArray, $firebaseObject, Notify, $interval) {
 
 		angular.extend($scope, {
 			objSafra: {},
@@ -19,6 +19,7 @@
 			},
 			objHistorico: {},
 			edit: false,
+			save:true,
 			editQuadra: false,
 			editCultura: true,
 			fazendas: [],
@@ -34,7 +35,7 @@
 			},
 			formSafra: {
 				descricao: '',
-				ativo: 'true',
+				ativo: true,
 				key: '',
 				key_filial:'',
 				data_plantio : ''
@@ -50,11 +51,45 @@
 		refHistoricoQuadrasCulturas = null;
 
 		atualizaListaFiliais();
-
+		$scope.planejamentoExcluir={};
 
 		$scope.culturas = $firebaseArray(refCultura);
 		var todasQuadras = $firebaseArray(refQuadra);
 		
+
+		$scope.gridOptions = { 
+			enableRowSelection: true, 
+			enableRowHeaderSelection: false,
+
+			enableColumnResizing: true,
+
+			multiSelect : false,
+			modifierKeysToMultiSelect : false,
+
+			columnDefs : [
+			{ field: "descricao", displayName: "Descricao", width: 400 },
+
+
+			{ field: "ativo", displayName: "Ativo", width: 150,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" },
+			],
+			appScopeProvider: {
+				mapValue: function(row) {
+					return row.entity.ativo ? 'Sim' : 'Não';
+				}
+			}
+		};
+
+		$scope.toggleMultiSelect = function() {
+			$scope.gridApi.selection.setMultiSelect(!$scope.gridApi.grid.options.multiSelect);
+		};
+
+
+		$scope.gridOptions.onRegisterApi = function(gridApi){
+			$scope.gridApi = gridApi;
+			gridApi.selection.on.rowSelectionChanged($scope,function(row){
+				$scope.ChamarEditarSafra(row.entity);
+			});
+		};
 
 		function atualizaVariedade(key_filial)
 		{
@@ -148,6 +183,7 @@
 					});
 				});
 			});
+			$scope.gridOptions.data = $scope.safras;
 		};
 
 		$scope.setaFazenda = function(fazenda){
@@ -193,13 +229,32 @@
 		$scope.ChamarEditarSafra = function(data){
 			$scope.formSafra = data;
 			$scope.edit = true;
+			$scope.save=false;
 		};
 
+		$scope.chamaExcluirSafra= function(data){
+			$('#modalDelete').modal('show');
+			return true;
+		};
+
+
 		$scope.excluirSafra = function(data){
-			var fazendaTmp=$scope.data.fazenda;
-			$scope.safras.$remove(data);
-			Notify.successBottom('Safra removida com sucesso!');
-			$scope.setaFazenda(fazendaTmp);
+			$('#modalDelete').modal('hide');
+			if(data!=null && data.key!=null)
+			{
+				var fazendaTmp=$scope.data.fazenda;
+				$scope.safras.$remove(data);
+				Notify.successBottom('Safra removida com sucesso!');
+				$scope.setaFazenda(fazendaTmp);
+				$scope.clearFormSafra();
+			}
+		};
+
+		$scope.cancelar= function(data){
+			$scope.clearFormSafra();
+			$scope.edit = false;
+			$scope.save = true;
+			return true;
 		};
 
 		//############################################################################################################################
@@ -213,10 +268,12 @@
 			if($scope.culturas.length === 0) return false;
 			if($scope.todasQuadras.length > 0) 
 			{
-				$scope.clearFormSafraQuadrasCulturas(fazenda, safra);
+				$scope.recuperaPlanejamentos(fazenda, safra);
 			}	
 			refHistoricoQuadrasCulturas = new Firebase(Constant.Url + '/filial/' + fazenda.key + '/safra/' + safra.$id +'/historicorelacionamento');
 			$scope.historico = $firebaseArray(refHistoricoQuadrasCulturas);
+
+
 			$('#modalQuadras').modal('show');
 		};
 
@@ -306,20 +363,31 @@
 			//$scope.quadrasPlanejamento.$save(formPlanejamento);
 			$scope.addHistorico(formPlanejamento.key, formPlanejamento.key_cultura, 'Atualizou');
 			Notify.successBottom('Relacionamento atualziado com sucesso!');
-			$scope.clearFormSafraQuadrasCulturas(fazenda, safra);
+			$scope.recuperaPlanejamentos(fazenda, safra);
 			$scope.clearFormPlanejamento();
 			$scope.setaFazenda(fazenda);		
 		};
 
-		$scope.excluirPlanejamento = function(data){
-			var fazendaTmp=$scope.data.fazenda;
-			$scope.quadrasPlanejamento.$remove(data);
-			$scope.addHistorico(data.key, data.key_cultura, 'Removeu');
-			Notify.successBottom('Relacionamento removido com sucesso!');
-			$scope.setaFazenda(fazendaTmp);
+		$scope.chamaExcluirPlanejamento= function(data){
+			$scope.planejamentoExcluir=data;
+			$('#modalDeletePlanejamento').modal('show');
+			return true;
 		};
 
-		$scope.clearFormSafraQuadrasCulturas = function(fazenda, safra){
+		$scope.excluirPlanejamento = function(){
+			$('#modalDeletePlanejamento').modal('hide');
+			var data=$scope.planejamentoExcluir;
+			if(data!=null)
+			{
+				var fazendaTmp=$scope.data.fazenda;
+				$scope.quadrasPlanejamento.$remove(data);
+				$scope.addHistorico(data.key, data.key_cultura, 'Removeu');
+				Notify.successBottom('Relacionamento removido com sucesso!');
+				$scope.setaFazenda(fazendaTmp);
+			}
+		};
+
+		$scope.recuperaPlanejamentos = function(fazenda, safra){
 
 			refQuadrasCulturas = new Firebase(Constant.Url + '/filial/' + fazenda.key + '/safra/' + safra.key + '/quadra');
 			$scope.quadrasPlanejamento = $firebaseArray(refQuadrasCulturas);
@@ -363,20 +431,23 @@
 		};
 
 		$scope.excluirVariedade = function(fazenda, safra, formPlanejamento, variedade){
-			var fazendaTmp=fazenda;
-			var refVariedadeNovo = new Firebase(Constant.Url + '/filial/' + fazenda.key + '/safra/' + safra.key + '/quadra/'+formPlanejamento.key+'/variedades/'+variedade.key);
-			refVariedadeNovo.remove();
-			console.log(Constant.Url + '/filial/' + fazenda.key + '/safra/' + safra.key + '/quadra/'+formPlanejamento.key+'/variedades/'+variedade.key);
-			Notify.successBottom('Variedade removida com sucesso!');
-			for (var i = 0; i < $scope.variedadesAdd.length; i++)
-			{			
-				if($scope.variedadesAdd[i].key==variedade.key)
-				{
-					$scope.formPlanejamento.variedades.splice(i);
-					break
+			if(variedade!=null && variedade.key!=null)
+			{
+				var fazendaTmp=fazenda;
+				var refVariedadeNovo = new Firebase(Constant.Url + '/filial/' + fazenda.key + '/safra/' + safra.key + '/quadra/'+formPlanejamento.key+'/variedades/'+variedade.key);
+				refVariedadeNovo.remove();
+				console.log(Constant.Url + '/filial/' + fazenda.key + '/safra/' + safra.key + '/quadra/'+formPlanejamento.key+'/variedades/'+variedade.key);
+				Notify.successBottom('Variedade removida com sucesso!');
+				for (var i = 0; i < $scope.variedadesAdd.length; i++)
+				{			
+					if($scope.variedadesAdd[i].key==variedade.key)
+					{
+						$scope.formPlanejamento.variedades.splice(i);
+						break
+					}
 				}
+				$scope.setaFazenda(fazendaTmp);
 			}
-			$scope.setaFazenda(fazendaTmp);
 		};
 
 		$scope.salvarVariedade = function(fazenda, safra, formPlanejamento){
@@ -460,7 +531,7 @@
 				Notify.errorBottom('O campo descriçāo é inválido!');
 				return true;
 			}
-			if(data.ativo === ''){
+			if(data.ativo === null){
 				Notify.errorBottom('O campo ativo é inválido!');
 				return true;
 			}
@@ -495,11 +566,13 @@
 			return false;
 		};
 
-		$scope.clearFormSafraFormSafra = function(){
+		$scope.clearFormSafra = function(){
 			angular.extend($scope.formSafra, {
 				descricao: '',
-				ativo: 'true'
-			});			
+				ativo: true
+			});		
+			$scope.edit=false;
+			$scope.save=true;
 			return true;
 		};
 
@@ -507,6 +580,7 @@
 			angular.extend($scope.formPlanejamento, {
 				ativo:true,
 				key:'',
+				area: 0,
 				key_cultura:'',
 				data_plantio: undefined,
 				variedades:[]

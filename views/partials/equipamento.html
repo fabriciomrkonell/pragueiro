@@ -1,0 +1,149 @@
+<div ng-controller="equipamentoCtrl" class="ng-scope ng_scope">
+
+	<div class="container container-view">
+		<div class="row">
+			<div class="col-sm-6 col-sm-no-bottom">
+				<p>Você está em <a href="#home">Início</a> / <a href="#cadastro">Cadastro</a>  / <a href="#equipamento">Equipamento</a></p>
+
+				<br />
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-6 col-sm-no-bottom">
+
+				<label>Fazenda</label>
+				<select class="form-control" ng-disabled=desabilitaFazenda ng-options="fazenda.nome for fazenda in fazendas" ng-model="data.fazenda" ng-change="chengeFazenda(data.fazenda)">
+					<option value="">Selecione</option>
+				</select>
+
+			</div>
+		</div>
+		<hr/>
+		<div class="row">
+			<div class="col-sm-6">
+				<button type="button" class="btn btn-success" ng-show="save" ng-click="salvarEquipamento(data)">Salvar</button>
+				<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarEquipamento
+				(data)">Atualizar</button>
+				<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar/Novo</button>
+				<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="excluir()">Excluir</button>
+				<br />
+				<br />
+				<form class="form-signin" role="form">
+					<div class="form-group">
+						<label><i>Código Interno</i></label>
+						<p>
+							<label>{{data.key}}</label>
+						</p>
+					</div>
+					<div class="form-group">
+						<label>Código</label>
+						<input type="text" class="form-control" placeholder="Código" ng-model="data.codigo" />
+					</div>	
+					<div class="form-group">
+						<label>Nome</label>
+						<input type="text" class="form-control" placeholder="Nome" ng-model="data.nome" />
+					</div>						
+
+
+
+
+					<div class="form-group">
+						<label>Marca</label>
+						<input type="text" class="form-control" placeholder="Marca" ng-model="data.marca" />
+					</div>	
+					<div class="form-group">
+						<label>Ano</label>
+						<input type="text" class="form-control" placeholder="Ano" ng-model="data.ano" />
+					</div>	
+
+					<div class="row">
+						<div class="col-sm-7">
+							<div class="form-group">
+								<label>Combustível</label>
+
+								<div class="radio">
+									<label><input type="radio" ng-model="data.key_combustivel" value="2" name="optradio">Álcool&nbsp;&nbsp;&nbsp;</label>
+									<label><input type="radio" ng-model="data.key_combustivel" value="3" name="optradio">Energia&nbsp;&nbsp;</label>
+									<label><input type="radio" ng-model="data.key_combustivel" value="5" name="optradio">Diesel&nbsp;&nbsp;</label>
+									<label><input type="radio" ng-model="data.key_combustivel" value="1" name="optradio">Gasolina&nbsp;&nbsp; </label>
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-5">
+							<div class="form-group">
+								<label>Consumo médio padrão por hora/km</label>
+								<input type="number" class="form-control" placeholder="consumo" ng-model="data.consumo" />
+							</div>
+						</div>
+					</div>
+
+
+
+					<div class="form-group">
+						<label>Observação</label>
+						<input type="text" class="form-control" placeholder="Observação" ng-model="data.obs" />
+					</div>	
+
+					<div class="form-group">
+						<input type="checkbox"  ng-model="data.ativo"
+						ng-true-value="true" ng-false-value="false">	
+						<label>Ativo</label>						
+					</div>		
+				</form>
+				<button type="button" class="btn btn-success" ng-show="!edit" ng-click="salvarEquipamento(data)">Salvar</button>
+				<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarEquipamento(data)">Atualizar</button>
+				<button type="button"  class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar</button>
+			</form>
+		</div>
+		<div class="col-sm-6">
+			<div ui-grid="gridOptions" ui-grid-selection class="gridEquipamento"></div>	
+		</div>
+	</div>
+</div>
+<!-- Modal DELETE-->
+<div class="modal fade" id="modalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="myModalLabel">Confirmação Exclusão</h4>
+			</div>
+
+			<div class="modal-body">
+				<p>Têm certeza que deseja excluir o Equipamento '{{data.nome}}'?</p>
+				<p class="debug-url"></p>
+			</div>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+				<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="excluirEquipamento(data)">Excluir</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal Start here-->
+<div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"
+role="dialog" aria-hidden="true" data-backdrop="static">
+<div class="modal-dialog modal-sm">
+	<div class="modal-content">
+		<div class="modal-header">
+			<h4 class="modal-title">
+				<span class="glyphicon glyphicon-time">
+				</span>&nbsp;&nbsp;Aguarde, carregando...
+			</h4>
+		</div>
+		<div class="modal-body">
+			<div class="progress">
+				<div class="progress-bar progress-bar-info
+				progress-bar-striped active"
+				style="width: 100%">
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+</div>
+<!-- Modal ends Here -->
+</div>

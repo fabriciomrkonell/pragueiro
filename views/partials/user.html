@@ -1,4 +1,4 @@
-<div ng-controller="userCtrl">
+<div ng-controller="userCtrl" class="ng-scope ng_scope">
   <div class="row">
     <div class="col-sm-4">
       <form>
@@ -16,7 +16,7 @@
         </div>
         <div class="form-group">
           <label>Tipo</label>
-           <select class="form-control" ng-options="type.name for type in options.types" ng-model="data.type"></select>
+          <select class="form-control" ng-options="type.name for type in options.types" ng-model="data.type"></select>
         </div>
         <button type="button" class="btn btn-success" ng-click="saveUser(data)">Salvar</button>
         <button type="button" class="btn btn-default" ng-click="clear()">Limpar</button>
