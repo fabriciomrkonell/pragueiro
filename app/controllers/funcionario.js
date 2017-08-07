@@ -132,7 +132,8 @@
 				$scope.funcionarios =null;
 			}
 			else
-			{				
+			{			
+				//$('#myPleaseWait').modal('show');	
 
 				$scope.funcionarios=[];
 
@@ -145,6 +146,16 @@
 					{"key":"$key.$value","alias":"funcionarios"}
 					).ref();
 
+/*
+					refNovoQuadra.on('value', function(snapshot) {
+						
+						if(snapshot.numChildren()==0)
+						{
+							$('#myPleaseWait').modal('hide');
+						}
+
+					});
+					*/
 					refNovoQuadra.on('child_added', function(snap) {
 						$('#myPleaseWait').modal('hide');
 						var objNovo= snap.val();
@@ -186,194 +197,194 @@
 			};
 
 
-		//############################################################################################################################
-		//############################################################################################################################
-		// QUADRA
-		//############################################################################################################################
-
-		
-
-		$scope.getDadosFuncionario = function(obj, nomeColuna){
-			var retorno = '';
-			if(nomeColuna=='nome')
-			{
-				$scope.todasFuncionarios.forEach(function(item){
-					if(item.$id === obj.$id) retorno = item['nome'];
-				});
-			}
-			if(nomeColuna=='codigo')
-			{
-				$scope.todasFuncionarios.forEach(function(item){
-					if(item.$id === obj.$id) retorno = item['codigo'];
-				});
-			}
-			if(nomeColuna=='ativo')
-			{
-				$scope.todasFuncionarios.forEach(function(item){
-					if(item.$id === obj.$id) retorno = item['ativo'];
-				});
-			}
-			if(nomeColuna=='coordenadas')
-			{
-				$scope.todasFuncionarios.forEach(function(item){
-					if(item.$id === obj.$id) retorno = item['coordenadas'];
-				});
-			}
-			return retorno;
-		};
-
-		$scope.salvarFuncionario = function(data){
-			if(validForm(data)) return false;
-
-			var fazendaTmp=data.fazenda;
-			delete data.fazenda;
-			delete data.$$hashKey;	
-			data['filial']=[];
-			data['filial'][fazendaTmp.key]=true;
-			var refFuncionario = new Firebase(Constant.Url + '/funcionario/');
-			var key=refFuncionario.push().key();
-			var refFuncionarioNovo = new Firebase(Constant.Url + '/funcionario/'+key);
-			data.key=key;
-			refFuncionarioNovo.set(data);
-			var refFuncionarioNovo = new Firebase(Constant.Url + '/filial/'+fazendaTmp.key + '/funcionario/'+key);
-			refFuncionarioNovo.set(true);
-			$scope.chengeFazenda(fazendaTmp);
-			$scope.clear();						
-			$scope.setaFazenda(fazendaTmp);	
-
-			Notify.successBottom('Funcionário(a) inserida com sucesso!');
-
-		};
-
-		$scope.editarFuncionario = function(data){
-			if(validForm(data)) return false;
-			var fazendaTmp=data.fazenda;
-			delete data.fazenda;
-			delete data.$$hashKey;		
-			var refFuncionario = new Firebase(Constant.Url + '/funcionario/'+data.key);
-			refFuncionario.set(data);
-			data.fazenda=fazendaTmp;
-			$scope.clear();
-
-			Notify.successBottom('Funcionário(a) atualizada com sucesso!');
-		};
-
-		$scope.cancelar = function(){
-			var fazendaTmp=$scope.data.fazenda;
-			$scope.clear();
-			$scope.setaFazenda(fazendaTmp);	
-			$scope.chengeFazenda($scope.data.fazenda);	
-			$scope.edit = false;
-			$scope.save= true;
-		};
-
-		$scope.editar = function(obj){
-			$scope.desabilitaFazenda=true;
-			var fazendaTmp=$scope.data.fazenda;
-			$scope.data = obj;
-			$scope.data.fazenda=fazendaTmp;
-			$scope.edit = true;
-			$scope.save= false;
-
-			$scope.desabilitaFazenda=true;		
-
-		};
-
-		$scope.excluir = function(objeto){
-			$('#modalDelete').modal('show');
-		}
-
-		$scope.excluirFuncionario = function(objeto){
-			$('#modalDelete').modal('hide');
-			var fazendaTmp=$scope.data.fazenda;
-			if(objeto.qtd!=null)
-			{
-				if(objeto.qtd>0)
-				{
-					setMessageError('Já foi associado em funcionário. Impossível continuar.');
-					return true;
-				}
-			}			
-			
-			var refFuncionarioNovo = new Firebase(Constant.Url + '/funcionario/' + objeto.key);
-			refFuncionarioNovo.remove();
-			var refFuncionarioNovo = new Firebase(Constant.Url + '/filial/'+ $scope.data.fazenda.key + '/funcionario/' + objeto.key);
-			refFuncionarioNovo.remove();						
-			Notify.successBottom('Funcionário(a) removida com sucesso!');
-			$scope.chengeFazenda(fazendaTmp);
-			$scope.cancelar();
-			return true;
-			
-		};
+//############################################################################################################################
+//############################################################################################################################
+// QUADRA
+//############################################################################################################################
 
 
-		//############################################################################################################################
-		//############################################################################################################################
-		//UTEIS
-		//############################################################################################################################
 
-		$scope.setaFazenda = function(fazenda){
-			if(fazenda === null) return false;
-
-			$scope.fazendas.forEach(function(item){
-				if(item.key === fazenda.key) 	
-				{
-					$scope.data.fazenda = item;		
-				}
-			});
-			
-		};
-
-		function setMessageError(message){
-			Notify.errorBottom(message);
-		};
-
-		function validForm(data){
-
-			if(data.fazenda==null || data.fazenda.key == null){
-				setMessageError('O campo fazenda é inválido!');
-				return true;
-			}			
-			
-			if(data.nome === ''){
-				setMessageError('O campo nome é inválido!');
-				return true;
-			}
-			if(data.ativo === ''){
-				setMessageError('O campo ativo é inválido!');
-				return true;
-			}
-			if(data.coordenadas === ''){
-				setMessageError('O campo coordenada é inválido!');
-				return true;
-			}
-			return false;
-		};
-		
-		$scope.clear = function(){
-			//var fazendaTmp=$scope.data.fazenda;
-			angular.extend($scope.data, {
-				ativo: true,
-				nome: '',
-				qtd:0,
-				codigo: '',
-				valhor: '',
-				key:''
-			});
-			//$scope.data.fazenda=fazendaTmp;
-			$scope.desabilitaFazenda=false;
-			$scope.edit=false;
-			$scope.save= true;
-			if(!$scope.$$phase) {
-				$scope.$apply();
-			}
-			//$scope.chengeFazenda($scope.fazenda);
-			//$scope.data.fazenda=fazendaTmp;
-		};
-		
-
-		//$scope.clear();
-
+$scope.getDadosFuncionario = function(obj, nomeColuna){
+	var retorno = '';
+	if(nomeColuna=='nome')
+	{
+		$scope.todasFuncionarios.forEach(function(item){
+			if(item.$id === obj.$id) retorno = item['nome'];
+		});
 	}
+	if(nomeColuna=='codigo')
+	{
+		$scope.todasFuncionarios.forEach(function(item){
+			if(item.$id === obj.$id) retorno = item['codigo'];
+		});
+	}
+	if(nomeColuna=='ativo')
+	{
+		$scope.todasFuncionarios.forEach(function(item){
+			if(item.$id === obj.$id) retorno = item['ativo'];
+		});
+	}
+	if(nomeColuna=='coordenadas')
+	{
+		$scope.todasFuncionarios.forEach(function(item){
+			if(item.$id === obj.$id) retorno = item['coordenadas'];
+		});
+	}
+	return retorno;
+};
+
+$scope.salvarFuncionario = function(data){
+	if(validForm(data)) return false;
+
+	var fazendaTmp=data.fazenda;
+	delete data.fazenda;
+	delete data.$$hashKey;	
+	data['filial']=[];
+	data['filial'][fazendaTmp.key]=true;
+	var refFuncionario = new Firebase(Constant.Url + '/funcionario/');
+	var key=refFuncionario.push().key();
+	var refFuncionarioNovo = new Firebase(Constant.Url + '/funcionario/'+key);
+	data.key=key;
+	refFuncionarioNovo.set(data);
+	var refFuncionarioNovo = new Firebase(Constant.Url + '/filial/'+fazendaTmp.key + '/funcionario/'+key);
+	refFuncionarioNovo.set(true);
+	$scope.chengeFazenda(fazendaTmp);
+	$scope.clear();						
+	$scope.setaFazenda(fazendaTmp);	
+
+	Notify.successBottom('Funcionário(a) inserida com sucesso!');
+
+};
+
+$scope.editarFuncionario = function(data){
+	if(validForm(data)) return false;
+	var fazendaTmp=data.fazenda;
+	delete data.fazenda;
+	delete data.$$hashKey;		
+	var refFuncionario = new Firebase(Constant.Url + '/funcionario/'+data.key);
+	refFuncionario.set(data);
+	data.fazenda=fazendaTmp;
+	$scope.clear();
+
+	Notify.successBottom('Funcionário(a) atualizada com sucesso!');
+};
+
+$scope.cancelar = function(){
+	var fazendaTmp=$scope.data.fazenda;
+	$scope.clear();
+	$scope.setaFazenda(fazendaTmp);	
+	$scope.chengeFazenda($scope.data.fazenda);	
+	$scope.edit = false;
+	$scope.save= true;
+};
+
+$scope.editar = function(obj){
+	$scope.desabilitaFazenda=true;
+	var fazendaTmp=$scope.data.fazenda;
+	$scope.data = obj;
+	$scope.data.fazenda=fazendaTmp;
+	$scope.edit = true;
+	$scope.save= false;
+
+	$scope.desabilitaFazenda=true;		
+
+};
+
+$scope.excluir = function(objeto){
+	$('#modalDelete').modal('show');
+}
+
+$scope.excluirFuncionario = function(objeto){
+	$('#modalDelete').modal('hide');
+	var fazendaTmp=$scope.data.fazenda;
+	if(objeto.qtd!=null)
+	{
+		if(objeto.qtd>0)
+		{
+			setMessageError('Já foi associado em funcionário. Impossível continuar.');
+			return true;
+		}
+	}			
+
+	var refFuncionarioNovo = new Firebase(Constant.Url + '/funcionario/' + objeto.key);
+	refFuncionarioNovo.remove();
+	var refFuncionarioNovo = new Firebase(Constant.Url + '/filial/'+ $scope.data.fazenda.key + '/funcionario/' + objeto.key);
+	refFuncionarioNovo.remove();						
+	Notify.successBottom('Funcionário(a) removida com sucesso!');
+	$scope.chengeFazenda(fazendaTmp);
+	$scope.cancelar();
+	return true;
+
+};
+
+
+//############################################################################################################################
+//############################################################################################################################
+//UTEIS
+//############################################################################################################################
+
+$scope.setaFazenda = function(fazenda){
+	if(fazenda === null) return false;
+
+	$scope.fazendas.forEach(function(item){
+		if(item.key === fazenda.key) 	
+		{
+			$scope.data.fazenda = item;		
+		}
+	});
+
+};
+
+function setMessageError(message){
+	Notify.errorBottom(message);
+};
+
+function validForm(data){
+
+	if(data.fazenda==null || data.fazenda.key == null){
+		setMessageError('O campo fazenda é inválido!');
+		return true;
+	}			
+
+	if(data.nome === ''){
+		setMessageError('O campo nome é inválido!');
+		return true;
+	}
+	if(data.ativo === ''){
+		setMessageError('O campo ativo é inválido!');
+		return true;
+	}
+	if(data.coordenadas === ''){
+		setMessageError('O campo coordenada é inválido!');
+		return true;
+	}
+	return false;
+};
+
+$scope.clear = function(){
+	//var fazendaTmp=$scope.data.fazenda;
+	angular.extend($scope.data, {
+		ativo: true,
+		nome: '',
+		qtd:0,
+		codigo: '',
+		valhor: '',
+		key:''
+	});
+	//$scope.data.fazenda=fazendaTmp;
+	$scope.desabilitaFazenda=false;
+	$scope.edit=false;
+	$scope.save= true;
+	if(!$scope.$$phase) {
+		$scope.$apply();
+	}
+	//$scope.chengeFazenda($scope.fazenda);
+	//$scope.data.fazenda=fazendaTmp;
+};
+
+
+//$scope.clear();
+
+}
 
 }());

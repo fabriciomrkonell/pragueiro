@@ -133,18 +133,28 @@
 				$scope.produtos =null;
 			}
 			else
-			{				
+			{			
+			//	$('#myPleaseWait').modal('show');	
 
-				$scope.produtos=[];
+			$scope.produtos=[];
 
-				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
-				var refNovoQuadra = new Firebase.util.NormalizedCollection(
-					baseRef.child("/filial/"+fazenda.key+"/produto"),
-					[baseRef.child("/produto"), "$key"]
-					).select(
-					{"key":"produto.$value","alias":"filial"},
-					{"key":"$key.$value","alias":"produtos"}
-					).ref();
+			var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
+			var refNovoQuadra = new Firebase.util.NormalizedCollection(
+				baseRef.child("/filial/"+fazenda.key+"/produto"),
+				[baseRef.child("/produto"), "$key"]
+				).select(
+				{"key":"produto.$value","alias":"filial"},
+				{"key":"$key.$value","alias":"produtos"}
+				).ref();
+
+/*
+					refNovoQuadra.on('value', function(snapshot) {
+						if(snapshot.numChildren()==0)
+						{
+							$('#myPleaseWait').modal('hide');
+						}
+					});
+					*/
 
 					refNovoQuadra.on('child_added', function(snap) {
 						$('#myPleaseWait').modal('hide');

@@ -134,17 +134,27 @@
 
 		$scope.chengeFazenda = function(fazenda)
 		{
+
 			if(fazenda === null) 
 			{
 				$scope.variedades =null;
 			}
 			else
 			{
+				//$('#myPleaseWait').modal('show');
 				$scope.variedades=[];
 
 				var refUsuarios= new Firebase(Constant.Url + '/variedade/'+fazenda.key);
-
+/*
+				refUsuarios.on('value', function(snapshot) {
+					if(snapshot.numChildren()==0)
+					{
+						$('#myPleaseWait').modal('hide');
+					}
+				});
+				*/
 				refUsuarios.ref().on('child_added', function(snap) {
+					$('#myPleaseWait').modal('hide');
 					var variedades_brutas=snap.val();
 					for(var obj in variedades_brutas ){
 						var objVar=variedades_brutas[obj];

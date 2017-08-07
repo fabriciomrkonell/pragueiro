@@ -137,6 +137,8 @@
 			else
 			{				
 
+				//$('#myPleaseWait').modal('show');
+
 				$scope.tipatis=[];
 
 				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
@@ -148,6 +150,14 @@
 					{"key":"$key.$value","alias":"tipatis"}
 					).ref();
 
+/*
+					refNovoQuadra.on('value', function(snapshot) {
+						if(snapshot.numChildren()==0)
+						{
+							$('#myPleaseWait').modal('hide');
+						}
+					});
+					*/
 					refNovoQuadra.on('child_added', function(snap) {
 						$('#myPleaseWait').modal('hide');
 						var objNovo= snap.val();

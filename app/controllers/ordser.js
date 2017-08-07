@@ -837,7 +837,7 @@ $scope.chengeSafra = function(key_safra) {
 //-------------------------------------------------------------------
 $scope.chengeFazenda = function(fazenda) {
 	if (fazenda === null) return false;
-	$('#myPleaseWait').modal('show');
+	//$('#myPleaseWait').modal('show');
 	fazendaSelecioanda = fazenda;
 	$scope.safras = [];
 	for (var propertyName in fazenda.safra) {
@@ -848,7 +848,14 @@ $scope.chengeFazenda = function(fazenda) {
 
 	refOrdser = new Firebase(Constant.Url + '/ordser/' + fazenda.key);
 
-
+	/*
+	refOrdser.on('value', function(snapshot) {
+		if(snapshot.numChildren()==0)
+		{
+			$('#myPleaseWait').modal('hide');
+		}
+	});
+	*/
 	refOrdser.on('child_added', function(snap) {
 		$('#myPleaseWait').modal('hide');
 		var objNovo = snap.val();
@@ -1388,7 +1395,16 @@ $scope.excluirProduto = function() {
 			}
 			i++;
 		});
-		if (posicao_deletar != null) {
+		if($scope.todosProdutosOrdser.length==1)
+		{
+			if (posicao_deletar != null) {
+				delete $scope.todosProdutosOrdser[posicao_deletar];
+
+				$scope.todosProdutosOrdser=[];
+			}
+		}
+		else
+		{
 			delete $scope.todosProdutosOrdser[posicao_deletar];
 		}
 
