@@ -172,6 +172,11 @@
 				width: 300
 			}, 
 			{
+				field: "consumo",
+				displayName: "Consumo",
+				width: 300
+			}, 
+			{
 				name: 'Retirar',
 				enableColumnMenu: false,
 				width: 70,
@@ -206,7 +211,7 @@
 				width: 300
 			}, 
 			{
-				field: "dospad",
+				field: "dose",
 				displayName: "Dose",
 				width: 300
 			}, 
@@ -259,7 +264,18 @@
 			{
 				field: "quahor",
 				displayName: "Qtde Horas",
-				width: 300,
+				width: 120,
+				cellFilter: 'number: 2'
+			}, 
+			{
+				field: "quadra.nome",
+				displayName: "Quadra",
+				width: 120
+			}, 
+			{
+				field: "area",
+				displayName: "Area",
+				width: 120,
 				cellFilter: 'number: 2'
 			}, 
 			{
@@ -1068,7 +1084,7 @@ $scope.chamaEditarOrdser = function(obj) {
 			for (var propertyName in $scope.data.produtos) {
 				$scope.todosProdutos.forEach(function(obj2) {
 					if (propertyName === obj2.key) {
-						obj2.dospad = $scope.data.produtos[propertyName]['dospad'];
+						obj2.dose = $scope.data.produtos[propertyName]['dose'];
 						obj2.quatot = $scope.data.produtos[propertyName]['quatot'];
 						$scope.todosProdutosOrdser.push(obj2);
 					}
@@ -1110,6 +1126,11 @@ $scope.chamaEditarOrdser = function(obj) {
 				$scope.todosFuncionarios.forEach(function(obj2) {
 					if (objExe.key_funcionario === obj2.key) {
 						objExe['funcionario'] = obj2;
+					}
+				});
+				$scope.todasQuadras.forEach(function(obj2) {
+					if (objExe.key_quadra === obj2.key) {
+						objExe['quadra'] = obj2;
 					}
 				});
 				$scope.todosExecucoesOrdser.push(objExe);
@@ -1297,8 +1318,8 @@ $scope.adicionarProduto = function(data, data_produto) {
 	}
 	var fazendaTmp = $scope.data.fazenda;
 	if (data_produto == null) return false;
-	if (data_produto.dospad != null) {
-		data_produto['quatot'] = (data_produto.dospad * $scope.area_total).toFixed(2);
+	if (data_produto.dose != null) {
+		data_produto['quatot'] = (data_produto.dose * $scope.area_total).toFixed(2);
 	}
 	var existe=false;
 	$scope.todosProdutosOrdser.forEach(function(obj2) {
@@ -1382,6 +1403,9 @@ $scope.excluirProduto = function() {
 	return true;
 
 };
+$scope.chengeProduto = function() {
+	$scope.data_produto.dose= $scope.data_produto.dospad;
+}
 //############################################################################################################################
 //############################################################################################################################
 //EQUIPAMENTO
@@ -1490,6 +1514,9 @@ $scope.excluirEquipamento = function() {
 	return true;
 
 };
+$scope.chengeEquipamento = function() {
+	$scope.data_equipamento.consumo = $scope.data_equipamento.equipamento.consumo;
+}
 //############################################################################################################################
 //############################################################################################################################
 //EXECUCAO
@@ -1511,6 +1538,10 @@ $scope.adicionarExecucao = function(data, data_execucao) {
 	data_execucao['key_ordser'] = data.key;
 	data_execucao['key_equipamento'] = data_execucao.equipamento.key;
 	data_execucao['key_funcionario'] = data_execucao.funcionario.key;
+	if(data_execucao.quadra!=null)
+	{
+		data_execucao['key_quadra'] = data_execucao.quadra.key;
+	}
 	data_execucao.data = new Date(data_execucao.data).getTime();
 	var refOrdser = new Firebase(Constant.Url + '/ordser/' + data.fazenda.key + '/' + data.key + '/execucoes/' + 	data_execucao.key);
 	var execucaoTmp = clone(data_execucao);
@@ -1520,6 +1551,7 @@ $scope.adicionarExecucao = function(data, data_execucao) {
 	delete execucaoTmp.$$hashKey;
 	delete execucaoTmp.equipamento;
 	delete execucaoTmp.funcionario;
+	delete execucaoTmp.quadra;
 
 	refOrdser.set(execucaoTmp);
 
@@ -1583,7 +1615,10 @@ $scope.excluirExecucao = function() {
 	return true;
 
 };
-
+//-------------------------------------------------------------------
+$scope.chengeQuadraExecucao = function(quadra) {
+	$scope.data_execucao.area = $scope.data_execucao.quadra.area;
+}
 //############################################################################################################################
 //############################################################################################################################
 //UTEIS
@@ -1630,10 +1665,7 @@ function validForm(data) {
 		setMessageError('O campo Tipo Ordem de Serviço/Aplicação é obrigatório!');
 		return true;
 	}
-	if (data.key_equipe === '') {
-		setMessageError('O campo Equipe é obrigatório!');
-		return true;
-	}
+
 
 
 	return false;
@@ -1659,6 +1691,10 @@ function validFormExecucao(data) {
 	}
 	if (data.quahor == null || data.quahor === '') {
 		setMessageError('O campo Quantidade de Horas é obrigatório!');
+		return true;
+	}
+	if (data.quadra != null && data.area != ''  && data.area >  data.quadra.area) {
+		setMessageError('A area informada está maior que a área da Quadra!');
 		return true;
 	}
 

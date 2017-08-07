@@ -16,7 +16,9 @@
 			tipatis: [],
 			tipatiFilial: [],
 			data: {
-				ativo:true				
+				ativo: true,
+				aplagr: false,
+				quahor: 0			
 			}
 		});
 
@@ -363,7 +365,9 @@
 				nome: '',
 				qtd:0,
 				codigo: '',
-				key:''
+				key:'',
+				aplagr: false,
+				quahor:0
 			});
 			//$scope.data.fazenda=fazendaTmp;
 			$scope.desabilitaFazenda=false;

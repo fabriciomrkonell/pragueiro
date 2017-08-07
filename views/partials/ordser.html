@@ -157,7 +157,7 @@
 					<div class="row">
 
 						<div class="form-group col-sm-2">
-							<b><p class="alinhado_direito">Quadra/Região</p></b>
+							<b><p class="alinhado_direito">Quadra/Região*</p></b>
 						</div>
 						<div class="form-group col-sm-4">
 							<select class="form-control" ng-model="data_quadra" ng-disabled="desabilitaQuadras" ng-options="pl as (pl.quadra.nome) for pl in todosPlanejamento">
@@ -177,12 +177,18 @@
 					<div class="row">
 
 						<div class="form-group col-sm-2">
-							<b><p class="alinhado_direito">Produto</p></b>
+							<b><p class="alinhado_direito">Produto*</p></b>
 						</div>
 						<div class="form-group col-sm-4">
-							<select class="form-control" ng-model="data_produto" ng-disabled="desabilitaQuadras" ng-options="produto as (produto.nome) for produto in todosProdutos">
+							<select class="form-control" ng-model="data_produto" ng-change="chengeProduto()" ng-disabled="desabilitaQuadras" ng-options="produto as (produto.nome) for produto in todosProdutos">
 								<option></option>
 							</select>
+						</div>
+						<div class="form-group col-sm-2 col-sm-no-bottom">
+							<b><p class="alinhado_direito">Dose</p></b>
+						</div>
+						<div class="form-group col-sm-2 col-sm-no-bottom">
+							<input type="number" class="form-control" placeholder="" ng-model="data_produto.dose" />
 						</div>
 						<button type="button" class="btn btn-default btn-xm"   ng-disabled="desabilitaQuadras" ng-click="adicionarProduto(data, data_produto)">
 							<i class="glyphicon glyphicon-plus-sign"></i>												
@@ -197,12 +203,18 @@
 				<div class="tab-pane" id="3a">
 					<div class="row">
 						<div class="form-group col-sm-2">
-							<b><p class="alinhado_direito">Equipamentos</p></b>
+							<b><p class="alinhado_direito">Equipamentos*</p></b>
 						</div>
 						<div class="form-group col-sm-4">
-							<select class="form-control" ng-model="data_equipamento" ng-disabled="desabilitaQuadras" ng-options="equipamento as (equipamento.nome) for equipamento in todosEquipamentos">
+							<select class="form-control" ng-model="data_equipamento" ng-change="chengeEquipamento()" ng-disabled="desabilitaQuadras" ng-options="equipamento as (equipamento.nome) for equipamento in todosEquipamentos">
 								<option></option>
 							</select>
+						</div>
+						<div class="form-group col-sm-2 col-sm-no-bottom">
+							<b><p class="alinhado_direito">Consumo</p></b>
+						</div>
+						<div class="form-group col-sm-2 col-sm-no-bottom">
+							<input type="number" class="form-control" placeholder="" ng-model="data_equipamento.consumo" />
 						</div>
 						<button type="button" class="btn btn-default btn-xm"   ng-disabled="desabilitaQuadras" ng-click="adicionarEquipamento(data, data_equipamento)">
 							<i class="glyphicon glyphicon-plus-sign"></i>												
@@ -218,13 +230,13 @@
 				<div class="tab-pane" id="4a">
 					<div class="row">
 						<div class="col-sm-2 col-sm-no-bottom">
-							<b><p class="alinhado_direito">Data</p></b>
+							<b><p class="alinhado_direito">Data*</p></b>
 						</div>
 						<div class="form-group col-sm-2 col-sm-no-bottom">
 							<input type="date" class="form-control" ng-model="data_execucao.data">
 						</div>	
 						<div class="form-group col-sm-2">
-							<b><p class="alinhado_direito">Equipamentos</p></b>
+							<b><p class="alinhado_direito">Equipamentos*</p></b>
 						</div>
 						<div class="form-group col-sm-2 col-sm-no-bottom">
 							<select class="form-control" ng-model="data_execucao.equipamento" ng-disabled="desabilitaQuadras" ng-options="equipamento as (equipamento.nome) for equipamento in todosEquipamentosOrdser">
@@ -232,7 +244,7 @@
 							</select>
 						</div>
 						<div class="col-sm-1 col-sm-no-bottom">
-							<b><p class="alinhado_direito">Operador</p></b>
+							<b><p class="alinhado_direito">Operador*</p></b>
 						</div>
 						<div class="form-group col-sm-2 col-sm-no-bottom">
 							<select class="form-control" ng-model="data_execucao.funcionario" ng-disabled="desabilitaQuadras" ng-options="funcionario as (funcionario.nome) for funcionario in todosFuncionarios">
@@ -243,12 +255,25 @@
 					<div class="row">
 
 						<div class="form-group col-sm-2 col-sm-no-bottom">
-							<b><p class="alinhado_direito">Quantidade Horas</p></b>
+							<b><p class="alinhado_direito">Quantidade Horas*</p></b>
 						</div>
 						<div class="form-group col-sm-2 col-sm-no-bottom">
-							<input type="number" class="form-control" placeholder="ha" ng-model="data_execucao.quahor" />
+							<input type="number" class="form-control" placeholder="" ng-model="data_execucao.quahor" />
 						</div>
-
+						<div class="form-group col-sm-2">
+							<b><p class="alinhado_direito">Quadra</p></b>
+						</div>
+						<div class="form-group col-sm-2 col-sm-no-bottom">
+							<select class="form-control" ng-model="data_execucao.quadra" ng-change="chengeQuadraExecucao()"ng-disabled="desabilitaQuadras" ng-options="quadra as (quadra.nome) for quadra in todasQuadrasOrdser">
+								<option></option>
+							</select>
+						</div>
+						<div class="col-sm-1 col-sm-no-bottom">
+							<b><p class="alinhado_direito">Area Total</p></b>
+						</div>
+						<div class="form-group col-sm-2 col-sm-no-bottom">
+							<input type="number" class="form-control" placeholder="ha" ng-model="data_execucao.area" />
+						</div>
 						<button type="button" class="btn btn-default btn-xm"   ng-disabled="finalizado" ng-click="adicionarExecucao(data, data_execucao)">
 							<i class="glyphicon glyphicon-plus-sign"></i>												
 						</button>
