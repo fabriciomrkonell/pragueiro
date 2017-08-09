@@ -1,6 +1,6 @@
 (function(){
 
-	'use strict';
+	'use strict'; 
 
 	angular.module('Pragueiro.controllers').registerCtrl('homeCtrl', homeCtrl);
 
@@ -17,7 +17,9 @@
 			vistorias:[],
 			variedades:[],
 			usuarios:[],
-			pragas:[]
+			pragasEncontradasGeral:[],
+			pragasExibir:[]
+
 		});
 
 /*
@@ -40,7 +42,7 @@
 		atualizaListaFiliais();
 		atualizaCulturas();
 		atualizaUsuarios();
-		atualizaPragas2();
+		atualizaTodasPragas();
 		//atualizaListaQuadras();
 		var chart1 = {};
 		chart1.type = "ColumnChart";
@@ -144,9 +146,9 @@
 		});
 	}
 
-	function atualizaPragas2()
+	function atualizaTodasPragas()
 	{
-		$scope.pragas2=[];
+		$scope.todasPragas=[];
 		var refPraga= new Firebase(Constant.Url + '/praga');
 		refPraga.ref().on('child_added', function(snap) {
 
@@ -174,8 +176,10 @@
 			}
 			praga['primeiro_tamanho']=primeiro_tamanho;
 			praga['tamanhos']=tamanhos;
-			$scope.pragas2.push(praga);
+			$scope.todasPragas.push(praga);
+			$scope.pragasExibir = $scope.todasPragas;
 		});
+
 	}
 
 		//############################################################################################################################
@@ -248,6 +252,33 @@
 		$scope.chengeSafra = function(){
 			atualizaListaQuadras();
 		};
+		$scope.chengeFazenda = function(fazenda){
+			$scope.ordsers=[];
+
+			var refOrdser = new Firebase(Constant.Url + '/ordser/' + fazenda.key);
+
+			refOrdser.on('child_added', function(snap) {
+				$('#myPleaseWait').modal('hide');
+				var objNovo = snap.val();
+				var x = 0;
+				var posicao = null;
+				$scope.ordsers.forEach(function(obj) {
+					if (obj.key === objNovo.key) {
+						posicao = x;
+					}
+					x++;
+
+				});
+				if (posicao == null) {
+					$scope.ordsers.push(objNovo);
+					//$scope.gridOptions.data = $scope.ordsers;
+				}
+				if (!$scope.$$phase) {
+					$scope.$apply();
+				}
+			});
+		};
+
 
 		$scope.setaFazenda = function(fazenda){
 			if(fazenda === null) return false;
@@ -258,8 +289,31 @@
 					$scope.data.fazenda = item;		
 				}
 			});
-			
+
 		};
+		$scope.addPragasEncontradas = function(praga){
+			var encontrou=false;
+			$scope.pragasEncontradasGeral.forEach(function(item){
+				if(item.key === praga.key) 	
+				{
+					encontrou=true;	
+				}
+			});
+			if(!encontrou)
+			{
+				$scope.pragasEncontradasGeral.push(praga);
+			}	
+		};
+		$scope.exibirSomenteEncontradas = function(){
+			if($scope.exibirSomenteEn)
+			{
+				$scope.pragasExibir=$scope.pragasEncontradasGeral;
+			}
+			else
+			{
+				$scope.pragasExibir=$scope.todasPragas;
+			}
+		}
 
 		//############################################################################################################################
 		//############################################################################################################################
@@ -505,7 +559,7 @@
 
 									obj.qtde_dia=count_dias;
 									var pragas_com_valor=[];
-									$scope.pragas2.forEach(function(objPraga)
+									$scope.todasPragas.forEach(function(objPraga)
 									{
 										var pragaAtualizada=clone(objPraga);
 										var count_tamanho=0;
@@ -527,6 +581,10 @@
 													}
 													var newObjeto={valor:valor_final.toFixed(3), tamanho:pragaAtualizada.tamanho[objInterno_tamanho], praga: pragaAtualizada}
 													pragas_com_valor.push(newObjeto);
+													if(valor_final>0)
+													{
+														$scope.addPragasEncontradas(pragaAtualizada);
+													}
 												}
 											});
 											if(!encontrou)
@@ -540,6 +598,20 @@
 									obj['pragas_com_valor']=pragas_com_valor;
 									obj['id']= new Date().getTime();
 									obj['id']= new Date().getTime();
+
+									$scope.ordsers.forEach(function(ordser) {
+										for (var propertyName in ordser.execucoes) {
+											var objExe=ordser.execucoes[propertyName];
+											if(objExe.key_quadra==obj.quadra.key)
+											{
+												var dataExecucao=new Date(objExe.data);
+
+												obj['datOrdser']= new Date(objExe.data);
+												obj['datOrdserExtenso']= formatDate(dataExecucao);
+												obj['datOrdserIntervalo']=  dataExecucao.getDate() - (new Date(dataMilis)).getDate();
+											}
+										}
+									});
 
 									$scope.vistorias.push(clone(obj));
 
@@ -671,7 +743,7 @@
 
 									obj.qtde_dia=count_dias;
 									var pragas_com_valor=[];
-									$scope.pragas2.forEach(function(objPraga)
+									$scope.todasPragas.forEach(function(objPraga)
 									{
 										var pragaAtualizada=clone(objPraga);
 										var count_tamanho=0;
@@ -693,6 +765,10 @@
 													}
 													var newObjeto={valor:valor_final.toFixed(3), tamanho:pragaAtualizada.tamanho[objInterno_tamanho], praga: pragaAtualizada}
 													pragas_com_valor.push(newObjeto);
+													if(valor_final>0)
+													{
+														$scope.addPragasEncontradas(pragaAtualizada);
+													}
 												}
 											});
 											if(!encontrou)
@@ -707,6 +783,20 @@
 									obj['id']= new Date().getTime();
 									obj['id']= new Date().getTime();
 									
+									$scope.ordsers.forEach(function(ordser) {
+										for (var propertyName in ordser.execucoes) {
+											var objExe=ordser.execucoes[propertyName];
+											if(objExe.key_quadra==obj.quadra.key)
+											{
+												var dataExecucao=new Date(objExe.data);
+
+												obj['datOrdser']= new Date(objExe.data);
+												obj['datOrdserExtenso']= formatDate(dataExecucao);
+												obj['datOrdserIntervalo']=  dataExecucao.getDate() - (new Date(dataMilis)).getDate();
+											}
+										}
+									});
+
 									$scope.vistorias.push(clone(obj));
 
 
@@ -752,6 +842,18 @@ refVis.on('child_removed', function(snap) {
 						//console.log('Houve uma remoção', snap.name(), snap.val());
 						//atualizaListaFiliais();
 					});
+}
+
+function formatDate(date) {
+	var d = new Date(date),
+	month = '' + (d.getMonth() + 1),
+	day = '' + d.getDate(),
+	year = d.getFullYear();
+
+	if (month.length < 2) month = '0' + month;
+	if (day.length < 2) day = '0' + day;
+
+	return [day, month, year].join('/');
 }
 
 function clone(obj) {

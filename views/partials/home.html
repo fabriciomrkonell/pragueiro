@@ -48,7 +48,7 @@
  				<form class="form-signin" role="form">
  					<div class="form-group">
  						<label>Escolha uma Fazenda</label>
- 						<select class="form-control" ng-options="fazenda.nome for fazenda in fazendas" ng-model="fazenda" >
+ 						<select class="form-control" ng-options="fazenda.nome for fazenda in fazendas" ng-change="chengeFazenda(fazenda)" ng-model="fazenda" >
  						</select>
  					</div>
  				</form>
@@ -61,6 +61,15 @@
  						</select>
  					</div>
  				</form>
+ 			</div>
+ 			<div class="col-sm-4 col-sm-no-bottom ">
+ 				<div class="form-group">
+ 					<label>&nbsp;</label>
+ 					<br>
+ 					<input type="checkbox"  ng-model="exibirSomenteEn" ng-change= "exibirSomenteEncontradas()"
+ 					ng-true-value="true" ng-false-value="false">	
+ 					<label>Exibir somente pragas encontradas</label>						
+ 				</div>	
  			</div>
 
  		</div>
@@ -84,10 +93,10 @@
  			<div class="col-md-4 col-sm-8 col-xs-12 tile_stats_count" style="padding-right:20px; border-right: 1px solid #ccc;">
  				<div google-chart chart="chart" style="{{cssStyle}}"></div>
  			</div>
- 			
+
  		</div>
  		<div class="row" >
- 			
+
  			<div class="panel panel-success">
  				<div class="panel-heading">
  					<h3 class="panel-title">Resumo das vistorias</h3>
@@ -114,106 +123,109 @@
  								</tr>
  								<tr>
  									<th colspan="2" class="text-right">Data do Levantamento</th>
- 									<th class="text-center active-table" ng-repeat="v in vistorias"><a ng-href="https://pragueiroproducao.firebaseio.com/vistoria/{{fazenda.key}}/{{safra.key}}/{{v.quadra.key}}/{{v.usuario.key}}">{{v.dataExtenso}} </a></th>
- 								</tr>
- 								<tr>
- 									<th colspan="2" class="text-right" style="vertical-align:middle;" >Estágio</th>
- 									<th class="text-center"  ng-repeat="v in vistorias">{{v.estagio.codigo}} - {{v.estagio.nome}}</th>
- 								</tr>
- 								<tr>
- 									<th colspan="2" class="text-right" style="vertical-align:middle;" >Monitor</th>
- 									<th class="text-center" ng-repeat="v in vistorias" >{{v.usuario.nome}}</th>
- 								</tr>
- 								<tr>
- 									<th colspan="2" class="text-right">Método (tipo)</th>
- 									<th class="text-center" ng-repeat="v in vistorias">{{v.metodo}}</th>
- 								</tr>
-
- 								<tr>
- 									<th colspan="2" class="text-right">Qtde Pontos</th>
- 									<th class="text-center" ng-repeat="v in vistorias">{{v.qtde_ponto}}</th>
- 								</tr>
-
- 								<tr>
- 									<th  colspan="2"  class="text-right">Tecnologia</th>
- 									<th class="text-center" ng-repeat="v in vistorias"> {{v.variedade.nome_tecnologia}}</th>
- 								</tr>
- 								<tr>
- 									<th colspan="2" class="text-right">Variedade</th>
- 									<th class="text-center" ng-repeat="v in vistorias"> {{v.variedade.nome}}</th>
- 								</tr>
- 								<tr>
- 									<th colspan="2" class="text-right">Data da última aplicação</th>
- 									<th class="text-center" ng-repeat="v in vistorias"> &nbsp;</th>
- 								</tr>
- 								<tr>
- 									<th colspan="2" class="text-right">Intervalo da aplicação</th>
- 									<th class="text-center" ng-repeat="v in vistorias"> &nbsp;</th> 							
- 								</tr>		
- 								<tr>
- 									<th colspan="2" class="text-right">&nbsp;</th>
- 									<th class="text-center"  ng-repeat="v in vistorias" >{{v.metodo=='Planta' ? 'Total plantas: ' + v.qtde_planta * v.qtde_ponto : '%'}}</th>
- 								</tr>	
- 								<tbody ng-repeat="praga in pragas2">
- 									<tr>
- 										<th rowspan="{{praga.tamanhos.length+1}}"  colspan="{{praga.colspan}}" style="vertical-align:middle;" class="text-center active-table">{{praga.descricao}}</th>
-
- 										<tr ng-repeat="tam in praga.tamanhos track by $index" >
- 											<th height="32" class="text-right active-table" ng-show="praga.tamanhos.length>1">{{tam.nome}}</th>
- 											<th class="text-center" ng-repeat="v in vistorias">
- 												{{vistorias[$index].pragas_com_valor[tam.id].valor !=0 ? vistorias[$index].pragas_com_valor[tam.id].valor  : '&nbsp;'}}
-
-
- 											</th>
+ 									<th class="text-center active-table" ng-repeat="v in vistorias">
+ 										<!--<a ng-href="https://pragueiroproducao.firebaseio.com/vistoria/{{fazenda.key}}/{{safra.key}}/{{v.quadra.key}}/{{v.usuario.key}}">-->
+ 										<a ng-href="#">
+ 											{{v.dataExtenso}} </a></th>
+ 										</tr>
+ 										<tr>
+ 											<th colspan="2" class="text-right" style="vertical-align:middle;" >Estágio</th>
+ 											<th class="text-center"  ng-repeat="v in vistorias">{{v.estagio.codigo}} - {{v.estagio.nome}}</th>
+ 										</tr>
+ 										<tr>
+ 											<th colspan="2" class="text-right" style="vertical-align:middle;" >Monitor</th>
+ 											<th class="text-center" ng-repeat="v in vistorias" >{{v.usuario.nome}}</th>
+ 										</tr>
+ 										<tr>
+ 											<th colspan="2" class="text-right">Método (tipo)</th>
+ 											<th class="text-center" ng-repeat="v in vistorias">{{v.metodo}}</th>
  										</tr>
 
- 									</tr>
+ 										<tr>
+ 											<th colspan="2" class="text-right">Qtde Pontos</th>
+ 											<th class="text-center" ng-repeat="v in vistorias">{{v.qtde_ponto}}</th>
+ 										</tr>
 
- 								</tbody>
+ 										<tr>
+ 											<th  colspan="2"  class="text-right">Tecnologia</th>
+ 											<th class="text-center" ng-repeat="v in vistorias"> {{v.variedade.nome_tecnologia}}</th>
+ 										</tr>
+ 										<tr>
+ 											<th colspan="2" class="text-right">Variedade</th>
+ 											<th class="text-center" ng-repeat="v in vistorias"> {{v.variedade.nome}}</th>
+ 										</tr>
+ 										<tr>
+ 											<th colspan="2" class="text-right">Data da última aplicação</th>
+ 											<th class="text-center" ng-repeat="v in vistorias"> {{v.datOrdserExtenso}}</th>
+ 										</tr>
+ 										<tr>
+ 											<th colspan="2" class="text-right">Intervalo da aplicação</th>
+ 											<th class="text-center" ng-repeat="v in vistorias">{{v.datOrdserIntervalo}}</th> 							
+ 										</tr>		
+ 										<tr>
+ 											<th colspan="2" class="text-right">&nbsp;</th>
+ 											<th class="text-center"  ng-repeat="v in vistorias" >{{v.metodo=='Planta' ? 'Total plantas: ' + v.qtde_planta * v.qtde_ponto : '%'}}</th>
+ 										</tr>	
+ 										<tbody ng-repeat="praga in pragasExibir">
+ 											<tr>
+ 												<th rowspan="{{praga.tamanhos.length+1}}"  colspan="{{praga.colspan}}" style="vertical-align:middle;" class="text-center active-table">{{praga.descricao}}</th>
 
- 							</tbody>
- 						</table>
+ 												<tr ng-repeat="tam in praga.tamanhos track by $index" >
+ 													<th height="32" class="text-right active-table" ng-show="praga.tamanhos.length>1">{{tam.nome}}</th>
+ 													<th class="text-center" ng-repeat="v in vistorias">
+ 														{{vistorias[$index].pragas_com_valor[tam.id].valor !=0 ? vistorias[$index].pragas_com_valor[tam.id].valor  : '&nbsp;'}}
+
+
+ 													</th>
+ 												</tr>
+
+ 											</tr>
+
+ 										</tbody>
+
+ 									</tbody>
+ 								</table>
+ 							</div>
+
+
+ 						</div>
  					</div>
 
 
  				</div>
- 			</div>
- 			
-
- 		</div>
- 		
 
 
 
 
 
 
- 	</div> <!-- container container-view -->
 
- </div> <!-- final homeCtrl-->
+ 			</div> <!-- container container-view -->
+
+ 		</div> <!-- final homeCtrl-->
 
 
- <!-- Modal Start here-->
- <div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"
- role="dialog" aria-hidden="true" data-backdrop="static">
- <div class="modal-dialog modal-sm">
- 	<div class="modal-content">
- 		<div class="modal-header">
- 			<h4 class="modal-title">
- 				<span class="glyphicon glyphicon-time">
- 				</span>&nbsp;&nbsp;Aguarde, carregando...
- 			</h4>
- 		</div>
- 		<div class="modal-body">
- 			<div class="progress">
- 				<div class="progress-bar progress-bar-info
- 				progress-bar-striped active"
- 				style="width: 100%">
+ 		<!-- Modal Start here-->
+ 		<div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"
+ 		role="dialog" aria-hidden="true" data-backdrop="static">
+ 		<div class="modal-dialog modal-sm">
+ 			<div class="modal-content">
+ 				<div class="modal-header">
+ 					<h4 class="modal-title">
+ 						<span class="glyphicon glyphicon-time">
+ 						</span>&nbsp;&nbsp;Aguarde, carregando...
+ 					</h4>
+ 				</div>
+ 				<div class="modal-body">
+ 					<div class="progress">
+ 						<div class="progress-bar progress-bar-info
+ 						progress-bar-striped active"
+ 						style="width: 100%">
+ 					</div>
+ 				</div>
  			</div>
  		</div>
  	</div>
  </div>
-</div>
-</div>
-<!-- Modal ends Here -->
+ <!-- Modal ends Here -->
 </div>
