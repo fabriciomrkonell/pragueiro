@@ -22,7 +22,7 @@
 		<hr/>
 		
 		<div class="row">
-			<div class="col-sm-6">
+			<div class="col-sm-5">
 				<form class="form-signin" role="form">
 					<button type="button" class="btn btn-success" ng-disabled="finalizado" ng-show="save" ng-click="salvarOrdser(data)">Salvar</button>
 					<button type="button" class="btn btn-success" ng-disabled="finalizado" ng-show="edit" ng-click="editarOrdser
@@ -89,7 +89,7 @@
 					<div class="row">
 						<div class="col-sm-6 col-sm-no-bottom">
 							<div class="form-group">
-								<label>Tipo Ordem de Serviço/Atividade*</label>
+								<label>Tipo Ordem de Serv.*</label>
 								<select class="form-control" ng-model="data.key_tipati"  ng-options="tipati.key as (tipati.nome) for tipati in tipatis"> >							
 									<option></option>
 								</select>
@@ -134,7 +134,7 @@
 				</form>
 
 			</div>
-			<div class="col-sm-6">
+			<div class="col-sm-7">
 
 
 				<div ui-grid="gridOptions" ui-grid-selection class="gridOrdser"></div>	

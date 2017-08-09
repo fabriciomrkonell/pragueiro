@@ -67,18 +67,25 @@
 				displayName: "Dat. Prev.",
 				type: 'date',
 				cellFilter: 'date:"dd/MM/yyyy"',
-				width: 130
+				width: 120
 			}, 
 			{
 				field: "situacao",
 				displayName: "Situação",
-				width: 115
+				width: 108
 			}, 
 			{
 				field: "tipati.nome",
 				displayName: "Tipo Aplicação",
 				width: 130
 			}, 
+			{
+				field: "quadras",
+				displayName: "Quadra",
+				width: 130,
+
+				cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>"
+			},
 			{
 				field: "equipe.nome",
 				displayName: "Equipe",
@@ -88,9 +95,22 @@
 				field: "safra.nome",
 				displayName: "Safra",
 				width: 130
+			},
+			
+			],
+			appScopeProvider: {
+				mapValue: function(row) {
+					var retorno='';
+					for (var propertyName in row.entity.quadras) {
+						$scope.todasQuadras.forEach(function(obj2) {
+							if (propertyName === obj2.key) {
+								retorno+=obj2.nome + ', ';
+							}
+						});
+					}
+					return retorno.substring(0, retorno.length-2);
+				}
 			}
-
-			]
 
 
 		};
@@ -847,6 +867,7 @@ $scope.chengeFazenda = function(fazenda) {
 	listenerCodigo(fazenda);
 
 	refOrdser = new Firebase(Constant.Url + '/ordser/' + fazenda.key);
+
 
 	/*
 	refOrdser.on('value', function(snapshot) {
