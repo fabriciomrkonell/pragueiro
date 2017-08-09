@@ -332,7 +332,8 @@ function atualizaListaFiliais() {
 				"key": "filial.$value",
 				"alias": "filial"
 			}).ref();
-
+			var i=0;
+			
 			refNovo.on('child_added', function(snap) {
 				$('#myPleaseWait').modal('hide');
 
@@ -345,6 +346,13 @@ function atualizaListaFiliais() {
 					recuperaEquipamento(obj);
 					recuperaFuncionario(obj);
 					recuperaProduto(obj);
+
+					if(i==0)
+					{
+						$scope.chengeFazenda($scope.fazendas[0]);
+						$scope.data.fazenda=$scope.fazendas[0];
+					}
+
 					if (!$scope.$$phase) {
 						$scope.$apply();
 					}
