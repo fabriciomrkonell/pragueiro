@@ -999,6 +999,23 @@ $scope.recuperaPlanejamentos = function(fazenda, safra) {
 	$scope.editQuadra = false;
 	return true;
 };
+$scope.chengeTipOrdser = function() {
+	if($scope.data.key_tipati!=null && $scope.data.key_tipati!=''  )
+	{
+		$scope.todasTipatis.forEach(function(obj2) {
+			if ($scope.data.key_tipati === obj2.key) {
+				$scope.data.aplagr=obj2.aplagr;
+			}
+		});
+	}
+	else
+	{
+		$scope.data.aplagr=false;
+	}
+
+
+	return true;
+};
 //############################################################################################################################
 //############################################################################################################################
 // ORDEM SERVICO
@@ -1582,7 +1599,10 @@ $scope.adicionarExecucao = function(data, data_execucao) {
 	data_execucao.data = new Date(data_execucao.data).getTime();
 	var refOrdser = new Firebase(Constant.Url + '/ordser/' + data.fazenda.key + '/' + data.key + '/execucoes/' + 	data_execucao.key);
 	var execucaoTmp = clone(data_execucao);
-
+	if(execucaoTmp.area==null)
+	{
+		delete execucaoTmp.area;
+	}
 	delete execucaoTmp.filial;
 	delete execucaoTmp.$$hashKey;
 	delete execucaoTmp.$$hashKey;
@@ -1712,6 +1732,10 @@ function validFormExecucao(data) {
 
 	if (data == null) {
 		setMessageError('É preciso preencher os campos da guia Execução!');
+		return true;
+	}
+	if (data.data == null) {
+		setMessageError('O campo Data é obrigatório!');
 		return true;
 	}
 	if (data.data === '') {

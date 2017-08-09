@@ -90,7 +90,7 @@
 						<div class="col-sm-6 col-sm-no-bottom">
 							<div class="form-group">
 								<label>Tipo Ordem de Serv.*</label>
-								<select class="form-control" ng-model="data.key_tipati"  ng-options="tipati.key as (tipati.nome) for tipati in tipatis"> >							
+								<select class="form-control" ng-change="chengeTipOrdser()" ng-model="data.key_tipati"  ng-options="tipati.key as (tipati.nome) for tipati in tipatis"> >							
 									<option></option>
 								</select>
 							</div>				
@@ -129,6 +129,7 @@
 							</div>	
 						</div>
 					</div>
+					
 
 
 				</form>
@@ -279,6 +280,12 @@
 						</button>
 
 					</div>
+					<br />
+					<div class="form-group">
+						<input type="checkbox" ng-show="true" ng-disabled="true" ng-model="data.aplagr"
+						ng-true-value="true" ng-false-value="false">	
+						<label>Aplicação de Agrotóxico</label>						
+					</div>		
 					<br />
 					<div class="row">
 						<div ui-grid="gridOptionsExecucoes" ui-grid-selection class="gridOrdserExecucao"></div>	

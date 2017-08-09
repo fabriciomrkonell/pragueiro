@@ -269,7 +269,7 @@
 					x++;
 
 				});
-				if (posicao == null) {
+				if (posicao == null && objNovo.aplagr) {
 					$scope.ordsers.push(objNovo);
 					//$scope.gridOptions.data = $scope.ordsers;
 				}
@@ -813,6 +813,14 @@
 
 
 
+				}
+				if($scope.exibirSomenteEn)
+				{
+					$scope.pragasExibir=$scope.pragasEncontradasGeral;
+				}
+				else
+				{
+					$scope.pragasExibir=$scope.todasPragas;
 				}
 
 
