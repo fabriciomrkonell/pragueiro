@@ -19,7 +19,7 @@ function showDicas()
 };
 
 (function()
-{
+{ 
 
 	'use strict';
 
@@ -64,6 +64,7 @@ function showDicas()
 
 			map = new google.maps.Map(document.getElementById('map'), mapOptions);
 		};
+
 		$scope.gridOptions = { 
 			enableRowSelection: true, 
 			enableRowHeaderSelection: false,
@@ -101,25 +102,25 @@ function showDicas()
 		//$scope.printRouter();
 
 
-		var ref = new Firebase(Constant.Url + '/coordenada');
-		$scope.todasQuadras = $firebaseArray(ref);
+		//var ref = new Firebase(Constant.Url + '/coordenada');
+		//$scope.todasQuadras = $firebaseArray(ref);
 
-		var ref = new Firebase('https://pragueirodebug.firebaseio.com/raiz/coordenada/');
-		$scope.todasQuadrasBKP = $firebaseArray(ref);
+		//var ref = new Firebase('https://pragueirodebug.firebaseio.com/raiz/coordenada/');
+		//$scope.todasQuadrasBKP = $firebaseArray(ref);
 
 	//var ref2 = new Firebase(Constant.Url + '/quadra');
 	//$scope.todasQuadrasMesmo = $firebaseArray(ref2);
 	
 
 	$scope.todasQuadrasMesmo =[];
-
+/*
 	var refCoordenadageo= new Firebase(Constant.Url + '/quadra');
 	refCoordenadageo.on('child_added', function(snap) {
 		var objNovo= snap.val();
 		$scope.todasQuadrasMesmo.push(objNovo);
 	});
 
-
+	*/
 	initMap(new google.maps.LatLng(-20, -55), 4 );
 
 
@@ -200,7 +201,7 @@ function showDicas()
 		}		
 
 		$scope.chengeFazenda = function(fazenda){
-			$('#myPleaseWait').modal('show');
+			//$('#myPleaseWait').modal('show');
 			if(fazenda === null) 
 			{
 				$scope.quadras =null;

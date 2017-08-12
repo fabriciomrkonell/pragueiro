@@ -105,6 +105,8 @@
 						}
 					});
 
+
+
 					refNovo.on('child_changed', function(snap) {
 						//console.log('Houve uma atualização', snap.name(), snap.val());
 						var objNovo= snap.val();
@@ -142,18 +144,18 @@
 			}
 			else
 			{			
-			//	$('#myPleaseWait').modal('show');	
+				//$('#myPleaseWait').modal('show');	
 
-			$scope.produtos=[];
+				$scope.produtos=[];
 
-			var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
-			var refNovoQuadra = new Firebase.util.NormalizedCollection(
-				baseRef.child("/filial/"+fazenda.key+"/produto"),
-				[baseRef.child("/produto"), "$key"]
-				).select(
-				{"key":"produto.$value","alias":"filial"},
-				{"key":"$key.$value","alias":"produtos"}
-				).ref();
+				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
+				var refNovoQuadra = new Firebase.util.NormalizedCollection(
+					baseRef.child("/filial/"+fazenda.key+"/produto"),
+					[baseRef.child("/produto"), "$key"]
+					).select(
+					{"key":"produto.$value","alias":"filial"},
+					{"key":"$key.$value","alias":"produtos"}
+					).ref();
 
 /*
 					refNovoQuadra.on('value', function(snapshot) {
@@ -173,6 +175,8 @@
 						}
 						$scope.gridOptions.data = $scope.produtos;
 					});
+
+
 
 					refNovoQuadra.on('child_changed', function(snap) {
 						$('#myPleaseWait').modal('hide');

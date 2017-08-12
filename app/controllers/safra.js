@@ -112,6 +112,8 @@
 			var key_usuario;
 			obj.$loaded().then(function() {
 				key_usuario= obj.$value;
+
+				var i =0;
 				
 				$scope.fazendas=[];
 				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
@@ -129,6 +131,13 @@
 						//console.log('Adicionou filial', snap.name(), snap.val());
 						var obj= snap.val();
 						$scope.fazendas.push(obj.filial);
+
+						if(i==0)
+						{
+							$scope.chengeFazenda($scope.fazendas[0]);
+							$scope.data.fazenda=$scope.fazendas[0];
+						}
+
 						if(!$scope.$$phase) {
 							$scope.$apply();
 						}

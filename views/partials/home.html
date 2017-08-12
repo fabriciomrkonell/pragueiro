@@ -11,6 +11,13 @@
  	}
 
 
+ 	.modalMapa{
+ 	}
+ 	#map{
+ 		height: 400px;
+ 		width: 570px;  
+ 	}
+ 	
 
  	.row{
  		margin-top:40px;
@@ -125,7 +132,7 @@
  									<th colspan="2" class="text-right">Data do Levantamento</th>
  									<th class="text-center active-table" ng-repeat="v in vistorias">
  										<!--<a ng-href="https://pragueiroproducao.firebaseio.com/vistoria/{{fazenda.key}}/{{safra.key}}/{{v.quadra.key}}/{{v.usuario.key}}">-->
- 										<a ng-href="#">
+ 										<a  >
  											{{v.dataExtenso}} </a></th>
  										</tr>
  										<tr>
@@ -144,6 +151,15 @@
  										<tr>
  											<th colspan="2" class="text-right">Qtde Pontos</th>
  											<th class="text-center" ng-repeat="v in vistorias">{{v.qtde_ponto}}</th>
+ 										</tr>
+
+ 										<tr>
+ 											<th colspan="2" class="text-right">Onde foram os pontos?</th>
+ 											<th class="text-center" ng-repeat="v in vistorias">
+ 												<button type="button" class="btn btn-success btn-xs" ng-click="abrirMapa(v)">
+ 													&nbsp;&nbsp;<i class="glyphicon glyphicon-map-marker"></i>&nbsp;&nbsp;
+ 												</button>
+ 											</th>
  										</tr>
 
  										<tr>
@@ -194,17 +210,30 @@
 
  				</div>
 
-
-
-
-
-
-
  			</div> <!-- container container-view -->
 
  		</div> <!-- final homeCtrl-->
 
 
+ 		<!-- Modal Help-->
+ 		<div class="modal fade modalMapa" id="modalMapa" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+ 			<div class="modal-dialog">
+ 				<div class="modal-content">
+
+ 					<div class="modal-header">
+ 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+ 						<h4 class="modal-title" id="myModalLabel">Onde foi o Levantamento?</h4>
+ 					</div>
+
+ 					<div class="modal-body">
+ 						<div id="map"></div>
+
+ 					</div>
+
+
+ 				</div>
+ 			</div>
+ 		</div>
  		<!-- Modal Start here-->
  		<div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"
  		role="dialog" aria-hidden="true" data-backdrop="static">
