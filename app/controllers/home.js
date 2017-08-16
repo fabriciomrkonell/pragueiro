@@ -41,9 +41,9 @@ function initMap() {
 
 	angular.module('Pragueiro.controllers').registerCtrl('homeCtrl', homeCtrl);
 
-	homeCtrl.$inject = ['$scope', 'Constant', 'Session', '$firebaseArray', '$firebaseObject', 'Notify', '$routeParams', '$geofire', 'NgMap'];
+	homeCtrl.$inject = ['$scope', 'Constant', 'Session', '$firebaseArray', '$firebaseObject', 'Notify', '$routeParams', '$geofire', 'NgMap', '$location', '$anchorScroll'];
 
-	function homeCtrl($scope, Constant, Session, $firebaseArray, $firebaseObject, Notify, $routeParams,  $geofire, NgMap) {
+	function homeCtrl($scope, Constant, Session, $firebaseArray, $firebaseObject, Notify, $routeParams,  $geofire, NgMap, $location, $anchorScroll) {
 
 
 		angular.extend($scope, {
@@ -1034,6 +1034,8 @@ function initMap() {
 
 		$scope.gerarMapa=function()
 		{
+			
+
 			if($scope.safra==null)
 			{
 				$scope.mensagem_aviso = "É preciso selecionar uma safra.";
@@ -1080,11 +1082,13 @@ function initMap() {
 			}
 			//---------------
 			$scope.todascoordenadasCentroidMapaInfestacao=[];
+			var temQuadra=false;
 			$scope.quadras.forEach(function(obj)
 			{
 				$scope.formMapa.quadras.forEach(function(objSelecionado){
 					if(objSelecionado.key==obj.quadra.key)
 					{
+						temQuadra=true;
 						var refCoordenadas = new Firebase(Constant.Url + '/coordenada/'+ obj.quadra.key);
 						refCoordenadas.on('value', function(snapshot) {
 							if(snapshot.numChildren()>0 )
@@ -1095,6 +1099,16 @@ function initMap() {
 					}
 				});			
 			});		
+			if(!temQuadra)
+			{
+				$scope.mensagem_aviso = "É preciso selecionar pelo menos 1 quadra/região.";
+				$('#modalMensagem').modal('show');
+				return true;
+			}
+			else
+			{
+				$scope.gotoAnchor('map_infestacao');
+			}
 
 
 			listHeat = [];
@@ -1442,76 +1456,90 @@ function initMap() {
 		//############################################################################################################################
 		//UTILIZADES
 		//############################################################################################################################
-		function formatDate(date) {
-			var d = new Date(date),
-			month = '' + (d.getMonth() + 1),
-			day = '' + d.getDate(),
-			year = d.getFullYear();
+		$scope.gotoAnchor = function(x) {
+			var newHash = x;
+			if ($location.hash() !== newHash) {
+          // set the $location.hash to `newHash` and
+          // $anchorScroll will automatically scroll to it
+          $location.hash(x);
+      } else {
+          // call $anchorScroll() explicitly,
+          // since $location.hash hasn't changed
+          $anchorScroll();
+      }
+  };
 
-			if (month.length < 2) month = '0' + month;
-			if (day.length < 2) day = '0' + day;
 
-			return [day, month, year].join('/');
-		}
+  function formatDate(date) {
+  	var d = new Date(date),
+  	month = '' + (d.getMonth() + 1),
+  	day = '' + d.getDate(),
+  	year = d.getFullYear();
 
-		function clone(obj) {
-			if (null == obj || "object" != typeof obj) return obj;
-			var copy = obj.constructor();
-			for (var attr in obj) {
-				if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
-			}
-			return copy;
-		}
+  	if (month.length < 2) month = '0' + month;
+  	if (day.length < 2) day = '0' + day;
 
-		function compare(a,b) {
-			if (a.nome_praga < b.nome_praga)
-				return -1;
-			if (a.nome_praga > b.nome_praga)
-				return 1;
+  	return [day, month, year].join('/');
+  }
 
-			if (a.key_tamanho < b.key_tamanho)
-				return -1;
-			if (a.key_tamanho > b.key_tamanho)
-				return 1;
-			return 0;
-		}
+  function clone(obj) {
+  	if (null == obj || "object" != typeof obj) return obj;
+  	var copy = obj.constructor();
+  	for (var attr in obj) {
+  		if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+  	}
+  	return copy;
+  }
 
-		function compareData(a,b) {
-			if (a.dataMilis > b.dataMilis)
-				return -1;
-			if (a.dataMilis < b.dataMilis)
-				return 1;
+  function compare(a,b) {
+  	if (a.nome_praga < b.nome_praga)
+  		return -1;
+  	if (a.nome_praga > b.nome_praga)
+  		return 1;
 
-			return 0;
-		}
+  	if (a.key_tamanho < b.key_tamanho)
+  		return -1;
+  	if (a.key_tamanho > b.key_tamanho)
+  		return 1;
+  	return 0;
+  }
 
-		$scope.diferencaData = function(a,b)
-		{
+  function compareData(a,b) {
+  	if (a.dataMilis > b.dataMilis)
+  		return -1;
+  	if (a.dataMilis < b.dataMilis)
+  		return 1;
 
-			var date1 = new Date(a);
-			var date2 = new Date(b);
-			var timeDiff = Math.abs(date2.getTime() - date1.getTime());
-			var  resultado= Math.ceil(timeDiff / (1000 * 3600 * 24));
-			if(resultado<0 || isNaN(resultado))
-			{
-				return 0;
-			}
-			else
-			{
-				return resultado 
-			}
-		}
+  	return 0;
+  }
 
-		function checkLocalHistoryCompatibilidade(){
-			var test = 'test';
-			try {
-				localStorage.setItem(test, test);
-				localStorage.removeItem(test);
-				return true;
-			} catch(e) {
-				return false;
-			}
-		}
+  $scope.diferencaData = function(a,b)
+  {
+
+  	var date1 = new Date(a);
+  	var date2 = new Date(b);
+  	var timeDiff = Math.abs(date2.getTime() - date1.getTime());
+  	var  resultado= Math.ceil(timeDiff / (1000 * 3600 * 24));
+  	if(resultado<0 || isNaN(resultado))
+  	{
+  		return 0;
+  	}
+  	else
+  	{
+  		return resultado 
+  	}
+  }
+
+  function checkLocalHistoryCompatibilidade(){
+  	var test = 'test';
+  	try {
+  		localStorage.setItem(test, test);
+  		localStorage.removeItem(test);
+  		return true;
+  	} catch(e) {
+  		return false;
+  	}
+  }
 
 
 

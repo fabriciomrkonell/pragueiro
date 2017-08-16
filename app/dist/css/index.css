@@ -18,6 +18,12 @@
 	height: 300px;
 }
 
+.row.tabela_pronta {
+	margin-top: -20px;
+	margin-left: -20px;
+	margin-right: 1px;
+}
+
 .alinhado_direito{
 	text-align: right;
 }
