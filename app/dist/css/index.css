@@ -63,8 +63,10 @@
 .cell_personalizada_excluir{
 	margin-top: 4px;
 	margin-left: 20px;
+}
 
-
+.sem_marge_botton{
+	margin-bottom: 0px;
 }
 
 .container-view{
@@ -86,6 +88,11 @@
 
 .logo-actionbar_title{
 	height: 25px;
+}
+
+.panel_mapa{
+	margin-top: -30px;
+	padding: 20px;
 }
 
 .container {
@@ -115,6 +122,7 @@
 .tab-content>.active {
 	display: block;
 	padding: 20px;
+	background-color: white;
 }
 
 .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {

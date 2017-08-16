@@ -1,7 +1,21 @@
-
 var map = null;
+var map_infestacao=null;
+var heatmap=null;
+var listHeat=[];
 
 function initMap() {
+
+	map_infestacao = new google.maps.Map(document.getElementById('map_infestacao'), {
+		zoom: 16,
+		mapTypeId: google.maps.MapTypeId.SATELLITE,
+		mapTypeControl: false,
+		zoomControl: true,
+		mapTypeControl: false,
+		scaleControl: false,
+		streetViewControl: false,
+		rotateControl: false
+	});
+
 	map = new google.maps.Map(document.getElementById('map'), {
 		zoom: 16,
 		mapTypeId: google.maps.MapTypeId.SATELLITE,
@@ -12,12 +26,12 @@ function initMap() {
 		streetViewControl: false,
 		rotateControl: false
 	});
+
+
 };
 
-function showDicas()
-{
-	$('#modalInstrucoes').modal('show');
-};
+
+
 
 
 (function(){
@@ -26,9 +40,9 @@ function showDicas()
 
 	angular.module('Pragueiro.controllers').registerCtrl('homeCtrl', homeCtrl);
 
-	homeCtrl.$inject = ['$scope', 'Constant', 'Session', '$firebaseArray', '$firebaseObject', 'Notify', '$routeParams', '$geofire'];
+	homeCtrl.$inject = ['$scope', 'Constant', 'Session', '$firebaseArray', '$firebaseObject', 'Notify', '$routeParams', '$geofire', 'NgMap'];
 
-	function homeCtrl($scope, Constant, Session, $firebaseArray, $firebaseObject, Notify, $routeParams,  $geofire) {
+	function homeCtrl($scope, Constant, Session, $firebaseArray, $firebaseObject, Notify, $routeParams,  $geofire, NgMap) {
 
 
 		angular.extend($scope, {
@@ -40,11 +54,21 @@ function showDicas()
 			variedades:[],
 			usuarios:[],
 			pragasEncontradasGeral:[],
-			pragasExibir:[]
+			pragasExibir:[],
+			mensagem_aviso : ''
 
 		});
 
-/*
+		$scope.exibirNome =true;
+		$scope.selecionarTodasQuadras = true;
+		/*
+		var heatmap, vm = this;
+		NgMap.getMap().then(function(map) {
+			vm.map = map;
+			heatmap = vm.map.heatmapLayers.foo;
+		});
+		
+
 		shapefile.open("https://cdn.rawgit.com/mbostock/shapefile/master/test/points.shp")
 		.then(source => source.read()
 			.then(function log(result) {
@@ -56,6 +80,11 @@ function showDicas()
 		*/
 		$scope.myNumber = 5;
 		$scope.table_pronta=false;
+		$scope.todascoordenadasCentroidMapaInfestacao=[];
+		$scope.formMapa = {
+			quadras: []
+		};
+		$scope.formMapa.intesidade = 20;
 
 		$scope.mCountTamanhos = 0;
 		$scope.mCont = 0;
@@ -104,6 +133,8 @@ function showDicas()
 		map.setCenter($scope.centerMapa);
 	});
 
+
+
 	function initMap(center, zoom){
 
 		var mapOptions = {
@@ -112,8 +143,29 @@ function showDicas()
 			mapTypeId: google.maps.MapTypeId.HYBRID
 		}
 
+		var mapOptions2 = {
+			zoom: zoom,
+			center: center,
+			mapTypeId: 'terrain'
+		}
+
 		map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+		map_infestacao = new google.maps.Map(document.getElementById('map_infestacao'), mapOptions2);
 	};
+
+	function initMapInfestacao(center, zoom){
+
+		var mapOptions = {
+			center: center,
+			mapTypeId: 'terrain'
+		}
+
+
+		map_infestacao = new google.maps.Map(document.getElementById('map_infestacao'), mapOptions);
+	};
+
+	initMap(new google.maps.LatLng(-20, -55), 4 );
 
 	function Point(x, y) {
 		this.x = x;
@@ -956,6 +1008,7 @@ function showDicas()
 						var obj= snap.val();
 						obj.cultura=$scope.getCulturaNome(obj.quadraxcultura.key_cultura)
 						$scope.quadras.push(obj);
+						$scope.formMapa.quadras.push(obj.quadra);
 						//atualizaCoordenadasQuadra(obj.quadra.key)
 						if($scope.quadras.length==1)
 						{
@@ -991,6 +1044,168 @@ function showDicas()
 			});// final do load1
 		}
 
+		var contador_anterior=0;
+		var contador_correto=0;
+		$scope.pragaAnterior=function()
+		{
+			contador_anterior=0;
+			$scope.pragasExibir.forEach(function(obj)
+			{
+				if(obj.key==$scope.formMapa.praga)
+				{
+					contador_correto=contador_anterior;
+				}
+				contador_anterior++;
+			});
+			if($scope.pragasExibir[contador_correto-1]!=null)
+			{
+				$scope.formMapa.praga=$scope.pragasExibir[contador_correto-1].key;
+			}
+			if($scope.formMapa.praga!=null)
+			{
+				$scope.gerarMapa();
+			}
+		}
+
+		var proximo=false;
+		$scope.pragaProxima=function()
+		{
+			$scope.pragasExibir.forEach(function(obj)
+			{
+				if(proximo)
+				{
+					$scope.formMapa.praga=obj.key;
+					proximo=false;
+					return true;
+				}
+				if(obj.key==$scope.formMapa.praga)
+				{
+					proximo=true;
+				}
+			});
+			if($scope.formMapa.praga!=null)
+			{
+				$scope.gerarMapa();
+			}
+		}	
+
+		$scope.resizeMapaInfestacao=function()
+		{
+			google.maps.event.trigger(map_infestacao, "resize");
+			initMapInfestacao(new google.maps.LatLng(-20, -55), 4 );
+		}
+
+		$scope.gerarMapa=function()
+		{
+			if($scope.safra==null)
+			{
+				$scope.mensagem_aviso = "É preciso selecionar uma safra.";
+				$('#modalMensagem').modal('show');
+				return true;
+			}
+			if($scope.formMapa.praga==null)
+			{
+				$scope.mensagem_aviso = "É preciso selecionar uma praga.";
+				$('#modalMensagem').modal('show');
+				return true;
+			}
+			if(heatmap!=null)
+			{
+				heatmap.setMap(null);
+			}
+
+			google.maps.event.trigger(map_infestacao, "resize");
+
+			initMapInfestacao();
+
+
+			if($scope.formMapa.intesidade==null)
+			{
+				$scope.formMapa.intesidade=20;
+			}
+			else
+			{
+				if($scope.formMapa.intesidade<10)
+				{
+					$scope.formMapa.intesidade=10
+				}
+				if($scope.formMapa.intesidade>50)
+				{
+					$scope.formMapa.intesidade=50;
+				}
+			}
+			$scope.todascoordenadasCentroidMapaInfestacao=[];
+			$scope.quadras.forEach(function(obj)
+			{
+				$scope.formMapa.quadras.forEach(function(objSelecionado){
+					if(objSelecionado.key==obj.quadra.key)
+					{
+						var refCoordenadas = new Firebase(Constant.Url + '/coordenada/'+ obj.quadra.key);
+						refCoordenadas.on('value', function(snapshot) {
+							if(snapshot.numChildren()>0 )
+							{
+								atualizaCoordenadasQuadraMapaInfestacao(obj.quadra.key, obj.quadra.nome, snapshot.numChildren());
+							}
+						});
+					}
+				});			
+			});		
+
+
+			listHeat = [];
+			$scope.vistorias.forEach(function(vistoria)
+			{
+				$scope.formMapa.quadras.forEach(function(objSelecionado){
+					if(objSelecionado.key==vistoria.quadra.key)
+					{
+						if(vistoria.quadra.separar_variedade)
+						{
+
+						}
+						else
+						{
+							for(var propertyName in vistoria.vistoria) 
+							{
+							//-----------DIA---------------------------------------------------------
+							for(var propertyName_Dia in vistoria.vistoria[propertyName]) 
+							{
+								//-----------PONTO---------------------------------------------------------
+								for(var propertyName_ponto in vistoria.vistoria[propertyName][propertyName_Dia]) 
+								{
+									for(var propertyName_levantamento in vistoria.vistoria[propertyName][propertyName_Dia][propertyName_ponto]) 
+									{
+										var vis_fina = vistoria.vistoria[propertyName][propertyName_Dia][propertyName_ponto][propertyName_levantamento];
+										
+										if($scope.formMapa.praga==vis_fina.key_praga)
+										{
+											if(vis_fina.latitude!=null && vis_fina.longitude!=null)
+											{
+												var passo=0;
+												for (passo = 0; passo < vis_fina.valor; passo++) 
+												{
+													listHeat.push(new google.maps.LatLng(vis_fina.latitude, vis_fina.longitude)) ;
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+
+			});
+
+			heatmap = new google.maps.visualization.HeatmapLayer({
+				data: listHeat,
+				map: map_infestacao,
+				radius: $scope.formMapa.intesidade
+			});
+
+
+		}
+
 		function atualizaCoordenadasQuadra(vistoria, qdteRegistro)
 		{
 			var todascoordenadasQuadraEspecifica=[];
@@ -1001,7 +1216,7 @@ function showDicas()
 			var i=0;
 			refCoordenadas.on('child_added', function(snap) {
 				i++;
-				
+
 
 				var coordenadas= snap.val();
 
@@ -1028,6 +1243,60 @@ function showDicas()
 			var i=0;	
 		}
 
+		function atualizaCoordenadasQuadraMapaInfestacao(key_quadra, nome_quadra, qdteRegistro)
+		{
+			var todascoordenadasQuadraEspecifica=[];
+			var todascoordenadasCentroidQuadraEspecifica=[];
+
+			var refCoordenadas = new Firebase(Constant.Url + '/coordenada/'+ key_quadra);
+
+			var i=0;
+			refCoordenadas.on('child_added', function(snap) {
+				i++;
+
+				var coordenadas= snap.val();
+
+				var novo=[];
+				novo['latitude']=coordenadas.latitude;
+				novo['longitude']=coordenadas.longitude;
+				todascoordenadasQuadraEspecifica.push(new google.maps.LatLng(coordenadas.latitude, coordenadas.longitude));
+
+				var novoCentroid=[];
+				novoCentroid['x']=coordenadas.latitude;
+				novoCentroid['y']=coordenadas.longitude;
+				$scope.todascoordenadasCentroidMapaInfestacao.push(novoCentroid);
+				todascoordenadasCentroidQuadraEspecifica.push(novoCentroid);
+
+				if(qdteRegistro==i)
+				{
+					$('#myPleaseWait').modal('hide');
+					console.log('terminou coordenadas, quadra '+ key_quadra);
+
+					var infowindow = new google.maps.InfoWindow({
+						content: nome_quadra
+					});
+
+					var region = new Region(todascoordenadasCentroidQuadraEspecifica);	
+
+					var marker = new google.maps.Marker({
+						position: new google.maps.LatLng(region.centroid().x, region.centroid().y),
+						map: map_infestacao,
+						label: '',
+						title: nome_quadra
+					});
+					marker.addListener('click', function() {
+						infowindow.open(map_infestacao, marker);
+					});
+
+					setaCoordenadasMapaInfestacao($scope.todascoordenadasCentroidMapaInfestacao, todascoordenadasQuadraEspecifica);
+
+				}
+
+			});
+
+			var i=0;	
+		}
+
 		$scope.abrirMapa = function(vistoria) {
 			$('#myPleaseWait').modal('show');
 			var refCoordenadas = new Firebase(Constant.Url + '/coordenada/'+ vistoria.quadra.key);
@@ -1043,6 +1312,54 @@ function showDicas()
 
 			});
 		}
+
+		function setaCoordenadasMapaInfestacao(todascoordenadasCentroid, todascoordenadasQuadraEspecifica)
+		{
+			console.log('setaCoordenadasMapaInfestacao');
+
+			if(todascoordenadasCentroid != null && todascoordenadasCentroid.length>0 && todascoordenadasQuadraEspecifica.length>0)
+			{
+				console.log('setaCoordenadasMapaInfestacao tem');
+
+				setaCentroMapaInfestacao();
+
+				var bermudaTriangle = new google.maps.Polygon({
+					paths: todascoordenadasQuadraEspecifica,
+					strokeColor: '#212121',
+					strokeOpacity: 0.8,
+					strokeWeight: 3,
+					fillColor: '#50b300',
+					fillOpacity: 0.01
+				});
+				bermudaTriangle.setMap(map_infestacao);
+			}
+			else
+			{
+				var todascoordenadasCentroidQuadraEspecifica=[];
+
+				var region = new Region(todascoordenadasCentroidQuadraEspecifica);			
+				$scope.centerMapa=new google.maps.LatLng(region.centroid().x, region.centroid().y);
+				//initMap(new google.maps.LatLng(region.centroid().x, region.centroid().y), 14);		
+				//$('#modalMapa').modal('show');
+			}
+
+			if(!$scope.$$phase) 
+			{
+				$scope.$apply();
+			}
+
+			$('#myPleaseWait').modal('hide');
+		}
+
+		function setaCentroMapaInfestacao()
+		{
+			var region = new Region($scope.todascoordenadasCentroidMapaInfestacao);	
+			map_infestacao.setCenter(new google.maps.LatLng(region.centroid().x, region.centroid().y))	;
+			map_infestacao.setZoom(12);	
+			//initMapInfestacao(new google.maps.LatLng(region.centroid().x, region.centroid().y), 14);
+		}
+
+		
 
 		function setaCoordenadas2(vistoria, todascoordenadasCentroid, todascoordenadasQuadraEspecifica)
 		{
@@ -1101,6 +1418,36 @@ function showDicas()
 			$('#myPleaseWait').modal('hide');
 		}
 
+		$scope.efetuaSelecionarTodasQuadras = function()
+		{
+
+			$scope.selecionarTodasQuadras=true;
+			$scope.quadras.forEach(function(obj){
+				$scope.formMapa.quadras.push(obj.quadra);
+			});	
+			
+
+		}
+
+		$scope.DesEfetuaSelecionarTodasQuadras= function()
+		{
+			$scope.selecionarTodasQuadras=false;
+			$scope.formMapa.quadras=[];
+		}
+
+		$scope.clickQuadras = function()
+		{
+			$scope.selecionarTodasQuadras=false;;
+		}
+
+		function getRandomColor() {
+			var letters = '0123456789ABCDEF';
+			var color = '#';
+			for (var i = 0; i < 6; i++) {
+				color += letters[Math.floor(Math.random() * 16)];
+			}
+			return color;
+		}
 
 
 		function formatDate(date) {
