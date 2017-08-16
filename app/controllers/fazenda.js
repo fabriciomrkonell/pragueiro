@@ -27,6 +27,7 @@
 				website: '',
 				cidade: '',
 				email: '',
+				tipintapl: '',
 				key: '',
 				distancia_pontos:10,
 				usuarios:[],
@@ -37,6 +38,8 @@
 		};
 
 		var key_usuario;
+
+		$scope.tipintapls = ['Data aplicação', 'Data atual'];
 
 		var ref = new Firebase(Constant.Url + '/filial');
 		$scope.todosFiliais=$firebaseArray(ref);

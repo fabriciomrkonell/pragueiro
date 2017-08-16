@@ -57,6 +57,17 @@
 						ng-true-value="true" ng-false-value="false">	<label>Mostrar quadras/regiões desativadas</label>
 
 					</div>
+					<hr/>
+					<div class="form-group">
+						<label>Modo Intervalo de aplicação</label>
+
+						<select class="form-control"  ng-model="data.tipintapl" ng-options="o as o for o in tipintapls" >							
+							<option></option>
+						</select>
+
+
+
+					</div>	
 					<!-- -->
 					<button type="button" class="btn btn-success" ng-show="save" ng-click="salvarFazenda(data)">Salvar</button>
 					<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarFazenda(data)">Atualizar</button>

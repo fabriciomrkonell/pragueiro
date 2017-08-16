@@ -1,3 +1,5 @@
+//############################################################################################################################
+//NECESSARIOS PRO MAPA FUNCIONAR, AQUI É BRUTO, SEM ANGULAR
 var map = null;
 var map_infestacao=null;
 var heatmap=null;
@@ -30,8 +32,7 @@ function initMap() {
 
 };
 
-
-
+//############################################################################################################################
 
 
 (function(){
@@ -46,8 +47,6 @@ function initMap() {
 
 
 		angular.extend($scope, {
-			teste2 : '',
-			edit: false,
 			quadras: [],
 			culturas:[],
 			vistorias:[],
@@ -55,46 +54,60 @@ function initMap() {
 			usuarios:[],
 			pragasEncontradasGeral:[],
 			pragasExibir:[],
-			mensagem_aviso : ''
+			mensagem_aviso : '',
+			exibirNomeQuadra : true,
+			selecionarTodasQuadras : true
 
 		});
-
-		$scope.exibirNome =true;
-		$scope.selecionarTodasQuadras = true;
-		/*
-		var heatmap, vm = this;
-		NgMap.getMap().then(function(map) {
-			vm.map = map;
-			heatmap = vm.map.heatmapLayers.foo;
-		});
-		
-
-		shapefile.open("https://cdn.rawgit.com/mbostock/shapefile/master/test/points.shp")
-		.then(source => source.read()
-			.then(function log(result) {
-				if (result.done) return;
-				console.log(result.value);
-				return source.read().then(log);
-			}))
-		.catch(error => console.error(error.stack));
-		*/
-		$scope.myNumber = 5;
-		$scope.table_pronta=false;
-		$scope.todascoordenadasCentroidMapaInfestacao=[];
 		$scope.formMapa = {
 			quadras: []
 		};
 		$scope.formMapa.intesidade = 20;
 
+
+		if(checkLocalHistoryCompatibilidade())
+		{
+			if(window.localStorage.getItem('exibirSomentePragasEncontradas')=='S')
+			{
+				$scope.exibirSomenteEn=true;
+			}
+			else
+			{
+				$scope.exibirSomenteEn=false;
+			}
+			//---------------------
+			if(window.localStorage.getItem('exibirNomeQuadra')=='S')
+			{
+				$scope.exibirNomeQuadra=true;
+			}
+			else
+			{
+				$scope.exibirNomeQuadra=false;
+			}
+			//---------------------
+			if(window.localStorage.getItem('intensidadeHeatMap')!=null)
+			{
+				$scope.formMapa.intesidade=Number(window.localStorage.getItem('intensidadeHeatMap'));
+			}
+		}
+
+
+		$scope.myNumber = 5;
+		$scope.table_pronta=false;
+		$scope.todascoordenadasCentroidMapaInfestacao=[];
+
+
+
+
+
 		$scope.mCountTamanhos = 0;
 		$scope.mCont = 0;
-		$scope.teste2="<table class='table'>	<thead>	<tr><th ng-repeat='v in vistorias'>{{v.quadra.nome}}</th> </tr>	</thead> <tr><th ng-repeat='v in vistorias'>{{v.cultura.nome}}</th> </tr> 	<tr> 	<th ng-repeat='v in vistorias'>{{v.dataExtenso}}</th>			</tr> </table>";
 
 		atualizaListaFiliais();
 		atualizaCulturas();
 		atualizaUsuarios();
 		atualizaTodasPragas();
-		//atualizaListaQuadras();
+
 		var chart1 = {};
 		chart1.type = "ColumnChart";
 		chart1.data = [
@@ -126,214 +139,110 @@ function initMap() {
 	$scope.bb=1*$scope.chart.data[2][1];
 	$scope.cc=1*$scope.chart.data[3][1];
 
-	$('#modalMapa').on('shown.bs.modal', function () {
-		//var map = maps[0].map;
-		//var currentCenter = map.getCenter();
-		google.maps.event.trigger(map, "resize");
-		map.setCenter($scope.centerMapa);
-	});
-
-
-
-	function initMap(center, zoom){
-
-		var mapOptions = {
-			zoom: zoom,
-			center: center,
-			mapTypeId: google.maps.MapTypeId.HYBRID
-		}
-
-		var mapOptions2 = {
-			zoom: zoom,
-			center: center,
-			mapTypeId: 'terrain'
-		}
-
-		map = new google.maps.Map(document.getElementById('map'), mapOptions);
-
-		map_infestacao = new google.maps.Map(document.getElementById('map_infestacao'), mapOptions2);
-	};
-
-	function initMapInfestacao(center, zoom){
-
-		var mapOptions = {
-			center: center,
-			mapTypeId: 'terrain'
-		}
-
-
-		map_infestacao = new google.maps.Map(document.getElementById('map_infestacao'), mapOptions);
-	};
-
-	initMap(new google.maps.LatLng(-20, -55), 4 );
-
-	function Point(x, y) {
-		this.x = x;
-		this.y = y;
-	}
-
-	function Region(points) {
-		this.points = points || [];
-		this.length = points.length;
-	}
-
-	Region.prototype.area = function () {
-		var area = 0,
-		i,
-		j,
-		point1,
-		point2;
-
-		for (i = 0, j = this.length - 1; i < this.length; j = i, i += 1) {
-			point1 = this.points[i];
-			point2 = this.points[j];
-			area += point1.x * point2.y;
-			area -= point1.y * point2.x;
-		}
-		area /= 2;
-
-		return area;
-	};
-
-	Region.prototype.centroid = function () {
-		var x = 0,
-		y = 0,
-		i,
-		j,
-		f,
-		point1,
-		point2;
-
-		for (i = 0, j = this.length - 1; i < this.length; j = i, i += 1) {
-			point1 = this.points[i];
-			point2 = this.points[j];
-			f = point1.x * point2.y - point2.x * point1.y;
-			x += (point1.x + point2.x) * f;
-			y += (point1.y + point2.y) * f;
-		}
-
-		f = this.area() * 6;
-
-		return new Point(x / f, y / f);
-	};
-
 	initMap(new google.maps.LatLng(-20, -55), 4 );
 
 
+		//############################################################################################################################
+		//############################################################################################################################
+		// BASICOS, NECESSARIOS PARA OS OUTROS
+		//############################################################################################################################
 
 
-	$scope.getNumber2 = function(id_vistoria, id_praga) {
-		$scope.vistorias[id_vistoria].pragas_com_valor[id_praga].valor;
-		return 0;	
-	}
+		function atualizaCulturas()
+		{
+			var refCultura = new Firebase(Constant.Url + '/cultura');
+			refCultura.ref().on('child_added', function(snap) {
+				$scope.culturas.push(snap.val());
+			});
+		}
 
+		function atualizaVariedade(key_filial)
+		{
+			var refVariedades = new Firebase(Constant.Url + '/variedade/'+ key_filial);
+			refVariedades.ref().on('child_added', function(snap) {
+				$scope.variedades.push(snap.val());
+			});
+		}
 
+		function atualizaUsuarios()
+		{
+			var refUsuarios= new Firebase(Constant.Url + '/usuario');
+			refUsuarios.ref().on('child_added', function(snap) {
+				$scope.usuarios.push(snap.val());
+			});
+		}
 
-	function moveToLocation(lat, lng){
-		var center = new google.maps.LatLng(lat, lng);
-		map.setCenter(center);
-	}
+		function atualizaPragas()
+		{
+			var refPraga= new Firebase(Constant.Url + '/praga');
+			refPraga.ref().on('child_added', function(snap) {
 
-	$scope.teste = function(){
-		console.log('Adicionou filial', $scope);
-	};
+				var praga=snap.val();
+				var count_tamanho=0;
+				var tamanhos=[];
+				var primeiro_tamanho;
+				for(var obj in praga.tamanho ){
+					if(count_tamanho==0)
+					{
+						primeiro_tamanho=praga.tamanho[obj];
+					}
+					else
+					{
+						tamanhos.push(praga.tamanho[obj]);
+					}
+					count_tamanho++;
 
-	function atualizaCulturas()
-	{
-		var refCultura = new Firebase(Constant.Url + '/cultura');
-		refCultura.ref().on('child_added', function(snap) {
-			$scope.culturas.push(snap.val());
-		});
-	}
-
-	function atualizaVariedade(key_filial)
-	{
-		var refVariedades = new Firebase(Constant.Url + '/variedade/'+ key_filial);
-		refVariedades.ref().on('child_added', function(snap) {
-			$scope.variedades.push(snap.val());
-		});
-	}
-
-	function atualizaUsuarios()
-	{
-		var refUsuarios= new Firebase(Constant.Url + '/usuario');
-		refUsuarios.ref().on('child_added', function(snap) {
-			$scope.usuarios.push(snap.val());
-		});
-	}
-
-	function atualizaPragas()
-	{
-		var refPraga= new Firebase(Constant.Url + '/praga');
-		refPraga.ref().on('child_added', function(snap) {
-
-			var praga=snap.val();
-			var count_tamanho=0;
-			var tamanhos=[];
-			var primeiro_tamanho;
-			for(var obj in praga.tamanho ){
-				if(count_tamanho==0)
+				}
+				if(tamanhos.length==0)
 				{
-					primeiro_tamanho=praga.tamanho[obj];
+					praga['colspan']=2;			
+					praga['class']='text-right';			
 				}
 				else
 				{
-					tamanhos.push(praga.tamanho[obj]);
+					praga['colspan']=1;
+					praga['class']='text-center';	
 				}
-				count_tamanho++;
+				praga['primeiro_tamanho']=primeiro_tamanho;
+				praga['tamanhos']=tamanhos;
+				$scope.pragas.push(praga);
+			});
+		}
 
-			}
-			if(tamanhos.length==0)
-			{
-				praga['colspan']=2;			
-				praga['class']='text-right';			
-			}
-			else
-			{
-				praga['colspan']=1;
-				praga['class']='text-center';	
-			}
-			praga['primeiro_tamanho']=primeiro_tamanho;
-			praga['tamanhos']=tamanhos;
-			$scope.pragas.push(praga);
-		});
-	}
+		function atualizaTodasPragas()
+		{
+			$scope.todasPragas=[];
+			var refPraga= new Firebase(Constant.Url + '/praga');
+			refPraga.ref().on('child_added', function(snap) {
 
-	function atualizaTodasPragas()
-	{
-		$scope.todasPragas=[];
-		var refPraga= new Firebase(Constant.Url + '/praga');
-		refPraga.ref().on('child_added', function(snap) {
+				var praga=snap.val();
+				var count_tamanho=0;
+				var tamanhos=[];
+				var primeiro_tamanho;
+				for(var obj in praga.tamanho ){
+					var tam=praga.tamanho[obj];
+					tam['id']=$scope.mCountTamanhos;
+					tamanhos.push(tam);
 
-			var praga=snap.val();
-			var count_tamanho=0;
-			var tamanhos=[];
-			var primeiro_tamanho;
-			for(var obj in praga.tamanho ){
-				var tam=praga.tamanho[obj];
-				tam['id']=$scope.mCountTamanhos;
-				tamanhos.push(tam);
-
-				count_tamanho++;
-				$scope.mCountTamanhos++;
-			}
-			if(tamanhos.length==1)
-			{
-				praga['colspan']=2;			
-				praga['class']='text-right';			
-			}
-			else
-			{
-				praga['colspan']=1;
-				praga['class']='text-center';	
-			}
-			praga['primeiro_tamanho']=primeiro_tamanho;
-			praga['tamanhos']=tamanhos;
-			$scope.todasPragas.push(praga);
-			$scope.pragasExibir = $scope.todasPragas;
-		});
-
-	}
+					count_tamanho++;
+					$scope.mCountTamanhos++;
+				}
+				if(tamanhos.length==1)
+				{
+					praga['colspan']=2;			
+					praga['class']='text-right';			
+				}
+				else
+				{
+					praga['colspan']=1;
+					praga['class']='text-center';	
+				}
+				praga['primeiro_tamanho']=primeiro_tamanho;
+				praga['tamanhos']=tamanhos;
+				$scope.todasPragas.push(praga);
+				$scope.pragasExibir = $scope.todasPragas;
+			});
+		}
 
 		//############################################################################################################################
 		//############################################################################################################################
@@ -364,7 +273,6 @@ function initMap() {
 					refNovo.on('child_added', function(snap) {
 
 						$('#myPleaseWait').modal('hide');
-						//console.log('Adicionou filial', snap.name(), snap.val());
 						var obj= snap.val();
 						$scope.fazendas.push(obj.filial);
 
@@ -380,7 +288,6 @@ function initMap() {
 					});
 
 					refNovo.on('child_changed', function(snap) {
-						//console.log('Houve uma atualização', snap.name(), snap.val());
 						var objNovo= snap.val();
 
 						var x=0;
@@ -399,20 +306,19 @@ function initMap() {
 					});
 
 					refNovo.on('child_removed', function(snap) {
-						//console.log('Houve uma remoção', snap.name(), snap.val());
 						atualizaListaFiliais();
 					});
 					if($scope.fazendas.length==0)
 					{
 						$('#myPleaseWait').modal('hide');
 					}
-			});// final do load
-		}
-		
+				});
+		}		
 
 		$scope.chengeSafra = function(){
 			atualizaListaQuadras();
 		};
+
 		$scope.chengeFazenda = function(fazenda){
 			$scope.ordsers=[];
 
@@ -432,17 +338,12 @@ function initMap() {
 				});
 				if (posicao == null && objNovo.aplagr) {
 					$scope.ordsers.push(objNovo);
-					//$scope.gridOptions.data = $scope.ordsers;
 				}
 				if (!$scope.$$phase) {
 					$scope.$apply();
 				}
 			});
-
-
-
 		};
-
 
 		$scope.setaFazenda = function(fazenda){
 			if(fazenda === null) return false;
@@ -453,8 +354,8 @@ function initMap() {
 					$scope.data.fazenda = item;		
 				}
 			});
-
 		};
+
 		$scope.addPragasEncontradas = function(praga){
 			var encontrou=false;
 			$scope.pragasEncontradasGeral.forEach(function(item){
@@ -468,16 +369,13 @@ function initMap() {
 				$scope.pragasEncontradasGeral.push(praga);
 			}	
 		};
-		$scope.exibirSomenteEncontradas = function(){
-			if($scope.exibirSomenteEn)
-			{
-				$scope.pragasExibir=$scope.pragasEncontradasGeral;
-			}
-			else
-			{
-				$scope.pragasExibir=$scope.todasPragas;
-			}
-		}
+
+
+
+		//############################################################################################################################
+		//############################################################################################################################
+		//LISTA VISTORIAS, SERVE PRO RESUMO E MAPA E OUTROS
+		//############################################################################################################################
 
 		function atualizaVistorias()
 		{
@@ -492,57 +390,58 @@ function initMap() {
 				{"key":"$key.$value","alias":"vistoria"},
 				{"key":"quadra.$value","alias":"quadra"}
 				).ref();
-		//----	
-		refVis.ref().on('child_added', function(snap) 
-		{
-			var obj2= snap.val();
-			var mListVariedades=[];
-			for(var itemQuadraXsafra in $scope.quadras )
-			{
-				if($scope.quadras[itemQuadraXsafra].quadraxcultura.key==obj2.quadra.key)
+				//----	
+				refVis.ref().on('child_added', function(snap) 
 				{
-					obj2.quadra.ativo=$scope.quadras[itemQuadraXsafra].quadraxcultura.ativo;
-					obj2.quadra['key_cultura']=$scope.quadras[itemQuadraXsafra].quadraxcultura.key_cultura;
-					if($scope.quadras[itemQuadraXsafra].quadraxcultura.hasOwnProperty("separar_variedade")){
-
-						if($scope.quadras[itemQuadraXsafra].quadraxcultura.separar_variedade==true)
-						{
-							for(var var_quadraxsafra in $scope.quadras[itemQuadraXsafra].quadraxcultura.variedades ){
-								console.log("teste");
-								mListVariedades.push(var_quadraxsafra);
-							}
-						}
-					}
-					break;
-				}
-			}
-
-			if($scope.fazenda.mosdes==true || obj2.quadra.ativo==true)
-			{
-				if(mListVariedades.length>0)//SEPARA POR VARIEDADE, FAZ DESSE JEITO
-				{
-					for(var keyVar in mListVariedades) 
+					var obj2= snap.val();
+					var mListVariedades=[];
+					for(var itemQuadraXsafra in $scope.quadras )
 					{
-
-						var obj=clone(obj2);
-						for(var obj_variedades_cultura in $scope.variedades) 
+						if($scope.quadras[itemQuadraXsafra].quadraxcultura.key==obj2.quadra.key)
 						{
-							var obj_varCul=$scope.variedades[obj_variedades_cultura];
-							for(var obj_variedades in obj_varCul) 
-							{
+							obj2.quadra.ativo=$scope.quadras[itemQuadraXsafra].quadraxcultura.ativo;
+							obj2.quadra['key_cultura']=$scope.quadras[itemQuadraXsafra].quadraxcultura.key_cultura;
+							if($scope.quadras[itemQuadraXsafra].quadraxcultura.hasOwnProperty("separar_variedade")){
+
+								if($scope.quadras[itemQuadraXsafra].quadraxcultura.separar_variedade==true)
 								{
-									if(obj_varCul[obj_variedades].key == mListVariedades[keyVar])
-									{ 
-										obj.quadra.nome=obj.quadra.nome + ' - ' + obj_varCul[obj_variedades].nome;
-										obj['variedade']=obj_varCul[obj_variedades];
-										break;
+									for(var var_quadraxsafra in $scope.quadras[itemQuadraXsafra].quadraxcultura.variedades ){
+										console.log("teste");
+										mListVariedades.push(var_quadraxsafra);
 									}
-								};
+								}
 							}
 							break;
 						}
+					}
 
-						var count_usuarios=0;
+					if($scope.fazenda.mosdes==true || obj2.quadra.ativo==true)
+					{
+						//----
+						if(mListVariedades.length>0)//SEPARA POR VARIEDADE, FAZ DESSE JEITO
+						{
+							for(var keyVar in mListVariedades) 
+							{
+
+								var obj=clone(obj2);
+								for(var obj_variedades_cultura in $scope.variedades) 
+								{
+									var obj_varCul=$scope.variedades[obj_variedades_cultura];
+									for(var obj_variedades in obj_varCul) 
+									{
+										{
+											if(obj_varCul[obj_variedades].key == mListVariedades[keyVar])
+											{ 
+												obj.quadra.nome=obj.quadra.nome + ' - ' + obj_varCul[obj_variedades].nome;
+												obj['variedade']=obj_varCul[obj_variedades];
+												break;
+											}
+										};
+									}
+									break;
+								}
+
+								var count_usuarios=0;
 
 						//--------USUARIO-----------------------------------
 						var objeto_vistoria=obj.vistoria[mListVariedades[keyVar]];
@@ -705,7 +604,21 @@ function initMap() {
 
 												obj['datOrdser']= new Date(objExe.data);
 												obj['datOrdserExtenso']= formatDate(dataExecucao);
-												obj['datOrdserIntervalo']=  dataExecucao.getDate() - (new Date(dataMilis)).getDate();
+												if($scope.fazenda.tipintapl!=null)//Se esta definido no cadastro da filial que tem um tipo
+												{
+													if($scope.fazenda.tipintapl=='Data atual')
+													{
+														obj['datOrdserIntervalo']=  $scope.diferencaData(dataExecucao, new Date());													
+													}
+													else
+													{
+														obj['datOrdserIntervalo']=  $scope.diferencaData(dataExecucao, new Date(dataMilis));
+													}
+												}
+												else
+												{
+													obj['datOrdserIntervalo']=  $scope.diferencaData(dataExecucao, new Date(dataMilis));
+												}
 											}
 										}
 									});
@@ -920,7 +833,22 @@ function initMap() {
 
 												obj['datOrdser']= new Date(objExe.data);
 												obj['datOrdserExtenso']= formatDate(dataExecucao);
-												obj['datOrdserIntervalo']=  dataExecucao.getDate() - (new Date(dataMilis)).getDate();
+
+												if($scope.fazenda.tipintapl!=null)//Se esta definido no cadastro da filial que tem um tipo
+												{
+													if($scope.fazenda.tipintapl=='Data atual')
+													{
+														obj['datOrdserIntervalo']=  $scope.diferencaData(dataExecucao, new Date());													
+													}
+													else
+													{
+														obj['datOrdserIntervalo']=  $scope.diferencaData(dataExecucao, new Date(dataMilis));
+													}
+												}
+												else
+												{
+													obj['datOrdserIntervalo']=  $scope.diferencaData(dataExecucao, new Date(dataMilis));
+												}
 											}
 										}
 									});
@@ -954,29 +882,30 @@ function initMap() {
 
 
 			});
-		//----
-		refVis.on('child_changed', function(snap) {
-			console.log('Houve uma atualização', snap.name(), snap.val());
-			var objNovo= snap.val();
+			//----
+			refVis.on('child_changed', function(snap) {
+				console.log('Houve uma atualização', snap.name(), snap.val());
+				var objNovo= snap.val();
 
-			var x=0;
-			var posicao=null;
-			$scope.vistorias.forEach(function(obj){
-				if(obj.$id === objNovo.$id)
-				{ 
-					posicao=x;
-				}
-				x++;
+				var x=0;
+				var posicao=null;
+				$scope.vistorias.forEach(function(obj){
+					if(obj.$id === objNovo.$id)
+					{ 
+						posicao=x;
+					}
+					x++;
+
+				});
+				if(posicao!=null)
+					$scope.vistorias[posicao]=objNovo;
 
 			});
-			if(posicao!=null)
-				$scope.vistorias[posicao]=objNovo;
-
-		});
-	}
+		}
 
 		//############################################################################################################################
 		//############################################################################################################################
+		//LISTA QUADRAS
 		//############################################################################################################################
 
 		function atualizaListaQuadras()
@@ -1044,8 +973,15 @@ function initMap() {
 			});// final do load1
 		}
 
+		//############################################################################################################################
+		//############################################################################################################################
+		//MAPAS
+		//############################################################################################################################
+		
+
 		var contador_anterior=0;
 		var contador_correto=0;
+
 		$scope.pragaAnterior=function()
 		{
 			contador_anterior=0;
@@ -1068,6 +1004,7 @@ function initMap() {
 		}
 
 		var proximo=false;
+
 		$scope.pragaProxima=function()
 		{
 			$scope.pragasExibir.forEach(function(obj)
@@ -1109,6 +1046,8 @@ function initMap() {
 				$('#modalMensagem').modal('show');
 				return true;
 			}
+
+
 			if(heatmap!=null)
 			{
 				heatmap.setMap(null);
@@ -1118,7 +1057,7 @@ function initMap() {
 
 			initMapInfestacao();
 
-
+			//---------------
 			if($scope.formMapa.intesidade==null)
 			{
 				$scope.formMapa.intesidade=20;
@@ -1134,6 +1073,12 @@ function initMap() {
 					$scope.formMapa.intesidade=50;
 				}
 			}
+
+			if(checkLocalHistoryCompatibilidade())
+			{
+				window.localStorage.setItem('intensidadeHeatMap', $scope.formMapa.intesidade);
+			}
+			//---------------
 			$scope.todascoordenadasCentroidMapaInfestacao=[];
 			$scope.quadras.forEach(function(obj)
 			{
@@ -1202,8 +1147,6 @@ function initMap() {
 				map: map_infestacao,
 				radius: $scope.formMapa.intesidade
 			});
-
-
 		}
 
 		function atualizaCoordenadasQuadra(vistoria, qdteRegistro)
@@ -1234,7 +1177,7 @@ function initMap() {
 				if(qdteRegistro==i)
 				{
 					$('#myPleaseWait').modal('hide');
-					setaCoordenadas2(vistoria, todascoordenadasCentroidQuadraEspecifica, todascoordenadasQuadraEspecifica);
+					setaCoordenadasPontos(vistoria, todascoordenadasCentroidQuadraEspecifica, todascoordenadasQuadraEspecifica);
 
 				}
 
@@ -1278,16 +1221,18 @@ function initMap() {
 
 					var region = new Region(todascoordenadasCentroidQuadraEspecifica);	
 
-					var marker = new google.maps.Marker({
-						position: new google.maps.LatLng(region.centroid().x, region.centroid().y),
-						map: map_infestacao,
-						label: '',
-						title: nome_quadra
-					});
-					marker.addListener('click', function() {
-						infowindow.open(map_infestacao, marker);
-					});
-
+					if($scope.exibirNomeQuadra)
+					{
+						var marker = new google.maps.Marker({
+							position: new google.maps.LatLng(region.centroid().x, region.centroid().y),
+							map: map_infestacao,
+							label: '',
+							title: nome_quadra
+						});
+						marker.addListener('click', function() {
+							infowindow.open(map_infestacao, marker);
+						});
+					}
 					setaCoordenadasMapaInfestacao($scope.todascoordenadasCentroidMapaInfestacao, todascoordenadasQuadraEspecifica);
 
 				}
@@ -1299,6 +1244,7 @@ function initMap() {
 
 		$scope.abrirMapa = function(vistoria) {
 			$('#myPleaseWait').modal('show');
+
 			var refCoordenadas = new Firebase(Constant.Url + '/coordenada/'+ vistoria.quadra.key);
 			refCoordenadas.on('value', function(snapshot) {
 				if(snapshot.numChildren()>0)
@@ -1307,7 +1253,7 @@ function initMap() {
 				}
 				else
 				{
-					setaCoordenadas2(vistoria, null, null);
+					setaCoordenadasPontos(vistoria, null, null);
 				}
 
 			});
@@ -1339,8 +1285,6 @@ function initMap() {
 
 				var region = new Region(todascoordenadasCentroidQuadraEspecifica);			
 				$scope.centerMapa=new google.maps.LatLng(region.centroid().x, region.centroid().y);
-				//initMap(new google.maps.LatLng(region.centroid().x, region.centroid().y), 14);		
-				//$('#modalMapa').modal('show');
 			}
 
 			if(!$scope.$$phase) 
@@ -1356,12 +1300,9 @@ function initMap() {
 			var region = new Region($scope.todascoordenadasCentroidMapaInfestacao);	
 			map_infestacao.setCenter(new google.maps.LatLng(region.centroid().x, region.centroid().y))	;
 			map_infestacao.setZoom(12);	
-			//initMapInfestacao(new google.maps.LatLng(region.centroid().x, region.centroid().y), 14);
 		}
 
-		
-
-		function setaCoordenadas2(vistoria, todascoordenadasCentroid, todascoordenadasQuadraEspecifica)
+		function setaCoordenadasPontos(vistoria, todascoordenadasCentroid, todascoordenadasQuadraEspecifica)
 		{
 			console.log('setaCoordenadas');
 
@@ -1420,13 +1361,10 @@ function initMap() {
 
 		$scope.efetuaSelecionarTodasQuadras = function()
 		{
-
 			$scope.selecionarTodasQuadras=true;
 			$scope.quadras.forEach(function(obj){
 				$scope.formMapa.quadras.push(obj.quadra);
-			});	
-			
-
+			});		
 		}
 
 		$scope.DesEfetuaSelecionarTodasQuadras= function()
@@ -1440,16 +1378,70 @@ function initMap() {
 			$scope.selecionarTodasQuadras=false;;
 		}
 
-		function getRandomColor() {
-			var letters = '0123456789ABCDEF';
-			var color = '#';
-			for (var i = 0; i < 6; i++) {
-				color += letters[Math.floor(Math.random() * 16)];
+		$scope.setaExibirSomenteEncontradas = function()
+		{
+			if($scope.exibirSomenteEn)
+			{
+				if(checkLocalHistoryCompatibilidade())
+				{
+					window.localStorage.setItem('exibirSomentePragasEncontradas', 'S');
+				}
+				$scope.pragasExibir=$scope.pragasEncontradasGeral;
 			}
-			return color;
+			else
+			{
+				if(checkLocalHistoryCompatibilidade())
+				{
+					window.localStorage.setItem('exibirSomentePragasEncontradas', 'N');
+				}
+				$scope.pragasExibir=$scope.todasPragas;
+			}
 		}
 
 
+		$scope.setaExibirNomeQuadras = function()
+		{
+			if($scope.exibirNomeQuadra)
+			{
+				if(checkLocalHistoryCompatibilidade())
+				{
+					window.localStorage.setItem('exibirNomeQuadra', 'S');
+				}
+			}
+			else
+			{
+				if(checkLocalHistoryCompatibilidade())
+				{
+					window.localStorage.setItem('exibirNomeQuadra', 'N');
+				}
+			}
+			$scope.gerarMapa();
+		}
+		//############################################################################################################################
+		//############################################################################################################################
+		//RECUPERA NOME QUADRA/CULTURA
+		//############################################################################################################################
+		$scope.getCulturaNome = function(culturaId){
+			var retorno = '';
+			$scope.culturas.forEach(function(item){
+				if(item.key === culturaId) retorno = item.nome;
+			});
+			return retorno;
+		};
+
+		$scope.getQuadraNome = function(quadraId){
+			var retorno = '';
+			$scope.quadras.forEach(function(item){
+				if(item.$id === quadraId) retorno = item.nome;
+			});
+			return retorno;
+		};
+
+
+		//############################################################################################################################
+		//############################################################################################################################
+		//UTILIZADES
+		//############################################################################################################################
 		function formatDate(date) {
 			var d = new Date(date),
 			month = '' + (d.getMonth() + 1),
@@ -1493,31 +1485,6 @@ function initMap() {
 			return 0;
 		}
 
-		$(document).on('click', '.panel-heading span.clickable', function(e){
-			var $this = $(this);
-			if(!$this.hasClass('panel-collapsed')) {
-				$this.parents('.panel').find('.panel-body').slideUp();
-				$this.addClass('panel-collapsed');
-				$this.find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
-			} else {
-				$this.parents('.panel').find('.panel-body').slideDown();
-				$this.removeClass('panel-collapsed');
-				$this.find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
-			}
-		})
-
-		//############################################################################################################################
-		//############################################################################################################################
-		//RECUPERA NOME QUADRA/CULTURA
-		//############################################################################################################################
-		$scope.getCulturaNome = function(culturaId){
-			var retorno = '';
-			$scope.culturas.forEach(function(item){
-				if(item.key === culturaId) retorno = item.nome;
-			});
-			return retorno;
-		};
-
 		$scope.diferencaData = function(a,b)
 		{
 
@@ -1533,22 +1500,114 @@ function initMap() {
 			{
 				return resultado 
 			}
-/*
-			var resultado=Math.round((new Date(a)-new Date(b))/(1000*60*60*24));
-			if(resultado<0 || isNaN(resultado))
-				return 0;
-			else
-				resultado;
-			*/
 		}
 
-		$scope.getQuadraNome = function(quadraId){
-			var retorno = '';
-			$scope.quadras.forEach(function(item){
-				if(item.$id === quadraId) retorno = item.nome;
-			});
-			return retorno;
+		function checkLocalHistoryCompatibilidade(){
+			var test = 'test';
+			try {
+				localStorage.setItem(test, test);
+				localStorage.removeItem(test);
+				return true;
+			} catch(e) {
+				return false;
+			}
+		}
+
+
+
+		//UTILIZADES MAPA
+		//############################################################################################################################
+		
+		$('#modalMapa').on('shown.bs.modal', function () {
+			google.maps.event.trigger(map, "resize");
+			map.setCenter($scope.centerMapa);
+		});
+
+		function initMap(center, zoom){
+
+			var mapOptions = {
+				zoom: zoom,
+				center: center,
+				mapTypeId: google.maps.MapTypeId.HYBRID
+			}
+
+			var mapOptions2 = {
+				zoom: zoom,
+				center: center,
+				mapTypeId: 'terrain'
+			}
+
+			map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+			map_infestacao = new google.maps.Map(document.getElementById('map_infestacao'), mapOptions2);
 		};
+
+		function initMapInfestacao(center, zoom){
+
+			var mapOptions = {
+				center: center,
+				mapTypeId: 'terrain'
+			}
+
+
+			map_infestacao = new google.maps.Map(document.getElementById('map_infestacao'), mapOptions);
+		};
+
+
+
+		function Point(x, y) {
+			this.x = x;
+			this.y = y;
+		}
+
+		function Region(points) {
+			this.points = points || [];
+			this.length = points.length;
+		}
+
+		Region.prototype.area = function () {
+			var area = 0,
+			i,
+			j,
+			point1,
+			point2;
+
+			for (i = 0, j = this.length - 1; i < this.length; j = i, i += 1) {
+				point1 = this.points[i];
+				point2 = this.points[j];
+				area += point1.x * point2.y;
+				area -= point1.y * point2.x;
+			}
+			area /= 2;
+
+			return area;
+		};
+
+		Region.prototype.centroid = function () {
+			var x = 0,
+			y = 0,
+			i,
+			j,
+			f,
+			point1,
+			point2;
+
+			for (i = 0, j = this.length - 1; i < this.length; j = i, i += 1) {
+				point1 = this.points[i];
+				point2 = this.points[j];
+				f = point1.x * point2.y - point2.x * point1.y;
+				x += (point1.x + point2.x) * f;
+				y += (point1.y + point2.y) * f;
+			}
+
+			f = this.area() * 6;
+
+			return new Point(x / f, y / f);
+		};
+
+		initMap(new google.maps.LatLng(-20, -55), 4 );
+
+
 	}
 
 
