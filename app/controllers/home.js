@@ -1107,7 +1107,7 @@ function initMap() {
 			}
 			else
 			{
-				$scope.gotoAnchor('map_infestacao');
+				//$scope.gotoAnchor('map_infestacao');
 			}
 
 
