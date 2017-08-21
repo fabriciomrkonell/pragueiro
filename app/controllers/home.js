@@ -1519,14 +1519,14 @@ function initMap() {
   	var date1 = new Date(a);
   	var date2 = new Date(b);
   	var timeDiff = Math.abs(date2.getTime() - date1.getTime());
-  	var  resultado= Math.ceil(timeDiff / (1000 * 3600 * 24));
+  	var  resultado= Math.ceil(timeDiff / (24 * 60 * 60 * 1000));
   	if(resultado<0 || isNaN(resultado))
   	{
   		return 0;
   	}
   	else
   	{
-  		return resultado 
+  		return resultado -1
   	}
   }
 

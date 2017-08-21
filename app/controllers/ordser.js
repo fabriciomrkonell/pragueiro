@@ -899,7 +899,7 @@ $scope.chengeFazenda = function(fazenda) {
 		});
 		if (posicao == null) {
 			$scope.todasTipatis.forEach(function(obj2) {
-				if (objNovo.key_tipati === obj2.key) {
+				if (obj2.key!=null && objNovo.key_tipati === obj2.key) {
 					objNovo['tipati'] = obj2;
 				}
 			});
@@ -1599,12 +1599,14 @@ $scope.adicionarExecucao = function(data, data_execucao) {
 	data_execucao['key'] = refOrdserExe.push().key();
 	data_execucao['key_ordser'] = data.key;
 	data_execucao['key_equipamento'] = data_execucao.equipamento.key;
+	data_execucao['key_safra'] = data.key_safra;
 	data_execucao['key_funcionario'] = data_execucao.funcionario.key;
 	if(data_execucao.quadra!=null)
 	{
 		data_execucao['key_quadra'] = data_execucao.quadra.key;
 	}
 	data_execucao.data = new Date(data_execucao.data).getTime();
+	data_execucao['data_string'] = formatDate(new Date(data_execucao.data));
 	var refOrdser = new Firebase(Constant.Url + '/ordser/' + data.fazenda.key + '/' + data.key + '/execucoes/' + 	data_execucao.key);
 	var execucaoTmp = clone(data_execucao);
 	if(execucaoTmp.area==null)
@@ -1620,6 +1622,11 @@ $scope.adicionarExecucao = function(data, data_execucao) {
 
 	refOrdser.set(execucaoTmp);
 
+	if($scope.data.aplagr!=null && $scope.data.aplagr)
+	{
+		var refOrdserQuadra = new Firebase(Constant.Url + '/quadra/' + data_execucao.quadra.key + '/aplicacoes/' + data.key_safra + '/' + data_execucao['key'] );
+		refOrdserQuadra.set(execucaoTmp);
+	}
 
 	$scope.todosExecucoesOrdser.push(clone(data_execucao));
 
@@ -1629,7 +1636,7 @@ $scope.adicionarExecucao = function(data, data_execucao) {
 
 	$scope.horas_total += data_execucao.quahor;
 
-	Notify.successBottom('Execucao inserido com sucesso!');
+	Notify.successBottom('Execução inserida com sucesso!');
 	$scope.data.fazenda = fazendaTmp;
 };
 //-------------------------------------------------------------------
@@ -1640,6 +1647,7 @@ $scope.questionaExcluirExecucao = function(row) {
 		return;
 	}
 	$scope.key_execucao = row.entity.key;
+	$scope.key_execucao_quadra = row.entity.key_quadra;
 	$('#modalDeleteExecucao').modal('show');
 };
 //-------------------------------------------------------------------
@@ -1654,7 +1662,14 @@ $scope.excluirExecucao = function() {
 	if ($scope.data != null && $scope.data.fazenda != null && $scope.key_execucao != null) {
 		var refOrdserNovo = new Firebase(Constant.Url + '/ordser/' + $scope.data.fazenda.key + '/' + $scope.data.key + '/execucoes/' + $scope.key_execucao);
 		refOrdserNovo.remove();
-		Notify.successBottom('Execucao removido com sucesso!');
+
+		if($scope.data.aplagr!=null && $scope.data.aplagr)
+		{
+			var refOrdserNovo = new Firebase(Constant.Url + '/quadra/' + $scope.key_execucao_quadra + '/aplicacoes/' + $scope.data.key_safra + '/' + $scope.key_execucao);
+			refOrdserNovo.remove();
+		}		
+
+		Notify.successBottom('Execução removida com sucesso!');
 
 		var i = 0;
 		var posicao_deletar;
@@ -1842,6 +1857,18 @@ function zeroFill(number, width) {
 		return new Array(width + (/\./.test(number) ? 2 : 1)).join('0') + number;
 	}
 	return number + "";
+}
+
+function formatDate(date) {
+	var d = new Date(date),
+	month = '' + (d.getMonth() + 1),
+	day = '' + d.getDate(),
+	year = d.getFullYear();
+
+	if (month.length < 2) month = '0' + month;
+	if (day.length < 2) day = '0' + day;
+
+	return [day, month, year].join('/');
 }
 
 
