@@ -1,0 +1,78 @@
+<div ng-controller="acessoCtrl">
+	<div class="container container-view">
+		<div class="row">
+			<div class="col-sm-4 col-sm-no-bottom">
+				<label>Painel de Acessos</label>
+			</div>
+		</div>
+		<hr/>
+		<div class="row">
+			<div class="col-sm-6 col-sm-no-bottom">
+
+				<label>Data</label>
+
+				<input type="date" class="form-control"  ng-model="filtro.data">
+				<br>
+				<button type="button" class="btn btn-success"  ng-click="gerarConsulta()">Gerar Consulta</button>
+			</div>
+		</div>
+		<hr/>
+		<div class="row">
+			<div class="col-sm-5">
+				<form class="form-signin" role="form">
+					<div class="form-group">
+						<label>Data</label>
+						<input type="date" class="form-control" ng-disabled="temexecucoes"  ng-model="data.acesso.data">
+					</div>
+					<div class="form-group">
+						<label>Usuário</label>
+						<input type="text" class="form-control" placeholder="Nome" ng-model="data.usuario.nome" />
+					</div>
+					
+					<div class="form-group">
+						<label>Key</label>
+						<input type="text" class="form-control" placeholder="Telefone" ng-model="data.usuario.key"  phone/>
+					</div>
+					<div class="form-group">
+						<label>Erro:</label>
+						<textarea ng-model="data.acesso.acesso" style="width:460px; height:1000px;">
+							{{data.acesso.acesso}}
+						</textarea>
+					</div>
+					
+					
+				</form>
+			</div>
+			<div class="col-sm-7">
+				
+				<div ui-grid="gridOptions" ui-grid-selection class="gridAcessos"></div>
+
+
+			</div>
+		</div>
+	</div>
+	
+	<!-- Modal Start here-->
+	<div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"
+	role="dialog" aria-hidden="true" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">
+					<span class="glyphicon glyphicon-time">
+					</span>&nbsp;&nbsp;Aguarde, carregando...
+				</h4>
+			</div>
+			<div class="modal-body">
+				<div class="progress">
+					<div class="progress-bar progress-bar-info
+					progress-bar-striped active"
+					style="width: 100%">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+<!-- Modal ends Here -->
+</div>

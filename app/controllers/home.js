@@ -47,6 +47,7 @@ function initMap() {
 
 
 		angular.extend($scope, {
+			versao: '1.09',
 			quadras: [],
 			culturas:[],
 			vistorias:[],
@@ -103,6 +104,7 @@ function initMap() {
 		$scope.mCountTamanhos = 0;
 		$scope.mCont = 0;
 
+		gravarAcesso();
 		atualizaListaFiliais();
 		atualizaCulturas();
 		atualizaUsuarios();
@@ -146,6 +148,24 @@ function initMap() {
 		//############################################################################################################################
 		// BASICOS, NECESSARIOS PARA OS OUTROS
 		//############################################################################################################################
+
+		function gravarAcesso()
+		{
+			if(Session.getUser().uid!=null)
+			{
+				var refAcessos = new Firebase(Constant.Url + '/informacoes/' + Session.getUser().uid + '/acessos' );
+
+				var acesso=[];
+				acesso['key'] = refAcessos.push().key();
+				acesso['data'] = new Date().getTime();
+				acesso['key_usuario'] = Session.getUser().uid;
+				acesso['versao'] = $scope.versao;
+				acesso['tipo'] = 'WEB';
+				var refAcessosGravar = new Firebase(Constant.Url + '/informacoes/' + Session.getUser().uid + '/acessos/'+acesso['key']  );
+
+				refAcessosGravar.set(acesso);
+			}
+		}
 
 
 		function atualizaCulturas()

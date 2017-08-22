@@ -32,6 +32,11 @@
         resolve: {
           deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/erros.js'])
         }
+      }).when('/acessos', {
+        templateUrl: '/views/partials/acessos.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/acessos.js'])
+        }
       }).when('/fazenda', {
         templateUrl: '/views/partials/fazenda.html',
         resolve: {
