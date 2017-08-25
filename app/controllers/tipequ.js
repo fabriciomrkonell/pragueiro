@@ -2,29 +2,28 @@
 
 	'use strict';
 
-	angular.module('Pragueiro.controllers').registerCtrl('equipamentoCtrl', equipamentoCtrl);
+	angular.module('Pragueiro.controllers').registerCtrl('tipequCtrl', tipequCtrl);
 
-	equipamentoCtrl.$inject = ['$scope', '$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Notify'];
+	tipequCtrl.$inject = ['$scope', '$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Notify'];
 
-	function equipamentoCtrl($scope, $firebaseArray, $firebaseObject, Session, Constant, Notify) {
+	function tipequCtrl($scope, $firebaseArray, $firebaseObject, Session, Constant, Notify) {
 
 		angular.extend($scope, {
 			edit: false,
 			save: true,
 			desabilitaFazenda: false,
 			fazendas: [],
-			equipamentos: [],
-			equipamentoFilial: [],
+			tipequs: [],
+			tipequFilial: [],
 			data: {
-				ativo:true,
-				perimp:true				
+				ativo: true		
 			}
 		});
 
-		var ref = new Firebase(Constant.Url + '/equipamento');
-		$scope.todasEquipamentos = $firebaseArray(ref);
+
+		var ref = new Firebase(Constant.Url + '/tipequ');
+		$scope.todasTipequs = $firebaseArray(ref);
 		//var refFazendas = new Firebase(Constant.Url + '/filial');
-		$scope.tipequs=[];
 		atualizaListaFiliais();
 
 		$scope.gridOptions = { 
@@ -38,43 +37,12 @@
 
 			columnDefs : [
 			{ field: "codigo", displayName: "Código", width: 80 },
-			{ field: "nome", displayName: "Nome", width: 200 },
-			{ field: "key_combustivel", displayName: "Combustível", width: 120 ,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValueComb(row)}}</div>" },
-			{ field: "consumo", displayName: "Consumo", width: 100 },
-			{ field: "ativo", displayName: "Ativo", width: 80,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" },
+			{ field: "nome", displayName: "Nome", width: 240 },
+			{ field: "ativo", displayName: "Ativo", width: 150,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" },
 			],
 			appScopeProvider: {
 				mapValue: function(row) {
 					return row.entity.ativo ? 'Sim' : 'Não';
-				},
-				mapValueComb: function(row) {
-					if(row.entity.key_combustivel=='1')
-					{
-						return 'Gasolina';
-					}
-					if(row.entity.key_combustivel=='2')
-					{
-						return 'Álcool';
-					}
-					if(row.entity.key_combustivel=='3')
-					{
-						return 'Energia';
-					}
-					if(row.entity.key_combustivel=='4')
-					{
-						return '';
-					}
-					if(row.entity.key_combustivel=='5')
-					{
-						return 'Diesel';
-					}
-
-					else
-					{
-						return '';
-					}
-
-
 				}
 			}
 			
@@ -118,31 +86,20 @@
 					).ref();
 
 					var i=0;
-					
 					refNovo.on('child_added', function(snap) {
-						
+						$('#myPleaseWait').modal('hide');
 
 						//console.log('Adicionou filial', snap.name(), snap.val());
 						var obj= snap.val();
-						//recuperaTipequi(obj);
-
 						$scope.fazendas.push(obj.filial);
-
 						if(i==0)
 						{
 							$scope.chengeFazenda($scope.fazendas[0]);
 							$scope.data.fazenda=$scope.fazendas[0];
 						}
-
-
 						if(!$scope.$$phase) {
 							$scope.$apply();
 						}
-
-						
-
-						
-
 					});
 
 					refNovo.on('child_changed', function(snap) {
@@ -175,56 +132,29 @@
 			});// final do load
 		}		
 
-		$scope.chengeFazenda = function(fazenda){
+		$scope.chengeFazenda = function(fazenda)
+		{
 			if(fazenda === null) 
 			{
-				$scope.equipamentos =null;
+				$scope.tipequs =null;
 			}
 			else
-			{			
-				$('#myPleaseWait').modal('show');	
+			{				
 
+				//$('#myPleaseWait').modal('show');
 
 				$scope.tipequs=[];
 
-				if(fazenda.tipequ!=null)
-				{
-					var listTipequ= castObjToArray(fazenda.tipequ);
-					var qtd_tipequ=listTipequ.length;
-					for (var propertyName in fazenda.tipequ) 
-					{
-						var refTipequ = new Firebase(Constant.Url );
-
-						refTipequ.child('tipequ').child(propertyName).once('value', function(snapshot) {
-							$scope.tipequs.push(snapshot.val());
-							if($scope.tipequs.length==qtd_tipequ)
-							{
-								$('#myPleaseWait').modal('hide');
-								if(!$scope.$$phase) {
-									$scope.$apply();
-								}
-							}
-						}, function(error) {
-							console.error(error);
-						});							
-					}
-				}
-				else
-				{
-					$('#myPleaseWait').modal('hide');
-				}
-
-				$scope.equipamentos=[];
-
 				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
 				var refNovoQuadra = new Firebase.util.NormalizedCollection(
-					baseRef.child("/filial/"+fazenda.key+"/equipamento"),
-					[baseRef.child("/equipamento"), "$key"]
+					baseRef.child("/filial/"+fazenda.key+"/tipequ"),
+					[baseRef.child("/tipequ"), "$key"]
 					).select(
-					{"key":"equipamento.$value","alias":"filial"},
-					{"key":"$key.$value","alias":"equipamentos"}
+					{"key":"tipequ.$value","alias":"filial"},
+					{"key":"$key.$value","alias":"tipequs"}
 					).ref();
-/*
+
+					/*
 					refNovoQuadra.on('value', function(snapshot) {
 						if(snapshot.numChildren()==0)
 						{
@@ -233,17 +163,13 @@
 					});
 					*/
 					refNovoQuadra.on('child_added', function(snap) {
-
+						$('#myPleaseWait').modal('hide');
 						var objNovo= snap.val();
-						$scope.equipamentos.push(objNovo['equipamentos']);
+						$scope.tipequs.push(objNovo['tipequs']);
 						if(!$scope.$$phase) {
 							$scope.$apply();
 						}
-						$scope.gridOptions.data = $scope.equipamentos;
-
-						
-
-
+						$scope.gridOptions.data=$scope.tipequs;
 					});
 
 					refNovoQuadra.on('child_changed', function(snap) {
@@ -251,8 +177,8 @@
 						var objNovo= snap.val();
 						var x=0;
 						var posicao=null;
-						$scope.equipamentos.forEach(function(obj){
-							if(obj.key === objNovo['equipamentos'].key)
+						$scope.tipequs.forEach(function(obj){
+							if(obj.key === objNovo['tipequs'].key)
 							{ 
 								posicao=x;
 							}
@@ -260,7 +186,7 @@
 
 						});
 						if(posicao!=null)
-							$scope.equipamentos[posicao]=objNovo['equipamentos'];
+							$scope.tipequs[posicao]=objNovo['tipequs'];
 
 						if(!$scope.$$phase) {
 							$scope.$apply();
@@ -271,79 +197,11 @@
 						$scope.chengeFazenda($scope.data.fazenda);
 					});
 
-					//-------------------------------------------------------------------
-
-
+					
 
 				}
 			};
 
-			//-------------------------------------------------------------------
-			function recuperaTipequis(fazenda) {
-				if (fazenda === null) {
-					$scope.todosTipequs = null;
-				} else 
-				{
-					$scope.todosTipequs = [];
-					var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
-					var refTipatiNovo = new Firebase.util.NormalizedCollection(
-						baseRef.child("/filial/" + fazenda.key + "/tipequ"), [baseRef.child("/tipequ"), "$key"]
-						).select({
-							"key": "tipequ.$value",
-							"alias": "filial"
-						}, {
-							"key": "$key.$value",
-							"alias": "tipequs"
-						}).ref();
-
-						refTipatiNovo.on('child_added', function(snap) {
-							$('#myPleaseWait').modal('hide');
-							var objNovo = snap.val();
-							$scope.todosTipequs.push(objNovo['tipequs']);
-							if (!$scope.$$phase) {
-								$scope.$apply();
-							}
-						});
-
-						refTipatiNovo.on('child_changed', function(snap) {
-							$('#myPleaseWait').modal('hide');
-							var objNovo = snap.val();
-							var x = 0;
-							var posicao = null;
-							$scope.todosTipequs.forEach(function(obj) {
-								if (obj.key === objNovo['tipequs'].key) {
-									posicao = x;
-								}
-								x++;
-
-							});
-							if (posicao != null)
-								$scope.todosTipequs[posicao] = objNovo['tipequs'];
-
-							if (!$scope.$$phase) {
-								$scope.$apply();
-							}
-						});
-
-						refTipatiNovo.on('child_removed', function(snap) {
-							var x = 0;
-							var posicao = null;
-							$scope.todasTipatis.forEach(function(obj) {
-								if (obj.key === objNovo['tipequs'].key) {
-									posicao = x;
-								}
-								x++;
-
-							});
-							if (posicao != null)
-								delete $scope.todasTipatis[posicao];
-
-						});
-
-
-
-					}
-				}
 
 
 
@@ -355,36 +213,36 @@
 
 		
 
-		$scope.getDadosEquipamento = function(obj, nomeColuna){
+		$scope.getDadosTipequ = function(obj, nomeColuna){
 			var retorno = '';
 			if(nomeColuna=='nome')
 			{
-				$scope.todasEquipamentos.forEach(function(item){
+				$scope.todasTipequs.forEach(function(item){
 					if(item.$id === obj.$id) retorno = item['nome'];
 				});
 			}
 			if(nomeColuna=='codigo')
 			{
-				$scope.todasEquipamentos.forEach(function(item){
+				$scope.todasTipequs.forEach(function(item){
 					if(item.$id === obj.$id) retorno = item['codigo'];
 				});
 			}
 			if(nomeColuna=='ativo')
 			{
-				$scope.todasEquipamentos.forEach(function(item){
+				$scope.todasTipequs.forEach(function(item){
 					if(item.$id === obj.$id) retorno = item['ativo'];
 				});
 			}
 			if(nomeColuna=='coordenadas')
 			{
-				$scope.todasEquipamentos.forEach(function(item){
+				$scope.todasTipequs.forEach(function(item){
 					if(item.$id === obj.$id) retorno = item['coordenadas'];
 				});
 			}
 			return retorno;
 		};
 
-		$scope.salvarEquipamento = function(data){
+		$scope.salvarTipequ = function(data){
 			if(validForm(data)) return false;
 
 			var fazendaTmp=data.fazenda;
@@ -392,32 +250,34 @@
 			delete data.$$hashKey;	
 			data['filial']=[];
 			data['filial'][fazendaTmp.key]=true;
-			var refEquipamento = new Firebase(Constant.Url + '/equipamento/');
-			var key=refEquipamento.push().key();
-			var refEquipamentoNovo = new Firebase(Constant.Url + '/equipamento/'+key);
+			var refTipequ = new Firebase(Constant.Url + '/tipequ/');
+			var key=refTipequ.push().key();
+			var refTipequNovo = new Firebase(Constant.Url + '/tipequ/'+key);
 			data.key=key;
-			refEquipamentoNovo.set(data);
-			var refEquipamentoNovo = new Firebase(Constant.Url + '/filial/'+fazendaTmp.key + '/equipamento/'+key);
-			refEquipamentoNovo.set(true);
+			refTipequNovo.set(data);
+			var refTipequNovo = new Firebase(Constant.Url + '/filial/'+fazendaTmp.key + '/tipequ/'+key);
+			refTipequNovo.set(true);
 			$scope.chengeFazenda(fazendaTmp);
 			$scope.clear();						
 			$scope.setaFazenda(fazendaTmp);	
 
-			Notify.successBottom('Equipamento inserida com sucesso!');
+			Notify.successBottom('Tipo Equipamento inserida com sucesso!');
+
+
 
 		};
 
-		$scope.editarEquipamento = function(data){
+		$scope.editarTipequ = function(data){
 			if(validForm(data)) return false;
 			var fazendaTmp=data.fazenda;
 			delete data.fazenda;
 			delete data.$$hashKey;		
-			var refEquipamento = new Firebase(Constant.Url + '/equipamento/'+data.key);
-			refEquipamento.set(data);
+			var refTipequ = new Firebase(Constant.Url + '/tipequ/'+data.key);
+			refTipequ.set(data);
 			data.fazenda=fazendaTmp;
 			$scope.clear();
 
-			Notify.successBottom('Equipamento atualizada com sucesso!');
+			Notify.successBottom('Tipo Equipamento atualizada com sucesso!');
 		};
 
 		$scope.cancelar = function(){
@@ -426,7 +286,7 @@
 			$scope.setaFazenda(fazendaTmp);	
 			$scope.chengeFazenda($scope.data.fazenda);	
 			$scope.edit = false;
-			$scope.save = true;
+			$scope.save= true;
 		};
 
 		$scope.editar = function(obj){
@@ -435,7 +295,7 @@
 			$scope.data = obj;
 			$scope.data.fazenda=fazendaTmp;
 			$scope.edit = true;
-			$scope.save = false;
+			$scope.save= false;
 
 			$scope.desabilitaFazenda=true;		
 
@@ -443,30 +303,27 @@
 
 		$scope.excluir = function(objeto){
 			$('#modalDelete').modal('show');
-		}
+		};
 
-		$scope.excluirEquipamento = function(objeto){
+		$scope.excluirTipequ = function(objeto){
 			$('#modalDelete').modal('hide');
-			if(objeto!=null && $scope.data.fazenda!=null)
+			var fazendaTmp=$scope.data.fazenda;
+			if(objeto.qtd!=null)
 			{
-				var fazendaTmp=$scope.data.fazenda;
-				if(objeto.qtd!=null)
+				if(objeto.qtd>0)
 				{
-					if(objeto.qtd>0)
-					{
-						setMessageError('Já foi associado em equipamento. Impossível continuar.');
-						return true;
-					}
-				}			
+					setMessageError('Já foi associado em Atividades. Impossível continuar.');
+					return true;
+				}
+			}		
 
-				var refEquipamentoNovo = new Firebase(Constant.Url + '/equipamento/'+objeto.key);
-				refEquipamentoNovo.remove();
-				var refEquipamentoNovo = new Firebase(Constant.Url + '/equipamento/'+ $scope.data.fazenda.key + '/equipamento/'+objeto.key);
-				refEquipamentoNovo.remove();						
-				Notify.successBottom('Equipamento removida com sucesso!');
-				$scope.chengeFazenda(fazendaTmp);
-				$scope.cancelar();
-			}
+			var refTipequNovo = new Firebase(Constant.Url + '/tipequ/'+objeto.key);
+			refTipequNovo.remove();
+			var refTipequNovo = new Firebase(Constant.Url + '/filial/'+ $scope.data.fazenda.key + '/tipequ/'+objeto.key);
+			refTipequNovo.remove();			
+			Notify.successBottom('Tipo Equipamento removida com sucesso!');
+			$scope.chengeFazenda(fazendaTmp);
+			$scope.cancelar();
 			return true;
 			
 		};
@@ -498,15 +355,8 @@
 			if(data.fazenda==null || data.fazenda.key == null){
 				setMessageError('O campo fazenda é inválido!');
 				return true;
-			}	
-
-
-			if(data.key_tipequ== null || data.key_tipequ === ''){
-				setMessageError('O campo nome é Tipo Equipamento é obrigatório!');
-				return true;
-			}
-
-
+			}			
+			
 			if(data.nome === ''){
 				setMessageError('O campo nome é inválido!');
 				return true;
@@ -515,10 +365,7 @@
 				setMessageError('O campo ativo é inválido!');
 				return true;
 			}
-			if(data.coordenadas === ''){
-				setMessageError('O campo coordenada é inválido!');
-				return true;
-			}
+			
 			return false;
 		};
 		
@@ -526,22 +373,14 @@
 			//var fazendaTmp=$scope.data.fazenda;
 			angular.extend($scope.data, {
 				ativo: true,
-				key_tipequ: '',
 				nome: '',
-				marca: '',
-				obs: '',
-				consumo: '',
 				qtd:0,
 				codigo: '',
-				key:'',
-				perimp:true,
-				implemento:false,
-				chassi:''
+				key:''
 			});
 			//$scope.data.fazenda=fazendaTmp;
 			$scope.desabilitaFazenda=false;
 			$scope.edit=false;
-			$scope.save = true;
 			if(!$scope.$$phase) {
 				$scope.$apply();
 			}
@@ -549,22 +388,6 @@
 			//$scope.data.fazenda=fazendaTmp;
 		};
 		
-		function castObjToArray(myObj)
-		{
-			if(myObj==null)
-			{
-				var sem_nada=[];
-				return sem_nada;
-			}
-			else
-			{
-				var array = $.map(myObj, function(value, index) {
-					return [value];
-				});
-				return array;
-
-			}
-		}
 
 		//$scope.clear();
 

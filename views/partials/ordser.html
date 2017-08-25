@@ -204,7 +204,7 @@
 				<div class="tab-pane" id="3a">
 					<div class="row">
 						<div class="form-group col-sm-2">
-							<b><p class="alinhado_direito">Equipamentos*</p></b>
+							<b><p class="alinhado_direito">Equipamento*</p></b>
 						</div>
 						<div class="form-group col-sm-4">
 							<select class="form-control" ng-model="data_equipamento" ng-change="chengeEquipamento()" ng-disabled="desabilitaQuadras" ng-options="equipamento as (equipamento.nome) for equipamento in todosEquipamentos">
@@ -237,7 +237,7 @@
 							<input type="date" class="form-control" ng-model="data_execucao.data">
 						</div>	
 						<div class="form-group col-sm-2">
-							<b><p class="alinhado_direito">Equipamentos*</p></b>
+							<b><p class="alinhado_direito">Equipamento*</p></b>
 						</div>
 						<div class="form-group col-sm-2 col-sm-no-bottom">
 							<select class="form-control" ng-model="data_execucao.equipamento" ng-disabled="desabilitaQuadras" ng-options="equipamento as (equipamento.nome) for equipamento in todosEquipamentosOrdser">
@@ -262,7 +262,7 @@
 							<input type="number" class="form-control" placeholder="" ng-model="data_execucao.quahor" />
 						</div>
 						<div class="form-group col-sm-2">
-							<b><p class="alinhado_direito">Quadra</p></b>
+							<b><p class="alinhado_direito">Quadra/região</p></b>
 						</div>
 						<div class="form-group col-sm-2 col-sm-no-bottom">
 							<select class="form-control" ng-model="data_execucao.quadra" ng-change="chengeQuadraExecucao()"ng-disabled="desabilitaQuadras" ng-options="quadra as (quadra.nome) for quadra in todasQuadrasOrdser">

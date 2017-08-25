@@ -135,8 +135,10 @@
 							$scope.erros.sort(compare);
 						}
 					}
-					$scope.$apply();
 					$scope.gridOptions.data = $scope.erros;
+					if (!$scope.$$phase) {
+						$scope.$apply();
+					}
 				});
 
 				refNovo.on('child_changed', function(snap) {

@@ -127,184 +127,184 @@
 			});
 		};
 
-		//############################################################################################################################
-		// GRID QUADRAS
-		//############################################################################################################################
-		$scope.todasQuadrasOrdser = [];
+//############################################################################################################################
+// GRID QUADRAS
+//############################################################################################################################
+$scope.todasQuadrasOrdser = [];
 
-		$scope.gridOptionsQuadras = {
-			enableRowSelection: true,
-			enableRowHeaderSelection: false,
+$scope.gridOptionsQuadras = {
+	enableRowSelection: true,
+	enableRowHeaderSelection: false,
 
-			enableColumnResizing: true,
+	enableColumnResizing: true,
 
-			multiSelect: false,
-			modifierKeysToMultiSelect: false,
+	multiSelect: false,
+	modifierKeysToMultiSelect: false,
 
-			columnDefs: [
-			{
-				field: "codigo",
-				displayName: "Código",
-				width: 100
-			}, 
-			{
-				field: "nome",
-				displayName: "Nome",
-				width: 300
-			}, 
-			{
-				field: "area",
-				displayName: "Area",
-				width: 300,
-				cellFilter: 'number: 2'
-			}, 
-			{
-				name: 'Retirar',
-				enableColumnMenu: false,
-				width: 70,
-				cellTemplate: '<div class="cell_personalizada_excluir"><button class="btn btn-danger btn-xs" ng-click="grid.appScope.questionaExcluirQuadra(row)"><i class="glyphicon glyphicon-remove"></i>	</button></div>'
-			}]
-		};
+	columnDefs: [
+	{
+		field: "codigo",
+		displayName: "Código",
+		width: 100
+	}, 
+	{
+		field: "nome",
+		displayName: "Nome",
+		width: 300
+	}, 
+	{
+		field: "area",
+		displayName: "Area",
+		width: 300,
+		cellFilter: 'number: 2'
+	}, 
+	{
+		name: 'Retirar',
+		enableColumnMenu: false,
+		width: 70,
+		cellTemplate: '<div class="cell_personalizada_excluir"><button class="btn btn-danger btn-xs" ng-click="grid.appScope.questionaExcluirQuadra(row)"><i class="glyphicon glyphicon-remove"></i>	</button></div>'
+	}]
+};
 
-		//############################################################################################################################
-		// GRID EQUIPAMENTOS
-		//############################################################################################################################
-		$scope.todosEquipamentosOrdser = [];
+//############################################################################################################################
+// GRID EQUIPAMENTOS
+//############################################################################################################################
+$scope.todosEquipamentosOrdser = [];
 
-		$scope.gridOptionsEquipamentos = {
-			enableRowSelection: true,
-			enableRowHeaderSelection: false,
+$scope.gridOptionsEquipamentos = {
+	enableRowSelection: true,
+	enableRowHeaderSelection: false,
 
-			enableColumnResizing: true,
+	enableColumnResizing: true,
 
-			multiSelect: false,
-			modifierKeysToMultiSelect: false,
+	multiSelect: false,
+	modifierKeysToMultiSelect: false,
 
-			columnDefs: [
-			{
-				field: "codigo",
-				displayName: "Código",
-				width: 100
-			},
-			{
-				field: "nome",
-				displayName: "Nome",
-				width: 300
-			}, 
-			{
-				field: "consumo",
-				displayName: "Consumo",
-				width: 300
-			}, 
-			{
-				name: 'Retirar',
-				enableColumnMenu: false,
-				width: 70,
-				cellTemplate: '<div class="cell_personalizada_excluir"><button class="btn btn-danger btn-xs" ng-click="grid.appScope.questionaExcluirEquipamento(row)"><i class="glyphicon glyphicon-remove"></i>	</button></div>'
-			}
-			]
-		};
+	columnDefs: [
+	{
+		field: "codigo",
+		displayName: "Código",
+		width: 100
+	},
+	{
+		field: "nome",
+		displayName: "Nome",
+		width: 300
+	}, 
+	{
+		field: "consumo",
+		displayName: "Consumo",
+		width: 300
+	}, 
+	{
+		name: 'Retirar',
+		enableColumnMenu: false,
+		width: 70,
+		cellTemplate: '<div class="cell_personalizada_excluir"><button class="btn btn-danger btn-xs" ng-click="grid.appScope.questionaExcluirEquipamento(row)"><i class="glyphicon glyphicon-remove"></i>	</button></div>'
+	}
+	]
+};
 
-		//############################################################################################################################
-		// GRID PRODUTOS
-		//############################################################################################################################
-		$scope.todosProdutosOrdser = [];
+//############################################################################################################################
+// GRID PRODUTOS
+//############################################################################################################################
+$scope.todosProdutosOrdser = [];
 
-		$scope.gridOptionsProdutos = {
-			enableRowSelection: true,
-			enableRowHeaderSelection: false,
+$scope.gridOptionsProdutos = {
+	enableRowSelection: true,
+	enableRowHeaderSelection: false,
 
-			enableColumnResizing: true,
+	enableColumnResizing: true,
 
-			multiSelect: false,
-			modifierKeysToMultiSelect: false,
+	multiSelect: false,
+	modifierKeysToMultiSelect: false,
 
-			columnDefs: [
-			{
-				field: "codigo",
-				displayName: "Código",
-				width: 100
-			}, 
-			{
-				field: "nome",
-				displayName: "Nome",
-				width: 300
-			}, 
-			{
-				field: "dose",
-				displayName: "Dose",
-				width: 300
-			}, 
-			{
-				field: "quatot",
-				displayName: "Qtde Total",
-				width: 300,
-				cellFilter: 'number: 2'
-			}, 
-			{
-				name: 'Retirar',
-				enableColumnMenu: false,
-				width: 70,
-				cellTemplate: '<div class="cell_personalizada_excluir"><button class="btn btn-danger btn-xs" ng-click="grid.appScope.questionaExcluirProduto(row)"><i class="glyphicon glyphicon-remove"></i>	</button></div>'
-			}]
-		};
+	columnDefs: [
+	{
+		field: "codigo",
+		displayName: "Código",
+		width: 100
+	}, 
+	{
+		field: "nome",
+		displayName: "Nome",
+		width: 300
+	}, 
+	{
+		field: "dose",
+		displayName: "Dose",
+		width: 300
+	}, 
+	{
+		field: "quatot",
+		displayName: "Qtde Total",
+		width: 300,
+		cellFilter: 'number: 2'
+	}, 
+	{
+		name: 'Retirar',
+		enableColumnMenu: false,
+		width: 70,
+		cellTemplate: '<div class="cell_personalizada_excluir"><button class="btn btn-danger btn-xs" ng-click="grid.appScope.questionaExcluirProduto(row)"><i class="glyphicon glyphicon-remove"></i>	</button></div>'
+	}]
+};
 
-			//############################################################################################################################
-		// GRID EXECUCAO
-		//############################################################################################################################
-		$scope.todosExecucoesOrdser = [];
+//############################################################################################################################
+// GRID EXECUCAO
+//############################################################################################################################
+$scope.todosExecucoesOrdser = [];
 
-		$scope.gridOptionsExecucoes = {
-			enableRowSelection: true,
-			enableRowHeaderSelection: false,
+$scope.gridOptionsExecucoes = {
+	enableRowSelection: true,
+	enableRowHeaderSelection: false,
 
-			enableColumnResizing: true,
+	enableColumnResizing: true,
 
-			multiSelect: false,
-			modifierKeysToMultiSelect: false,
+	multiSelect: false,
+	modifierKeysToMultiSelect: false,
 
-			columnDefs: [
-			{
-				field: "data",
-				displayName: "Data",
-				type: 'date',
-				cellFilter: 'date:"dd/MM/yyyy"',
-				width: 130
-			}, 
-			{
-				field: "equipamento.nome",
-				displayName: "Equipamento",
-				width: 120
-			}, 
-			{
-				field: "funcionario.nome",
-				displayName: "Operador",
-				width: 120
-			}, 
-			{
-				field: "quahor",
-				displayName: "Qtde Horas",
-				width: 120,
-				cellFilter: 'number: 2'
-			}, 
-			{
-				field: "quadra.nome",
-				displayName: "Quadra",
-				width: 120
-			}, 
-			{
-				field: "area",
-				displayName: "Area",
-				width: 120,
-				cellFilter: 'number: 2'
-			}, 
-			{
-				name: 'Retirar',
-				enableColumnMenu: false,
-				width: 70,
-				cellTemplate: '<div class="cell_personalizada_excluir"><button class="btn btn-danger btn-xs" ng-click="grid.appScope.questionaExcluirExecucao(row)"><i class="glyphicon glyphicon-remove"></i>	</button></div>'
-			}]
-		};
+	columnDefs: [
+	{
+		field: "data",
+		displayName: "Data",
+		type: 'date',
+		cellFilter: 'date:"dd/MM/yyyy"',
+		width: 130
+	}, 
+	{
+		field: "equipamento.nome",
+		displayName: "Equipamento",
+		width: 120
+	}, 
+	{
+		field: "funcionario.nome",
+		displayName: "Operador",
+		width: 120
+	}, 
+	{
+		field: "quahor",
+		displayName: "Qtde Horas",
+		width: 120,
+		cellFilter: 'number: 2'
+	}, 
+	{
+		field: "quadra.nome",
+		displayName: "Quadra",
+		width: 120
+	}, 
+	{
+		field: "area",
+		displayName: "Area",
+		width: 120,
+		cellFilter: 'number: 2'
+	}, 
+	{
+		name: 'Retirar',
+		enableColumnMenu: false,
+		width: 70,
+		cellTemplate: '<div class="cell_personalizada_excluir"><button class="btn btn-danger btn-xs" ng-click="grid.appScope.questionaExcluirExecucao(row)"><i class="glyphicon glyphicon-remove"></i>	</button></div>'
+	}]
+};
 
 //############################################################################################################################
 //############################################################################################################################

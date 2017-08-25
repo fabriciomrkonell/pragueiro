@@ -83,6 +83,11 @@
         resolve: {
           deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/tipati.js'])
         }
+      }).when('/tipequ', {
+        templateUrl: '/views/partials/tipequ.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/tipequ.js'])
+        }
       }).when('/equipamento', {
         templateUrl: '/views/partials/equipamento.html',
         resolve: {

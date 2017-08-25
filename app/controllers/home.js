@@ -47,7 +47,7 @@ function initMap() {
 
 
 		angular.extend($scope, {
-			versao: '1.1',
+			versao: '1.2',
 			quadras: [],
 			culturas:[],
 			vistorias:[],
@@ -153,7 +153,7 @@ function initMap() {
 		{
 			if(Session.getUser().uid!=null)
 			{
-				var refAcessos = new Firebase(Constant.Url + '/informacoes/' + Session.getUser().uid + '/acessos' );
+				var refAcessos = new Firebase(Constant.Url + '/informacoes/' + Session.getUser().uid + '/acessos_web' );
 
 				var acesso=[];
 				acesso['key'] = refAcessos.push().key();
@@ -161,7 +161,7 @@ function initMap() {
 				acesso['key_usuario'] = Session.getUser().uid;
 				acesso['versao'] = $scope.versao;
 				acesso['tipo'] = 'WEB';
-				var refAcessosGravar = new Firebase(Constant.Url + '/informacoes/' + Session.getUser().uid + '/acessos/'+acesso['key']  );
+				var refAcessosGravar = new Firebase(Constant.Url + '/informacoes/' + Session.getUser().uid + '/acessos_web/'+acesso['key']  );
 
 				refAcessosGravar.set(acesso);
 			}
@@ -1213,6 +1213,10 @@ function initMap() {
 				map: map_infestacao,
 				radius: $scope.formMapa.intesidade
 			});
+
+
+			
+			
 			
 		}
 

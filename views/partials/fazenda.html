@@ -10,7 +10,7 @@
 
 		<div class="row">
 			<div class="col-sm-5">
-				<button type="button" class="btn btn-success" ng-show="save" ng-click="salvarFazenda(data)">Salvar</button>
+				<button type="button" class="btn btn-success" ng-disabled="true" ng-show="save" ng-click="salvarFazenda(data)">Salvar</button>
 				<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarFazenda(data)">Atualizar</button>
 				<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar/Novo</button>
 				<button type="button" class="btn btn-default btn-warning" ng-disabled="!edit" ng-click="getUsuarios(data)">Permissões</button>

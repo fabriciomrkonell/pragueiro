@@ -18,6 +18,9 @@
 			data: {
 				ativo: true,
 				aplagr: false,
+				aplagr: false,
+				plantio: false,
+				colheita: false,
 				quahor: 0			
 			}
 		});
@@ -383,6 +386,8 @@
 				codigo: '',
 				key:'',
 				aplagr: false,
+				plantio: false,
+				colheita: false,
 				quahor:0
 			});
 			//$scope.data.fazenda=fazendaTmp;

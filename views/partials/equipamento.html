@@ -48,11 +48,36 @@
 						</div>
 					</div>
 					<div class="form-group">
+						<label>Tipo Equipamento*</label>
+						<select class="form-control"  ng-model="data.key_tipequ"  ng-options="tipequ.key as (tipequ.nome) for tipequ in tipequs"> >							
+							<option></option>
+						</select>
+					</div>	
+
+					<div class="row">
+						<div class="col-sm-5">
+							<div class="form-group">
+								<input type="checkbox"  ng-disabled="data.implemento" ng-model="data.perimp"
+								ng-true-value="true" ng-false-value="false">	
+								<label>Permite implemento</label>						
+							</div>								
+						</div>
+						<div class="col-sm-5">
+							<div class="form-group">
+								<input type="checkbox"  ng-disabled="data.perimp" ng-model="data.implemento"
+								ng-true-value="true" ng-false-value="false">	
+								<label>É um implemento</label>						
+							</div>	
+						</div>
+					</div>
+
+
+					<div class="form-group">
 						<label>Código</label>
 						<input type="text" class="form-control" placeholder="Código" ng-model="data.codigo" />
 					</div>	
 					<div class="form-group">
-						<label>Nome</label>
+						<label>Nome/Modelo</label>
 						<input type="text" class="form-control" placeholder="Nome" ng-model="data.nome" />
 					</div>						
 
@@ -94,6 +119,11 @@
 					<div class="form-group">
 						<label>Observação</label>
 						<input type="text" class="form-control" placeholder="Observação" ng-model="data.obs" />
+					</div>	
+
+					<div class="form-group">
+						<label>Chassi/Nro Série</label>
+						<input type="text" class="form-control" placeholder="Chassi" ng-model="data.chassi" />
 					</div>	
 
 					

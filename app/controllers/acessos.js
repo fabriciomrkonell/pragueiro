@@ -48,6 +48,7 @@
 
 			columnDefs : [
 			{ field: "acesso.data", displayName: "Data",  type: 'date', cellFilter: 'date:"dd/MM/yyyy HH:mm:ss"', width: 150 },
+			{ field: "acesso_web.data", displayName: "Data",  type: 'date', cellFilter: 'date:"dd/MM/yyyy HH:mm:ss"', width: 150 },
 			{ field: "acesso.versao", displayName: "Ver", width: 50 },
 			{ field: "usuario.nome", displayName: "Nome", width: 100 },
 			{ field: "usuario.email", displayName: "E-mail", width: 170 },
@@ -96,6 +97,8 @@
 			$('#myPleaseWait').modal('show');
 
 			$scope.acessos=[];
+
+
 			var baseRef = new Firebase(Constant.Url);
 			var refNovo = new Firebase.util.NormalizedCollection(
 				baseRef.child("/informacoes"),
@@ -121,9 +124,7 @@
 						var obj_puro=array[array.length-1];
 
 
-					//for(var propertyName in obj.informacoes.acessos) {
 						var obj_acesso=[];
-						//obj.informacoes.acessos[propertyName]['key']=propertyName;
 						obj_acesso['acesso']=obj_puro;
 						var data_datetime =new Date(obj_puro.data);
 						obj_acesso['data']=data_datetime;
@@ -145,11 +146,47 @@
 							$scope.acessos.push(obj_acesso);
 							$scope.acessos.sort(compare);
 						}
-					//}
-				}
-				$scope.$apply();
-				$scope.gridOptions.data = $scope.acessos;
-			});
+
+					}
+
+					if(obj.informacoes.acessos_web!=null)
+					{
+						var array2 = $.map(obj.informacoes.acessos_web, function(value, index) {
+							return [value];
+						})
+
+
+						var obj_puro2=array2[array2.length-1];
+						var obj_acesso_web=[];
+						obj_acesso_web['acesso_web']=obj_puro2;
+						var data_datetime =new Date(obj_puro2.data);
+						obj_acesso_web['data']=data_datetime;
+						obj_acesso_web['versao']=obj_puro2.versao;
+						if(obj_puro2.tipo==null)
+						{
+							obj_acesso_web['tipo']='APP';
+						}
+						else
+						{
+							obj_acesso_web['tipo']='WEB';
+						}
+
+						obj_acesso_web['data_str']= new Date(data_datetime);
+						if(obj_acesso_web['data_str']> $scope.filtro.data)
+						{
+							obj_acesso_web['usuario']=obj.usuario;							
+
+							$scope.acessos.push(obj_acesso_web);
+							$scope.acessos.sort(compare);
+						}
+						
+					}
+					
+					$scope.gridOptions.data = $scope.acessos;
+					if (!$scope.$$phase) {
+						$scope.$apply();
+					}
+				});
 
 				refNovo.on('child_changed', function(snap) {
 
