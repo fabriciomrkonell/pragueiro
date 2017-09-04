@@ -16,7 +16,6 @@
 				<select class="form-control" ng-disabled=desabilitaFazenda ng-options="fazenda.nome for fazenda in fazendas" ng-model="data.fazenda" ng-change="chengeFazenda(data.fazenda)">
 					<option value="">Selecione</option>
 				</select>
-
 			</div>
 		</div>
 		<hr/>
@@ -110,7 +109,7 @@
 						<input type="text" class="form-control" placeholder="Observação" ng-disabled="temexecucoes" ng-model="data.obs" />
 					</div>	
 					<div class="row">
-						<div class="col-sm-6 col-sm-no-bottom">
+						<div class="col-sm-4 col-sm-no-bottom">
 							<div class="form-group">
 
 								<label>Área Total</label>
@@ -119,13 +118,23 @@
 
 							</div>	
 						</div>
-						<div class="col-sm-6 col-sm-no-bottom">
+						<div class="col-sm-4 col-sm-no-bottom">
 							<div class="form-group">
 
 								<label>Horas Trabalhadas</label>
 								<br />
 								<label>{{horas_total.toFixed(2)}}</label>
 
+							</div>	
+						</div>
+
+						<div class="col-sm-4 col-sm-no-bottom">
+							<div class="form-group">
+
+								<label>Área realizada</label>
+								<br />
+								<label ng-show="area_total_executada<=0 || area_total_executada==null">0</label>
+								<label ng-show="area_total_executada>0">{{area_total_executada.toFixed(2)}} ha / {{per_total_executada.toFixed(2)}} %</label>
 							</div>	
 						</div>
 					</div>
@@ -161,15 +170,43 @@
 							<b><p class="alinhado_direito">Quadra/Região*</p></b>
 						</div>
 						<div class="form-group col-sm-4">
-							<select class="form-control" ng-model="data_quadra" ng-disabled="desabilitaQuadras" ng-options="pl as (pl.quadra.nome) for pl in todosPlanejamento">
+
+							<select class="form-control" ng-model="data_quadra" ng-change="chengeQuadra(data_quadra)" ng-disabled="desabilitaQuadras" ng-options="pl as (pl.quadra.nome) for pl in todosPlanejamento">
 								<option></option>
 							</select>
+
+
 						</div>
+
+						<div class="" ng-show= "data_quadra.variedades.length>0 && (data.plantio || data.colheita)" >
+
+							<div class="form-group col-sm-1">
+								<b><p class="alinhado_direito">Variedade</p></b>
+							</div>
+							<div class="form-group col-sm-3">
+
+								<select class="form-control" ng-model="data_variedade" ng-change="chengeVariedade(data_variedade)" ng-disabled="desabilitaQuadras" ng-options="pl as (pl.nome) for pl in variedadesTmp">
+									<option></option>
+								</select>
+							</div>
+						</div>
+
+					</div>
+					<div class="row">
+						<div class="form-group col-sm-2 col-sm-no-bottom">
+							<b><p class="alinhado_direito">Área</p></b>
+						</div>
+						<div class="form-group col-sm-3 col-sm-no-bottom">
+							<input type="number" class="form-control" placeholder="" ng-model="data_quadra_area" ng-disabled="true" />
+						</div>
+
+
+
 						<button type="button" class="btn btn-default btn-xm"   ng-disabled="desabilitaQuadras" ng-click="adicionarQuadra(data, data_quadra)">
 							<i class="glyphicon glyphicon-plus-sign"></i>												
 						</button>
 					</div>
-
+					<br />
 					<div class="row">
 						<div ui-grid="gridOptionsQuadras" ui-grid-selection class="gridOrdserQuadras"></div>	
 					</div>
@@ -240,11 +277,23 @@
 							<b><p class="alinhado_direito">Equipamento*</p></b>
 						</div>
 						<div class="form-group col-sm-2 col-sm-no-bottom">
-							<select class="form-control" ng-model="data_execucao.equipamento" ng-disabled="desabilitaQuadras" ng-options="equipamento as (equipamento.nome) for equipamento in todosEquipamentosOrdser">
+							<select class="form-control" ng-model="data_execucao.equipamento" ng-change="chengeEquipamentoExecucao()"  ng-disabled="desabilitaQuadras" ng-options="equipamento as (equipamento.nome) for equipamento in todosEquipamentosNaoImplementoOrdser">
 								<option></option>
 							</select>
 						</div>
-						<div class="col-sm-1 col-sm-no-bottom">
+						<div ng-show="exibeImplemento">
+							<div class="col-sm-1 col-sm-no-bottom" >
+								<b><p class="alinhado_direito">Implemento</p></b>
+							</div>
+							<div class="form-group col-sm-2 col-sm-no-bottom">
+								<select class="form-control" ng-model="data_execucao.implemento" ng-disabled="desabilitaQuadras" ng-options="implemento as (implemento.nome) for implemento in todosEquipamentosImplementoOrdser">
+									<option></option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-2 col-sm-no-bottom">
 							<b><p class="alinhado_direito">Operador*</p></b>
 						</div>
 						<div class="form-group col-sm-2 col-sm-no-bottom">
@@ -252,24 +301,38 @@
 								<option></option>
 							</select>
 						</div>
-					</div>
-					<div class="row">
-
 						<div class="form-group col-sm-2 col-sm-no-bottom">
 							<b><p class="alinhado_direito">Quantidade Horas*</p></b>
 						</div>
 						<div class="form-group col-sm-2 col-sm-no-bottom">
 							<input type="number" class="form-control" placeholder="" ng-model="data_execucao.quahor" />
 						</div>
+					</div>
+					<br >
+					<div class="row">
+
+
 						<div class="form-group col-sm-2">
 							<b><p class="alinhado_direito">Quadra/região</p></b>
 						</div>
 						<div class="form-group col-sm-2 col-sm-no-bottom">
-							<select class="form-control" ng-model="data_execucao.quadra" ng-change="chengeQuadraExecucao()"ng-disabled="desabilitaQuadras" ng-options="quadra as (quadra.nome) for quadra in todasQuadrasOrdser">
+							<select class="form-control" ng-model="data_execucao.quadra" ng-disabled="desabilitaQuadras" ng-change="chengeQuadraExecucao()" ng-options="quadra as (quadra.nome) for quadra in todasQuadrasOrdser | unique:'key_quadra'">
 								<option></option>
 							</select>
 						</div>
-						<div class="col-sm-1 col-sm-no-bottom">
+						<div class="" ng-show= "variedadesTmpExecucao.length>0 && (data.plantio || data.colheita)" >
+							<div class="form-group col-sm-2 col-sm-no-bottom">
+								<b><p class="alinhado_direito">Variedade</p></b>
+							</div>
+							<div class="form-group col-sm-3">
+								<select class="form-control" ng-model="data_execucao.variedade" ng-change="chengeVariedadeExecucao(data_execucao.variedade)" ng-disabled="desabilitaQuadras" ng-options="pl as (pl.nome) for pl in variedadesTmpExecucao">
+									<option></option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-sm-2">
 							<b><p class="alinhado_direito">Area Total</p></b>
 						</div>
 						<div class="form-group col-sm-2 col-sm-no-bottom">
@@ -281,12 +344,31 @@
 
 					</div>
 					<br />
-					<div class="form-group">
-						<input type="checkbox" ng-show="true" ng-disabled="true" ng-model="data.aplagr"
-						ng-true-value="true" ng-false-value="false">	
-						<label>Aplicação de Agrotóxico</label>						
-					</div>		
+					<div class="row">
+						<div class="col-sm-2 col-sm-no-bottom">
+							<div class="form-group alinhado_direito">
+								<input type="checkbox" ng-show="true" ng-disabled="true" ng-model="data.aplagr"
+								ng-true-value="true" ng-false-value="false">	
+								<label>Aplic. de Agrotóxico</label>						
+							</div>	
+						</div>	
+						<div class="col-sm-4 col-sm-no-bottom">
+							<div class="form-group alinhado_direito">
+								<input type="checkbox" ng-show="true" ng-disabled="true" ng-model="data.plantio"
+								ng-true-value="true" ng-false-value="false">	
+								<label>Plantio</label>						
+							</div>	
+						</div>	
+						<div class="col-sm-4 col-sm-no-bottom">
+							<div class="form-group alinhado_direito">
+								<input type="checkbox" ng-show="true" ng-disabled="true" ng-model="data.colheita"
+								ng-true-value="true" ng-false-value="false">	
+								<label>Colheita</label>						
+							</div>	
+						</div>	
+					</div>
 					<br />
+
 					<div class="row">
 						<div ui-grid="gridOptionsExecucoes" ui-grid-selection class="gridOrdserExecucao"></div>	
 					</div>

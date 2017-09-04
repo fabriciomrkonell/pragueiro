@@ -5,7 +5,7 @@ if(ref.getAuth() === null) window.location.href = '/login';
 
 
 angular.module('Pragueiro.controllers', [ 'firebase', 'ngSanitize', 'googlechart',  'angularGeoFire', 
-	'ui.grid', 'ui.grid.pagination', 'ui.grid.selection', 'ui.grid.edit', 'ui.grid.resizeColumns', 'ngMap', 'checklist-model'])
+	'ui.grid', 'ui.grid.pagination', 'ui.grid.selection', 'ui.grid.edit', 'ui.grid.resizeColumns', 'ngMap', 'checklist-model', 'angular.filter'])
 //'uiGmapgoogle-maps'
 /*
 .config(['uiGmapGoogleMapApiProvider', function (GoogleMapApi) {

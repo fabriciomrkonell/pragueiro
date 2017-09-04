@@ -11,6 +11,7 @@
 		angular.extend($scope, {
 			edit: false,
 			save: true,
+
 			editarcodigo: true,
 			temquadras: false,
 			temprodutos: false,
@@ -33,12 +34,31 @@
 			}
 		});
 
-
 		$scope.situacoes = ['Aberto', 'Iniciado', 'Finalizado'];
-
+		$scope.exibeImplemento = false;
 		$scope.numeracao_codigo = 1;
 		$scope.area_total = 0;
-		$scope.horas_total =0;
+		$scope.horas_total = 0;
+		$scope.area_total_executada = 0;
+		$scope.per_total_executada = 0;
+
+		$scope.qtde_tipatis  = 0;
+		$scope.qtde_equipes = 0;
+		$scope.qtde_equipamentos = 0;
+		$scope.qtde_quadras = 0;
+		$scope.qtde_produtos = 0;
+		$scope.qtde_funcionarios  = 0;
+		$scope.qtde_variedades = 0;
+
+		$scope.todasTipatis = [];
+		$scope.todasEquipes  = [];
+		$scope.todasQuadras  = [];
+		$scope.todosProdutos  = [];
+		$scope.todosEquipamentos  = [];
+		$scope.todosFuncionarios  = [];
+		$scope.todasVariedades = [];
+
+		$scope.variedadesTmp = [];
 
 		$scope.activetab = 'dashboard';
 		var ref = new Firebase(Constant.Url + '/filial');
@@ -46,86 +66,92 @@
 		atualizaListaFiliais();
 		var fazendaSelecioanda;
 
+//############################################################################################################################
+// GRID ORDSER
+//############################################################################################################################
 
-		$scope.gridOptions = {
-			enableRowSelection: true,
-			enableRowHeaderSelection: false,
+$scope.gridOptions = {
+	enableRowSelection: true,
+	enableRowHeaderSelection: false,
 
-			enableColumnResizing: true,
+	enableColumnResizing: true,
 
-			multiSelect: false,
-			modifierKeysToMultiSelect: false,
+	multiSelect: false,
+	modifierKeysToMultiSelect: false,
 
-			columnDefs: [
-			{
-				field: "codigo",
-				displayName: "Código",
-				width: 80
-			}, 
-			{
-				field: "datpre",
-				displayName: "Dat. Prev.",
-				type: 'date',
-				cellFilter: 'date:"dd/MM/yyyy"',
-				width: 120
-			}, 
-			{
-				field: "situacao",
-				displayName: "Situação",
-				width: 108
-			}, 
-			{
-				field: "tipati.nome",
-				displayName: "Tipo Aplicação",
-				width: 130
-			}, 
-			{
-				field: "quadras",
-				displayName: "Quadra",
-				width: 130,
+	columnDefs: [
+	{
+		field: "codigo",
+		displayName: "Código",
+		width: 80
+	}, 
+	{
+		field: "datpre",
+		displayName: "Dat. Prev.",
+		type: 'date',
+		cellFilter: 'date:"dd/MM/yyyy"',
+		width: 120
+	}, 
+	{
+		field: "situacao",
+		displayName: "Situação",
+		width: 108
+	}, 
+	{
+		field: "per_total_executada" ,
+		displayName: "% Exec.",
+		width: 90
+	}, 
+	{
+		field: "tipati.nome",
+		displayName: "Tipo Ord. Ser.",
+		width: 130
+	}, 
+	{
+		field: "quadras",
+		displayName: "Quadra",
+		width: 130,
 
-				cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>"
-			},
-			{
-				field: "equipe.nome",
-				displayName: "Equipe",
-				width: 130
-			}, 
-			{
-				field: "safra.nome",
-				displayName: "Safra",
-				width: 130
-			},
-			
-			],
-			appScopeProvider: {
-				mapValue: function(row) {
-					var retorno='';
-					for (var propertyName in row.entity.quadras) {
-						$scope.todasQuadras.forEach(function(obj2) {
-							if (propertyName === obj2.key) {
-								retorno+=obj2.nome + ', ';
-							}
-						});
+		cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>"
+	},
+	{
+		field: "equipe.nome",
+		displayName: "Equipe",
+		width: 130
+	}, 
+	{
+		field: "safra.nome",
+		displayName: "Safra",
+		width: 130
+	},
+
+	],
+	appScopeProvider: {
+		mapValue: function(row) {
+			var retorno='';
+			for (var propertyName in row.entity.quadras) {
+				$scope.todasQuadras.forEach(function(obj2) {
+					if (row.entity.quadras[propertyName].key_quadra === obj2.key) {
+						retorno+=obj2.nome + ', ';
 					}
-					return retorno.substring(0, retorno.length-2);
-				}
+				});
 			}
+			return retorno.substring(0, retorno.length-2);
+		}
+	}
+};
+
+$scope.toggleMultiSelect = function() {
+	$scope.gridApi.selection.setMultiSelect(!$scope.gridApi.grid.options.multiSelect);
+};
 
 
-		};
-
-		$scope.toggleMultiSelect = function() {
-			$scope.gridApi.selection.setMultiSelect(!$scope.gridApi.grid.options.multiSelect);
-		};
-
-
-		$scope.gridOptions.onRegisterApi = function(gridApi) {
-			$scope.gridApi = gridApi;
-			gridApi.selection.on.rowSelectionChanged($scope, function(row) {
-				$scope.chamaEditarOrdser(row.entity);
-			});
-		};
+$scope.gridOptions.onRegisterApi = function(gridApi) {
+	$scope.gridApi = gridApi;
+	gridApi.selection.on.rowSelectionChanged($scope, function(row) {
+		$scope.chamaEditarOrdser(row.entity);
+	});
+};
 
 //############################################################################################################################
 // GRID QUADRAS
@@ -151,6 +177,11 @@ $scope.gridOptionsQuadras = {
 		field: "nome",
 		displayName: "Nome",
 		width: 300
+	}, 
+	{
+		field: "variedade.nome",
+		displayName: "Variedade",
+		width: 200
 	}, 
 	{
 		field: "area",
@@ -277,6 +308,11 @@ $scope.gridOptionsExecucoes = {
 		width: 120
 	}, 
 	{
+		field: "implemento.nome",
+		displayName: "Implemento",
+		width: 120
+	}, 
+	{
 		field: "funcionario.nome",
 		displayName: "Operador",
 		width: 120
@@ -290,6 +326,11 @@ $scope.gridOptionsExecucoes = {
 	{
 		field: "quadra.nome",
 		displayName: "Quadra",
+		width: 120
+	}, 	
+	{
+		field: "variedade.nome",
+		displayName: "Variedade",
 		width: 120
 	}, 
 	{
@@ -335,23 +376,77 @@ function atualizaListaFiliais() {
 			var i=0;
 			
 			refNovo.on('child_added', function(snap) {
-				$('#myPleaseWait').modal('hide');
 
 					//console.log('Adicionou filial', snap.name(), snap.val());
 					var obj = snap.val();
 					$scope.fazendas.push(obj.filial);
+
+					if(obj.filial.tipati!=null)
+					{
+						$scope.qtde_tipatis=+ Object.keys(obj.filial.tipati).length;
+					}
+					else
+					{
+						$scope.qtde_tipatis=+ 0;
+					}
+					if(obj.filial.equipe!=null)
+					{
+						$scope.qtde_equipes =+ Object.keys(obj.filial.equipe).length;
+					}
+					else
+					{
+						$scope.qtde_equipes =+ 0;
+					}
+					if(obj.filial.quadra!=null)
+					{
+						$scope.qtde_quadras =+ Object.keys(obj.filial.quadra).length;
+					}
+					else
+					{
+						$scope.qtde_quadras =+ 0;
+					}
+					if(obj.filial.produto!=null)
+					{
+						$scope.qtde_produtos =+ Object.keys(obj.filial.produto).length;
+					}
+					else
+					{
+						$scope.qtde_produtos =+ 0;
+					}
+					if(obj.filial.equipamento!=null)
+					{
+						$scope.qtde_equipamentos =+ Object.keys(obj.filial.equipamento).length;
+					}
+					else
+					{
+						$scope.qtde_equipamentos =+ 0;
+					}
+					if(obj.filial.funcionario!=null)
+					{
+						$scope.qtde_funcionarios  =+ Object.keys(obj.filial.funcionario).length;
+					}
+					else
+					{
+						$scope.qtde_funcionarios  =+ 0;
+					}
+					if(obj.filial.variedade!=null)
+					{
+						$scope.qtde_variedades  =+ Object.keys(obj.filial.variedade).length;
+					}
+					else
+					{
+						$scope.qtde_variedades  =+ 0;
+					}
+
 					recuperaTipati(obj);
 					recuperaEquipe(obj);
 					recuperaQuadra(obj);
 					recuperaEquipamento(obj);
 					recuperaFuncionario(obj);
 					recuperaProduto(obj);
+					recuperaVariedade(obj);
 
-					if(i==0)
-					{
-						$scope.chengeFazenda($scope.fazendas[0]);
-						$scope.data.fazenda=$scope.fazendas[0];
-					}
+					
 
 					if (!$scope.$$phase) {
 						$scope.$apply();
@@ -359,29 +454,28 @@ function atualizaListaFiliais() {
 				});
 
 			refNovo.on('child_changed', function(snap) {
-					//console.log('Houve uma atualização', snap.name(), snap.val());
-					var objNovo = snap.val();
+				var objNovo = snap.val();
 
-					var x = 0;
-					var posicao = null;
-					$scope.fazendas.forEach(function(obj) {
-						if (obj.key === objNovo.filial.key) {
-							posicao = x;
-						}
-						x++;
-
-					});
-					if (posicao != null)
-						$scope.fazendas[posicao] = objNovo.filial;
+				var x = 0;
+				var posicao = null;
+				$scope.fazendas.forEach(function(obj) {
+					if (obj.key === objNovo.filial.key) {
+						posicao = x;
+					}
+					x++;
 
 				});
+				if (posicao != null)
+					$scope.fazendas[posicao] = objNovo.filial;
+
+			});
 
 			refNovo.on('child_removed', function(snap) {
 					//console.log('Houve uma remoção', snap.name(), snap.val());
 					atualizaListaFiliais();
 				});
 			if ($scope.fazendas.length == 0) {
-				$('#myPleaseWait').modal('hide');
+				//$('#myPleaseWait').modal('hide');
 			}
 			}); // final do load
 }
@@ -415,6 +509,7 @@ function recuperaTipati(fazenda) {
 	} else {
 
 		$scope.todasTipatis = [];
+		
 		var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
 		var refTipatiNovo = new Firebase.util.NormalizedCollection(
 			baseRef.child("/filial/" + fazenda.key + "/tipati"), [baseRef.child("/tipati"), "$key"]
@@ -427,11 +522,18 @@ function recuperaTipati(fazenda) {
 			}).ref();
 
 			refTipatiNovo.on('child_added', function(snap) {
-				$('#myPleaseWait').modal('hide');
+				//$('#myPleaseWait').modal('hide');
 				var objNovo = snap.val();
 				$scope.todasTipatis.push(objNovo['tipatis']);
 				if (!$scope.$$phase) {
 					$scope.$apply();
+				}
+
+				if(verificaFinalizacaoCarregamento())
+				{
+					$scope.chengeFazenda($scope.fazendas[0]);
+					$scope.data.fazenda=$scope.fazendas[0];
+					$('#myPleaseWait').modal('hide');
 				}
 			});
 
@@ -453,6 +555,9 @@ function recuperaTipati(fazenda) {
 				if (!$scope.$$phase) {
 					$scope.$apply();
 				}
+
+
+
 			});
 
 			refTipatiNovo.on('child_removed', function(snap) {
@@ -494,11 +599,17 @@ function recuperaEquipe(fazenda) {
 			}).ref();
 
 			refNovoQuadra.on('child_added', function(snap) {
-				$('#myPleaseWait').modal('hide');
+				//$('#myPleaseWait').modal('hide');
 				var objNovo = snap.val();
 				$scope.todasEquipes.push(objNovo['equipes']);
 				if (!$scope.$$phase) {
 					$scope.$apply();
+				}
+				if(verificaFinalizacaoCarregamento())
+				{
+					$scope.chengeFazenda($scope.fazendas[0]);
+					$scope.data.fazenda=$scope.fazendas[0];
+					$('#myPleaseWait').modal('hide');
 				}
 			});
 
@@ -560,11 +671,17 @@ function recuperaQuadra(fazenda) {
 			}).ref();
 
 			refNovoQuadra.on('child_added', function(snap) {
-				$('#myPleaseWait').modal('hide');
+				//$('#myPleaseWait').modal('hide');
 				var objNovo = snap.val();
 				$scope.todasQuadras.push(objNovo['Quadras']);
 				if (!$scope.$$phase) {
 					$scope.$apply();
+				}
+				if(verificaFinalizacaoCarregamento())
+				{
+					$scope.chengeFazenda($scope.fazendas[0]);
+					$scope.data.fazenda=$scope.fazendas[0];
+					$('#myPleaseWait').modal('hide');
 				}
 			});
 
@@ -626,11 +743,17 @@ function recuperaProduto(fazenda) {
 			}).ref();
 
 			refNovoProduto.on('child_added', function(snap) {
-				$('#myPleaseWait').modal('hide');
+				//$('#myPleaseWait').modal('hide');
 				var objNovo = snap.val();
 				$scope.todosProdutos.push(objNovo['Produtos']);
 				if (!$scope.$$phase) {
 					$scope.$apply();
+				}
+				if(verificaFinalizacaoCarregamento())
+				{
+					$scope.chengeFazenda($scope.fazendas[0]);
+					$scope.data.fazenda=$scope.fazendas[0];
+					$('#myPleaseWait').modal('hide');
 				}
 			});
 
@@ -679,6 +802,8 @@ function recuperaEquipamento(fazenda) {
 	} else {
 
 		$scope.todosEquipamentos = [];
+		$scope.todosEquipamentosNaoImplemento = [];
+		$scope.todosEquipamentosImplemento = [];
 
 		var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
 		var refNovoEquipamento = new Firebase.util.NormalizedCollection(
@@ -692,11 +817,26 @@ function recuperaEquipamento(fazenda) {
 			}).ref();
 
 			refNovoEquipamento.on('child_added', function(snap) {
-				$('#myPleaseWait').modal('hide');
+				//$('#myPleaseWait').modal('hide');
 				var objNovo = snap.val();
 				$scope.todosEquipamentos.push(objNovo['Equipamentos']);
+				if(objNovo.implemento!=null && objNovo.implemento)
+				{
+					$scope.todosEquipamentosImplemento.push(objNovo['Equipamentos']);
+				}
+				else
+				{
+					$scope.todosEquipamentosNaoImplemento.push(objNovo['Equipamentos']);
+				}
+
 				if (!$scope.$$phase) {
 					$scope.$apply();
+				}
+				if(verificaFinalizacaoCarregamento())
+				{
+					$scope.chengeFazenda($scope.fazendas[0]);
+					$scope.data.fazenda=$scope.fazendas[0];
+					$('#myPleaseWait').modal('hide');
 				}
 			});
 
@@ -758,11 +898,17 @@ function recuperaFuncionario(fazenda) {
 			}).ref();
 
 			refNovoFuncionario.on('child_added', function(snap) {
-				$('#myPleaseWait').modal('hide');
+				
 				var objNovo = snap.val();
 				$scope.todosFuncionarios.push(objNovo['Funcionarios']);
 				if (!$scope.$$phase) {
 					$scope.$apply();
+				}
+				if(verificaFinalizacaoCarregamento())
+				{
+					$scope.chengeFazenda($scope.fazendas[0]);
+					$scope.data.fazenda=$scope.fazendas[0];
+					$('#myPleaseWait').modal('hide');
 				}
 			});
 
@@ -805,6 +951,67 @@ function recuperaFuncionario(fazenda) {
 		}
 	}
 //-------------------------------------------------------------------
+function recuperaVariedade(fazenda) {
+	if (fazenda === null) {
+		$scope.todasVariedades = null;
+	} else {
+
+		$scope.todasVariedades = [];
+
+		var refUsuarios= new Firebase(Constant.Url + '/variedade/'+fazenda.key);
+
+		refUsuarios.ref().on('child_added', function(snap) {
+			var variedades_brutas=snap.val();
+			$scope.todasVariedades.push(variedades_brutas);
+
+			for(var obj in variedades_brutas ){
+				var objVar=variedades_brutas[obj];
+				$scope.todasVariedades.push(objVar);
+			};
+			if(verificaFinalizacaoCarregamento())
+			{
+				$scope.chengeFazenda($scope.fazendas[0]);
+				$scope.data.fazenda=$scope.fazendas[0];
+				$('#myPleaseWait').modal('hide');
+			}			
+		}); 
+
+
+	}
+}
+//-------------------------------------------------------------------
+function verificaFinalizacaoCarregamento()
+{
+	
+	console.log(' --------------------- ');
+	console.log('todasTipatis: ' + $scope.todasTipatis.length + ' - qde: ' + $scope.qtde_tipatis);
+	console.log('todasEquipes: ' + $scope.todasEquipes.length + ' - qde: ' + $scope.qtde_equipes);
+	console.log('todasQuadras: ' + $scope.todasQuadras.length + ' - qde: ' + $scope.qtde_quadras);
+	console.log('todosProdutos: ' + $scope.todosProdutos.length + ' - qde: ' + $scope.qtde_produtos);
+	console.log('todosEquipamentos: ' + $scope.todosEquipamentos.length + ' - qde: ' + $scope.qtde_equipamentos);
+	console.log('todosFuncionarios: ' + $scope.todosFuncionarios.length + ' - qde: ' + $scope.qtde_funcionarios);
+	console.log('todasVariedades: ' + $scope.todasVariedades.length + ' - qde: ' + $scope.qtde_variedades);
+
+	console.log(' --------------------- ');
+	
+	if(
+		$scope.todasTipatis.length==$scope.qtde_tipatis 
+		&& $scope.todasEquipes.length==$scope.qtde_equipes
+		&& $scope.todasQuadras.length==$scope.qtde_quadras
+		&& $scope.todosProdutos.length==$scope.qtde_produtos
+		&& $scope.todosEquipamentos.length==$scope.qtde_equipamentos
+		&& $scope.todosFuncionarios.length==$scope.qtde_funcionarios
+		&& $scope.todasVariedades.length==$scope.qtde_variedades
+		)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+//-------------------------------------------------------------------		
 $scope.chengeSafra = function(key_safra) {
 
 	if (key_safra === null) {
@@ -825,8 +1032,54 @@ $scope.chengeSafra = function(key_safra) {
 			}).ref();
 
 			refTipatiNovo.on('child_added', function(snap) {
-				$('#myPleaseWait').modal('hide');
+				//$('#myPleaseWait').modal('hide');
 				var objNovo = snap.val();
+
+				if(objNovo.planejamento.variedades!=null)
+				{
+					var list_var=[];
+					if(!Array.isArray(objNovo.planejamento.variedades))
+					{
+						for(var objVar in objNovo.planejamento.variedades)
+						{
+							for(var variedade of $scope.todasVariedades) {
+								if (objVar === variedade.key) {
+									var obj=clone(variedade);
+									if(objNovo.planejamento.variedades[objVar].area!=null)
+									{
+										obj['area']=objNovo.planejamento.variedades[objVar].area;
+									}
+									list_var.push(obj);
+									break;
+								}
+							};
+						}
+						objNovo['variedades']=list_var;
+					}
+					else
+					{
+						var list_var=[];
+						objNovo.planejamento.variedades.forEach(function(var_pla) 
+						{
+							for(var variedade of $scope.todasVariedades) {
+								if (var_pla.key === variedade.key) {
+									var obj=variedade;
+									if(var_pla.area!=null)
+									{
+										obj['area']=var_pla.area;
+										$scope.soma_area = $scope.soma_area + var_pla.area;
+									}
+									list_var.push(obj);
+									break;
+								}
+							};
+
+						});
+						objNovo['variedades']=list_var;
+					}
+				}
+				
+
 				$scope.todosPlanejamento.push(objNovo);
 				if (!$scope.$$phase) {
 					$scope.$apply();
@@ -865,8 +1118,6 @@ $scope.chengeSafra = function(key_safra) {
 //-------------------------------------------------------------------
 $scope.chengeFazenda = function(fazenda) {
 	if (fazenda === null) return false;
-	//$('#myPleaseWait').modal('show');
-	fazendaSelecioanda = fazenda;
 	$scope.safras = [];
 	for (var propertyName in fazenda.safra) {
 		$scope.safras.push(fazenda.safra[propertyName]);
@@ -876,15 +1127,6 @@ $scope.chengeFazenda = function(fazenda) {
 
 	refOrdser = new Firebase(Constant.Url + '/ordser/' + fazenda.key);
 
-
-	/*
-	refOrdser.on('value', function(snapshot) {
-		if(snapshot.numChildren()==0)
-		{
-			$('#myPleaseWait').modal('hide');
-		}
-	});
-	*/
 	refOrdser.on('child_added', function(snap) {
 		$('#myPleaseWait').modal('hide');
 		var objNovo = snap.val();
@@ -916,6 +1158,29 @@ $scope.chengeFazenda = function(fazenda) {
 				}
 			});
 
+			var area_total_tmp=0;
+			var area_total_executada_tmp=0;
+			var per_total_executada_tmp = 0;
+			for (var propertyName in objNovo.quadras) {
+				if(objNovo.quadras[propertyName].area!=null)
+				{
+					area_total_tmp +=objNovo.quadras[propertyName].area;
+				}
+			}
+			for (var propertyName in objNovo.execucoes) {
+				var objExe=objNovo.execucoes[propertyName];
+
+				area_total_executada_tmp += objExe.area;
+				per_total_executada_tmp = (area_total_executada_tmp*100) / area_total_tmp ;
+			};
+			if(!isNaN(area_total_executada_tmp))
+			{
+				objNovo['area_total_executada']=area_total_executada_tmp;
+			}
+			if(!isNaN(per_total_executada_tmp))
+			{
+				objNovo['per_total_executada']=per_total_executada_tmp.toFixed(2);
+			}
 			$scope.ordsers.push(objNovo);
 			$scope.gridOptions.data = $scope.ordsers;
 		}
@@ -980,39 +1245,57 @@ $scope.chengeFazenda = function(fazenda) {
 		}
 
 	});
-			//-------------------------------------------------------------------
-			$scope.tipatis = [];
-			for (var propertyName in fazenda.tipati) {
-				$scope.todasTipatis.forEach(function(obj2) {
-					if (propertyName === obj2.key) {
-						$scope.tipatis.push(obj2);
-					}
-				});
+	//-------------------------------------------------------------------
+	$scope.tipatis = [];
+	for (var propertyName in fazenda.tipati) {
+		$scope.todasTipatis.forEach(function(obj2) {
+			if (propertyName === obj2.key) {
+				$scope.tipatis.push(obj2);
 			}
-			//-------------------------------------------------------------------
-			$scope.equipes = [];
-			for (var propertyName in fazenda.equipe) {
-				$scope.todasEquipes.forEach(function(obj2) {
-					if (propertyName === obj2.key) {
-						$scope.equipes.push(obj2);
-					}
-				});
+		});
+	}
+	//-------------------------------------------------------------------
+	$scope.equipes = [];
+	for (var propertyName in fazenda.equipe) {
+		$scope.todasEquipes.forEach(function(obj2) {
+			if (propertyName === obj2.key) {
+				$scope.equipes.push(obj2);
 			}
-		};
-//-------------------------------------------------------------------
-$scope.recuperaPlanejamentos = function(fazenda, safra) {
-
-	refQuadrasCulturas = new Firebase(Constant.Url + '/filial/' + fazenda.key + '/safra/' + safra.key + '/quadra');
-	$scope.quadrasPlanejamento = $firebaseArray(refQuadrasCulturas);
-	$scope.editQuadra = false;
-	return true;
+		});
+	}
 };
+//-------------------------------------------------------------------
 $scope.chengeTipOrdser = function() {
 	if($scope.data.key_tipati!=null && $scope.data.key_tipati!=''  )
 	{
 		$scope.todasTipatis.forEach(function(obj2) {
 			if ($scope.data.key_tipati === obj2.key) {
-				$scope.data.aplagr=obj2.aplagr;
+				if(obj2.aplagr!=null)
+				{
+					$scope.data.aplagr=obj2.aplagr;
+				}
+				else
+				{
+					$scope.data.aplagr=false;
+				}
+
+				if(obj2.plantio!=null)
+				{
+					$scope.data.plantio=obj2.plantio;
+				}
+				else
+				{
+					$scope.data.plantio=false;
+				}
+
+				if(obj2.colheita!=null)
+				{
+					$scope.data.colheita=obj2.colheita;
+				}
+				else
+				{
+					$scope.data.colheita=false;
+				}
 			}
 		});
 	}
@@ -1102,10 +1385,10 @@ $scope.chamaEditarOrdser = function(obj) {
 	$scope.data = clone(obj);
 	$scope.data.fazenda = fazendaTmp;
 
-
-
 	$scope.area_total = 0;
 	$scope.horas_total =0;
+	$scope.area_total_executada = 0;
+	$scope.per_total_executada = 0;
 
 	if($scope.data.situacao=='Finalizado')
 	{
@@ -1113,89 +1396,133 @@ $scope.chamaEditarOrdser = function(obj) {
 	}
 
 	$scope.chengeSafra($scope.data.key_safra);
-			//-------------------------------------------------------------
-			$scope.todasQuadrasOrdser=[];
-			for (var propertyName in $scope.data.quadras) {
-				$scope.todasQuadras.forEach(function(obj2) {
-					if (propertyName === obj2.key) {
-						obj2['area'] = $scope.data.quadras[propertyName].area;
-						if ($scope.data.quadras[propertyName].area != null) {
-							$scope.area_total += $scope.data.quadras[propertyName].area;
-						}
-						$scope.todasQuadrasOrdser.push(obj2);
-					}
-				});
-			}
-			if ($scope.todasQuadrasOrdser.length == 0) {
-				$scope.temquadras = false;
-			} else {
-				$scope.temquadras = true;
-			}
-			$scope.gridOptionsQuadras.data = $scope.todasQuadrasOrdser;
-			//-------------------------------------------------------------
-			$scope.todosProdutosOrdser=[];
-			for (var propertyName in $scope.data.produtos) {
-				$scope.todosProdutos.forEach(function(obj2) {
-					if (propertyName === obj2.key) {
-						obj2.dose = $scope.data.produtos[propertyName]['dose'];
-						obj2.quatot = $scope.data.produtos[propertyName]['quatot'];
-						$scope.todosProdutosOrdser.push(obj2);
-					}
-				});
-			}
-			$scope.gridOptionsProdutos.data = $scope.todosProdutosOrdser;
-			if ($scope.todosProdutos.length == 0) {
-				$scope.temprodutos = false;
-			} else {
-				$scope.temprodutos = true;
-			}
-			//-------------------------------------------------------------
-			$scope.todosEquipamentosOrdser = [];
-			for (var propertyName in $scope.data.equipamentos) {
-				$scope.todosEquipamentos.forEach(function(obj2) {
-					if (propertyName === obj2.key) {
-						obj2.consumo = $scope.data.equipamentos[propertyName]['consumo'];
-						$scope.todosEquipamentosOrdser.push(obj2);
+	$scope.todasQuadrasOrdser=[];
+	for (var propertyName in $scope.data.quadras) {
+		for(var obj3 of $scope.todasQuadras) {
+			if ($scope.data.quadras[propertyName].key_quadra === obj3.key) {
 
-					}
-				});
+				var obj2 = clone(obj3);
+				obj2['key'] = propertyName;
+				obj2['key_quadra'] = obj3.key;
+				obj2['area'] = $scope.data.quadras[propertyName].area;
+				if ($scope.data.quadras[propertyName].area != null) {
+					$scope.area_total += $scope.data.quadras[propertyName].area;
+				}
+				if ($scope.data.quadras[propertyName].key_variedade != null) {
+					$scope.todasVariedades.forEach(function(objVar) {
+						if ($scope.data.quadras[propertyName].key_variedade === objVar.key) {
+							obj2['variedade'] = objVar;
+						}
+					});
+				}
+				$scope.todasQuadrasOrdser.push(obj2);
+
 			}
-			if ($scope.todosEquipamentosOrdser.length == 0) {
-				$scope.temequipamentos = false;
-			} else {
-				$scope.temequipamentos = true;
-			}
-			$scope.gridOptionsEquipamentos.data = $scope.todosEquipamentosOrdser;
-			//-------------------------------------------------------------
-			$scope.todosExecucoesOrdser = [];
-			for (var propertyName in $scope.data.execucoes) {
-				var objExe=$scope.data.execucoes[propertyName];
-				$scope.horas_total += objExe.quahor;
-				$scope.todosEquipamentos.forEach(function(obj2) {
-					if (objExe.key_equipamento === obj2.key) {
-						objExe['equipamento'] = obj2;
-					}
-				});
-				$scope.todosFuncionarios.forEach(function(obj2) {
-					if (objExe.key_funcionario === obj2.key) {
-						objExe['funcionario'] = obj2;
-					}
-				});
-				$scope.todasQuadras.forEach(function(obj2) {
-					if (objExe.key_quadra === obj2.key) {
-						objExe['quadra'] = obj2;
-					}
-				});
-				$scope.todosExecucoesOrdser.push(objExe);
-			}
-			if ($scope.todosExecucoesOrdser.length == 0) {
-				$scope.temexecucoes = false;
-			} else {
-				$scope.temexecucoes = true;
-			}
-			$scope.gridOptionsExecucoes.data = $scope.todosExecucoesOrdser;
-			//-------------------------------------------------------------
 		};
+	}
+	if ($scope.todasQuadrasOrdser.length == 0) {
+		$scope.temquadras = false;
+	} else {
+		$scope.temquadras = true;
+	}
+	$scope.gridOptionsQuadras.data = $scope.todasQuadrasOrdser;
+	//-------------------------------------------------------------
+	$scope.todosProdutosOrdser=[];
+	for (var propertyName in $scope.data.produtos) {
+		$scope.todosProdutos.forEach(function(obj2) {
+			if (propertyName === obj2.key) {
+				obj2.dose = $scope.data.produtos[propertyName]['dose'];
+				obj2.quatot = $scope.data.produtos[propertyName]['quatot'];
+				$scope.todosProdutosOrdser.push(obj2);
+			}
+		});
+	}
+	$scope.gridOptionsProdutos.data = $scope.todosProdutosOrdser;
+	if ($scope.todosProdutos.length == 0) {
+		$scope.temprodutos = false;
+	} else {
+		$scope.temprodutos = true;
+	}
+	//-------------------------------------------------------------
+	$scope.todosEquipamentosOrdser = [];
+	$scope.todosEquipamentosNaoImplementoOrdser = [];
+	$scope.todosEquipamentosImplementoOrdser = [];
+	for (var propertyName in $scope.data.equipamentos) {
+		$scope.todosEquipamentos.forEach(function(obj2) {
+			if (propertyName === obj2.key) {
+				obj2.consumo = $scope.data.equipamentos[propertyName]['consumo'];
+				$scope.todosEquipamentosOrdser.push(obj2);
+				if(obj2.implemento!=null && obj2.implemento)
+				{
+					$scope.todosEquipamentosImplementoOrdser.push(obj2);
+				}
+				else
+				{
+					$scope.todosEquipamentosNaoImplementoOrdser.push(obj2);
+				}
+			}
+		});
+	}
+
+	if ($scope.todosEquipamentosOrdser.length == 0) {
+		$scope.temequipamentos = false;
+	} else {
+		$scope.temequipamentos = true;
+	}
+	$scope.gridOptionsEquipamentos.data = $scope.todosEquipamentosOrdser;
+	//-------------------------------------------------------------
+	$scope.todosExecucoesOrdser = [];
+	for (var propertyName in $scope.data.execucoes) {
+		var objExe=$scope.data.execucoes[propertyName];
+		$scope.horas_total += objExe.quahor;
+
+		$scope.area_total_executada += objExe.area;
+		$scope.per_total_executada = ($scope.area_total_executada*100) / $scope.area_total ;
+
+		$scope.todosEquipamentos.forEach(function(obj2) {
+			if (objExe.key_equipamento === obj2.key) {
+				objExe['equipamento'] = obj2;
+			}
+		});
+
+		if(objExe.key_implemento!=null)
+		{
+			$scope.todosEquipamentos.forEach(function(obj2) {
+				if (objExe.key_implemento === obj2.key) {
+					objExe['implemento'] = obj2;
+				}
+			});
+		}
+
+		if(objExe.key_variedade!=null)
+		{
+			$scope.todasVariedades.forEach(function(obj2) {
+				if (objExe.key_variedade === obj2.key) {
+					objExe['variedade'] = obj2;
+				}
+			});
+		}
+
+		$scope.todosFuncionarios.forEach(function(obj2) {
+			if (objExe.key_funcionario === obj2.key) {
+				objExe['funcionario'] = obj2;
+			}
+		});
+		$scope.todasQuadras.forEach(function(obj2) {
+			if (objExe.key_quadra === obj2.key) {
+				objExe['quadra'] = obj2;
+			}
+		});
+		$scope.todosExecucoesOrdser.push(objExe);
+	}
+	if ($scope.todosExecucoesOrdser.length == 0) {
+		$scope.temexecucoes = false;
+	} else {
+		$scope.temexecucoes = true;
+	}
+	$scope.gridOptionsExecucoes.data = $scope.todosExecucoesOrdser;
+	//-------------------------------------------------------------
+};
 
 //-------------------------------------------------------------------
 $scope.finalizarOrdser = function(obj) {
@@ -1244,11 +1571,20 @@ $scope.excluirOrdser = function() {
 //############################################################################################################################
 //-------------------------------------------------------------------
 $scope.adicionarQuadra = function(data, data_quadra) {
-	if ($scope.todosProdutosOrdser.length > 0 && data_quadra.planejamento.area != null) {
+	if ($scope.todosProdutosOrdser.length > 0 && $scope.data_quadra_area != null) {
 		$scope.mensagem_aviso = "Ordem de serviço/atividade já possui produtos, ao adicionar quadra/região a área total mudará e a quantidade total do produto baseado na dose x area ficará errado. Impossível continuar.";
 		$('#modalMensagem').modal('show');
 		return;
 	}
+	if($scope.data.plantio || $scope.data.colheita)
+	{
+		if ($scope.data_quadra_area== null) {
+			$scope.mensagem_aviso = "Para atividade de 'plantio' e 'colheita' é necessário a área, defina-a em 'Planejamento de Safra'. Impossível continuar.";
+			$('#modalMensagem').modal('show');
+			return;
+		}
+	}
+
 	if ($scope.finalizado) {
 		$scope.mensagem_aviso = "Ordem de serviço/atividade está finalizada. Impossível continuar.";
 		$('#modalMensagem').modal('show');
@@ -1256,24 +1592,63 @@ $scope.adicionarQuadra = function(data, data_quadra) {
 	}
 
 	var existe=false;
-	$scope.todasQuadrasOrdser.forEach(function(obj2) {
-		if (obj2.key === data_quadra.quadra.key) {
-			$scope.mensagem_aviso = "Quadra já adicionada. Impossível continuar.";
-			existe=true;
-			$('#modalMensagem').modal('show');
-			return;
-		}
-	});
+	if($scope.data.plantio || $scope.data.colheita)
+	{
+		$scope.todasQuadrasOrdser.forEach(function(obj2) {
+			if($scope.data_variedade==null)
+			{
+				$scope.todasQuadrasOrdser.forEach(function(obj2) {
+					if (obj2.key_quadra === data_quadra.quadra.key) {
+						$scope.mensagem_aviso = "Quadra já adicionada. Impossível continuar.";
+						existe=true;
+						$('#modalMensagem').modal('show');
+						return;
+					}
+				});
+			}
+			else
+			{
+				if (obj2.key_quadra === data_quadra.quadra.key && obj2.variedade.key== $scope.data_variedade.key) {
+					$scope.mensagem_aviso = "Quadra e Variedade já adicionada. Impossível continuar.";
+					existe=true;
+					$('#modalMensagem').modal('show');
+					return;
+				}
+			}
+		});
+	}
+	else
+	{
+		$scope.todasQuadrasOrdser.forEach(function(obj2) {
+			if (obj2.key_quadra === data_quadra.quadra.key) {
+				$scope.mensagem_aviso = "Quadra já adicionada. Impossível continuar.";
+				existe=true;
+				$('#modalMensagem').modal('show');
+				return;
+			}
+		});
+	}
+
 	if(!existe)
 	{
 		var fazendaTmp = $scope.data.fazenda;
 		if (data_quadra == null) return false;
 
-		var refOrdser = new Firebase(Constant.Url + '/ordser/' + data.fazenda.key + '/' + data.key + '/quadras/' + data_quadra.quadra.key);
-		if (data_quadra.planejamento.area != null) {
-			data_quadra.quadra['area'] = data_quadra.planejamento.area;
+		//var refOrdser = new Firebase(Constant.Url + '/ordser/' + data.fazenda.key + '/' + data.key + '/quadras/' + data_quadra.quadra.key);
+		var refOrdser = new Firebase(Constant.Url + '/ordser/' + data.fazenda.key + '/' + data.key + '/quadras/');
+		
+		var quadraIncluir = clone(data_quadra.quadra);
+		quadraIncluir['key_quadra']=data_quadra.quadra.key;
+
+		quadraIncluir.key = refOrdser.push().key();
+		if ($scope.data_quadra_area  != null) {
+			quadraIncluir['area'] = $scope.data_quadra_area;
+			if( $scope.data_variedade!=null)
+			{
+				quadraIncluir['key_variedade'] = $scope.data_variedade.key;
+			}
 		}
-		var quadraTmp = clone(data_quadra.quadra);
+		var quadraTmp = clone(quadraIncluir);
 		delete quadraTmp.filial;
 		delete quadraTmp.$$hashKey;
 		delete quadraTmp.$$hashKey;
@@ -1283,17 +1658,22 @@ $scope.adicionarQuadra = function(data, data_quadra) {
 		delete quadraTmp.coordenadas;
 		delete quadraTmp.dataStr_ultalt;
 		delete quadraTmp.data_ultalt;
+		delete quadraTmp.aplicacoes;
+		delete quadraTmp.variedade;
+		delete quadraTmp.separar_variedade;
 
-		refOrdser.set(quadraTmp);
+		var refOrdserGravar = new Firebase(Constant.Url + '/ordser/' + data.fazenda.key + '/' + data.key + '/quadras/'+quadraIncluir.key);
+		refOrdserGravar.set(quadraTmp);
 
-		$scope.todasQuadrasOrdser.push(data_quadra.quadra);
+		quadraIncluir['variedade'] = $scope.data_variedade;
+		$scope.todasQuadrasOrdser.push(quadraIncluir);
 
 		$scope.temquadras = true;
 
 		$scope.gridOptionsQuadras.data = $scope.todasQuadrasOrdser;
 
-		if (data_quadra.planejamento.area != null) {
-			$scope.area_total += data_quadra.planejamento.area;
+		if ($scope.data_quadra_area  != null) {
+			$scope.area_total += $scope.data_quadra_area ;
 		}
 
 		Notify.successBottom('Quadra/Região inserida com sucesso!');
@@ -1333,13 +1713,11 @@ $scope.excluirQuadra = function() {
 		refOrdserNovo.remove();
 		Notify.successBottom('Quadra/Região removido com sucesso!');
 
-		var i = 0;
 		var posicao_deletar;
 		$scope.todasQuadrasOrdser.forEach(function(obj2) {
 			if ($scope.key_quadra === obj2.key) {
-				posicao_deletar = i;
+				posicao_deletar = $scope.todasQuadrasOrdser.indexOf(obj2);
 			}
-			i++;
 		});
 		if (posicao_deletar != null) {
 			if ($scope.todasQuadrasOrdser[posicao_deletar].area != null) {
@@ -1358,6 +1736,53 @@ $scope.excluirQuadra = function() {
 	return true;
 
 };
+
+$scope.chengeQuadra = function(qus) {
+	if(qus!=null)
+	{
+		if(qus.planejamento.area==null)
+		{			
+			$scope.data_quadra_area=null;
+		}
+
+		if($scope.data.plantio || $scope.data.colheita)
+		{
+			if(qus.variedades==null)
+			{
+				if(qus.planejamento.area!=null)
+				{
+					$scope.data_quadra_area=qus.planejamento.area;
+				}
+			}
+			else
+			{
+				$scope.variedadesTmp = qus.variedades;
+				$scope.data_quadra_area=null;
+			}
+		}
+		else
+		{
+			if(qus.planejamento.area!=null)
+			{
+				$scope.data_quadra_area=qus.planejamento.area;
+			}			
+		}
+	}
+	else
+	{
+		$scope.data_quadra_area=null;
+	}
+}
+
+$scope.chengeVariedade = function(variedade) {
+	if(variedade!=null && variedade.area!=null)
+	{		
+		$scope.data_quadra_area=variedade.area;		
+	}
+}
+
+
+
 //############################################################################################################################
 //############################################################################################################################
 //PRODUTO
@@ -1433,13 +1858,11 @@ $scope.excluirProduto = function() {
 		refOrdserNovo.remove();
 		Notify.successBottom('Produto removido com sucesso!');
 
-		var i = 0;
 		var posicao_deletar;
 		$scope.todosProdutosOrdser.forEach(function(obj2) {
 			if ($scope.key_produto === obj2.key) {
-				posicao_deletar = i;
+				posicao_deletar = $scope.todosProdutosOrdser.indexOf(obj2);
 			}
-			i++;
 		});
 		if($scope.todosProdutosOrdser.length==1)
 		{
@@ -1510,6 +1933,16 @@ $scope.adicionarEquipamento = function(data, data_equipamento) {
 
 		$scope.todosEquipamentosOrdser.push(data_equipamento);
 
+		if(data_equipamento.implemento!=null && data_equipamento.implemento)
+		{
+			$scope.todosEquipamentosImplementoOrdser.push(data_equipamento);
+		}
+		else
+		{
+			$scope.todosEquipamentosNaoImplementoOrdser.push(data_equipamento);
+		}
+
+
 		$scope.gridOptionsEquipamentos.data = $scope.todosEquipamentosOrdser;
 
 		$scope.temequipamentos = true;
@@ -1554,13 +1987,11 @@ $scope.excluirEquipamento = function() {
 		refOrdserNovo.remove();
 		Notify.successBottom('Equipamento removido com sucesso!');
 
-		var i = 0;
 		var posicao_deletar;
 		$scope.todosEquipamentosOrdser.forEach(function(obj2) {
 			if ($scope.key_equipamento === obj2.key) {
-				posicao_deletar = i;
+				posicao_deletar = $scope.todosEquipamentosOrdser.indexOf(obj2);
 			}
-			i++;
 		});
 		if (posicao_deletar != null) {
 			delete $scope.todosEquipamentosOrdser[posicao_deletar];
@@ -1577,13 +2008,35 @@ $scope.excluirEquipamento = function() {
 
 };
 $scope.chengeEquipamento = function() {
-	$scope.data_equipamento.consumo = $scope.data_equipamento.equipamento.consumo;
+	if($scope.data_equipamento.equipamento.consumo!=null)
+	{
+		$scope.data_equipamento.consumo = $scope.data_equipamento.equipamento.consumo;
+	}
+	else
+	{
+		$scope.data_equipamento.consumo = null;
+	}
 }
+
 //############################################################################################################################
 //############################################################################################################################
 //EXECUCAO
 //############################################################################################################################
 //-------------------------------------------------------------------
+
+$scope.chengeEquipamentoExecucao = function() {
+	if($scope.data_execucao.equipamento.perimp !=null && $scope.data_execucao.equipamento.perimp)
+	{
+		$scope.exibeImplemento = $scope.data_execucao.equipamento.perimp;
+	}
+	else
+	{
+		$scope.exibeImplemento = false;
+		$scope.data_execucao.implemento=null;
+	}
+	
+}
+
 $scope.adicionarExecucao = function(data, data_execucao) {
 	if ($scope.finalizado) {
 		$scope.mensagem_aviso = "Ordem de serviço/atividade está finalizada. Impossível continuar.";
@@ -1599,11 +2052,19 @@ $scope.adicionarExecucao = function(data, data_execucao) {
 	data_execucao['key'] = refOrdserExe.push().key();
 	data_execucao['key_ordser'] = data.key;
 	data_execucao['key_equipamento'] = data_execucao.equipamento.key;
+	if(data_execucao.implemento!=null)
+	{
+		data_execucao['key_implemento'] = data_execucao.implemento.key;
+	}
 	data_execucao['key_safra'] = data.key_safra;
 	data_execucao['key_funcionario'] = data_execucao.funcionario.key;
 	if(data_execucao.quadra!=null)
 	{
 		data_execucao['key_quadra'] = data_execucao.quadra.key;
+	}
+	if(data_execucao.variedade!=null)
+	{
+		data_execucao['key_variedade'] = data_execucao.variedade.key;
 	}
 	data_execucao.data = new Date(data_execucao.data).getTime();
 	data_execucao['data_string'] = formatDate(new Date(data_execucao.data));
@@ -1619,6 +2080,8 @@ $scope.adicionarExecucao = function(data, data_execucao) {
 	delete execucaoTmp.equipamento;
 	delete execucaoTmp.funcionario;
 	delete execucaoTmp.quadra;
+	delete execucaoTmp.implemento;
+	delete execucaoTmp.variedade;
 
 	refOrdser.set(execucaoTmp);
 
@@ -1671,14 +2134,12 @@ $scope.excluirExecucao = function() {
 
 		Notify.successBottom('Execução removida com sucesso!');
 
-		var i = 0;
 		var posicao_deletar;
 		$scope.todosExecucoesOrdser.forEach(function(obj2) {
 			if ($scope.key_execucao === obj2.key) {
 				$scope.horas_total -= obj2.quahor;
-				posicao_deletar = i;
+				posicao_deletar = $scope.todosExecucoesOrdser.indexOf(obj2);
 			}
-			i++;
 		});
 		if (posicao_deletar != null) {
 			delete $scope.todosExecucoesOrdser[posicao_deletar];
@@ -1696,9 +2157,64 @@ $scope.excluirExecucao = function() {
 
 };
 //-------------------------------------------------------------------
-$scope.chengeQuadraExecucao = function(quadra) {
-	$scope.data_execucao.area = $scope.data_execucao.quadra.area;
+$scope.chengeQuadraExecucao = function() {
+	//$scope.data_execucao.area = $scope.data_execucao.quadra.area;
+
+	if($scope.data_execucao.quadra!=null)
+	{
+		if($scope.data_execucao.quadra.area==null)
+		{			
+			$scope.data_execucao.area =null;
+		}
+
+		if($scope.data.plantio || $scope.data.colheita)
+		{
+			if( $scope.data_execucao.quadra.variedade==null)
+			{
+				if($scope.data_execucao.quadra.area!=null)
+				{
+					$scope.data_execucao.area=$scope.data_execucao.quadra.area;
+				}
+			}
+			else
+			{
+				$scope.data_execucao.area=null;
+			}			
+		}
+		else
+		{
+			if($scope.data_execucao.quadra.area!=null)
+			{
+				$scope.data_execucao.area=$scope.data_execucao.quadra.area;
+			}			
+		}
+	}
+	else
+	{
+		$scope.data_execucao.area=null;
+	}
+
+
+	$scope.variedadesTmpExecucao=[];
+	if($scope.data.plantio || $scope.data.colheita)
+	{
+		$scope.todasQuadrasOrdser.forEach(function(obj2) {
+			if (obj2.key_quadra === $scope.data_execucao.quadra.key_quadra && $scope.data_execucao.quadra.variedade!=null) {
+				var objCloneVariedade= clone(obj2.variedade);
+				objCloneVariedade['area']=obj2.area;
+				$scope.variedadesTmpExecucao.push(objCloneVariedade)
+			}
+		});
+
+	}
 }
+$scope.chengeVariedadeExecucao = function(variedade) {
+	if(variedade!=null && variedade.area!=null)
+	{		
+		$scope.data_execucao.area=variedade.area;		
+	}
+}
+
 //############################################################################################################################
 //############################################################################################################################
 //UTEIS
@@ -1777,9 +2293,19 @@ function validFormExecucao(data) {
 		setMessageError('O campo Quantidade de Horas é obrigatório!');
 		return true;
 	}
-	if (data.quadra != null && data.area != ''  && data.area >  data.quadra.area) {
-		setMessageError('A area informada está maior que a área da Quadra!');
-		return true;
+	if(data.variedade==null)
+	{
+		if (data.quadra != null && data.area != ''  && data.area >  data.quadra.area) {
+			setMessageError('A area informada está maior que a área da Quadra/região!');
+			return true;
+		}
+	}
+	else
+	{
+		if (data.area != ''  && data.area >  data.variedade.area) {
+			setMessageError('A area informada está maior que a área da Variedade!');
+			return true;
+		}
 	}
 
 

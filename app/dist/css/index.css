@@ -8,6 +8,16 @@
 	height: 300px;
 }
 
+.gridPlanejamento{
+	width: 100%;
+	height: 700px;
+}
+
+.gridPlanejamentoVariedade{
+	width: 100%;
+	height: 200px;
+}
+
 .gridOrdserProdutos {
 	width: 100%;
 	height: 300px;
@@ -56,6 +66,9 @@
 	height: 500px;
 }
 
+.variedades {
+	background-color: #adabab;
+}
 .logo-home{
 	width: 350px;
 	margin-top: 15%;

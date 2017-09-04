@@ -84,22 +84,43 @@
 										<option value="{{cultura.$id}}" ng-repeat="cultura in culturas | orderBy:'nome'" >{{cultura.nome}}</option>
 									</select>
 								</div>
-								<div class="form-group">
+								<div class="row">
+									<div class="col-sm-7">
+										<div class="form-group">
+											<label>Data do Plantio</label><br>
+											<input type="date" ng-model="formPlanejamento.data_plantio">
 
-									<label>Data do Plantio</label><br>
-									<input type="date" ng-model="formPlanejamento.data_plantio">
 
-									<input type="checkbox" ng-model="formPlanejamento.ativo"
-									ng-true-value="true" ng-false-value="false">	<label>Ativo</label>
-									
+
+										</div>
+									</div>
+									<div class="col-sm-5">
+										<div class="form-group">
+
+											<label>Área</label><br>
+
+											<input type="number" class="form-control" placeholder="ha" ng-model="formPlanejamento.area" />
+										</div>
+
+									</div>
 								</div>
-								<div class="form-group">
 
-									<label>Area</label><br>
+								<div class="row">
+									<div class="col-sm-8">
 
-									<input type="number" class="form-control" placeholder="ha" ng-model="formPlanejamento.area" />
-									
+										<div class="form-group">
+											<input type="checkbox" ng-disabled=editCultura ng-model="formPlanejamento.separar_variedade"
+											ng-true-value="true" ng-false-value="false">	
+											<label>Separar por variedade</label>
+										</div>
+									</div>
+									<div class="col-sm-4">
+										<input type="checkbox" ng-model="formPlanejamento.ativo"
+										ng-true-value="true" ng-false-value="false">	<label>Ativo</label>
+									</div>
+
 								</div>
+
 								<button type="button" class="btn btn-success pull-left" ng-show="!editQuadra" ng-click="salvarPlanejamento(data.fazenda, objSafra, formPlanejamento)">Salvar
 								</button>
 								<button type="button" class="btn btn-success pull-left" ng-show="editQuadra" ng-click="atualizarPlanejamento(data.fazenda, objSafra, formPlanejamento)">Atualizar
@@ -109,44 +130,50 @@
 								<hr class="small">  
 							</form>
 
-							<div class="form-group">
-								<input type="checkbox" ng-disabled=editCultura ng-model="formPlanejamento.separar_variedade"
-								ng-true-value="true" ng-false-value="false">	
-								<label>Separar por variedade</label>
-							</div>
+							
 							<div class="form-group">
 
 							</div>
 							<div class="form-group">
 								<label>Variedades</label>
 
+
+								<select class="form-control" ng-model="formPlanejamento.key_variedade"  >
+									<option value="{{variedade.key}}" ng-repeat="variedade in variedadesAdd">{{variedade.nome}}</option>
+								</select>						
 							</div>
 							<div class="form-group">
-								<div class="col-sm-10 variedade_css">
-									<select class="form-control" ng-model="formPlanejamento.key_variedade"  >
-										<option value="{{variedade.key}}" ng-repeat="variedade in variedadesAdd">{{variedade.nome}}</option>
-									</select>
-								</div>
-								<div class="col-sm-2">
-									<button type="button" class="btn btn-default btn-xs"   ng-disabled="!editQuadra" ng-click="salvarVariedade(data.fazenda, objSafra, formPlanejamento)">
-										<i class="glyphicon glyphicon-plus-sign"></i>												
-									</button>
-								</div>
+
+								<label>Área (Variedade)</label><br>
+
+								<input type="number" class="form-control" placeholder="ha" ng-model="formPlanejamento.area_variedade" />
+
+							</div>
+							<div class="form-group">
+
+								<button type="button" class="btn btn-default btn-xm"   ng-disabled="!editQuadra" ng-click="salvarVariedade(data.fazenda, objSafra, formPlanejamento)">
+									<i class="glyphicon glyphicon-plus-sign"></i> Inserir												
+								</button>
+
 							</div>
 							<br>
 							<br>	
 							<table class="table table-condensed table-bordered">
 								<thead>
 									<tr>
-										<th>Nome</th>
+										<th width="200px">Nome</th>
+										<th class="text-center" width="10px">Área</th>
 										<th class="text-center" width="10px">Ações</th>
 									</tr>
 								</thead>
 								<tbody>
 									<tr ng-repeat="variedade in formPlanejamento.variedades">
 										<td>{{variedade.nome}}</td>
+										<td>{{variedade.area}}</td>
 										<td class="text-center" width="130px">
-
+											<button type="button" class="btn btn-default btn-xs" ng-click="ChamarEditarVariedade(data.fazenda, objSafra, formPlanejamento, variedade)">
+												<i class="glyphicon glyphicon-pencil"></i>
+											</button>
 
 											<button type="button" class="btn btn-danger btn-xs" ng-click="excluirVariedade(data.fazenda, objSafra, formPlanejamento, variedade)">
 												<i class="glyphicon glyphicon-remove"></i>
@@ -155,7 +182,7 @@
 									</tr>
 								</tbody>
 							</table>
-							
+
 						</div>
 						<div class="col-sm-8">
 
@@ -163,9 +190,10 @@
 							<table class="table table-condensed table-bordered">
 								<thead>
 									<tr>
-										<th>Quadra</th>
+										<th  width="160px">Quadra</th>
 										<th class="text-center" width="130px">Cultura</th>
 										<th class="text-center" width="130px">Data de Plantio</th>
+										<th class="text-center" width="80px">Área</th>
 										<th class="text-center" width="70px">Ações</th>
 									</tr>
 								</thead>
@@ -174,6 +202,7 @@
 										<td>{{getQuadraNome(quadracultura.key)}}</td>
 										<td class="text-center" width="130px">{{getCulturaNome(quadracultura.key_cultura)}}</td>
 										<td class="text-center" width="130px">{{quadracultura.data_plantio | date:'dd/MM/yyyy'}}</td>
+										<td class="text-center" width="130px">{{quadracultura.area}}</td>
 										<td class="text-center" width="70px">
 											<button type="button" class="btn btn-default btn-xs" ng-click="ChamarEditarPlanejamento(quadracultura)">
 												<i class="glyphicon glyphicon-pencil"></i>

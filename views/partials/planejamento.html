@@ -1,0 +1,241 @@
+<div ng-controller="planejamentoCtrl" class="ng-scope ng_scope">
+	<div class="container container-view">
+		<div class="row">
+			<div class="col-sm-6 col-sm-no-bottom">
+				<p>Você está em <a href="#home">Início</a> / <a href="#cadastro">Cadastro</a>  / <a href="#planejamento">Planejamento</a></p>
+
+				<br />
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-4 col-sm-no-bottom">
+				<form class="form-signin" >
+					<div class="form-group">
+						<label>Fazenda</label>
+						<select class="form-control" ng-options="fazenda.nome for fazenda in fazendas" ng-model="fazenda" ng-change="chengeFazenda(data.fazenda)">
+						</select>
+					</div>
+				</form>
+			</div>
+			<div class="col-sm-4 col-sm-no-bottom ">
+				<form class="form-signin" role="form" >
+					<div class="form-group">
+						<label>Safra</label>						
+						<select class="form-control"   ng-options="safra as (safra.descricao) for safra in safras"  ng-model="safra"  ng-change="chengeSafra(data.safra)" > 							
+							<option></option>
+						</select>
+					</div>
+				</form>
+			</div>
+		</div>
+		<hr/>
+		<div class="row">
+			<div class="col-sm-6">
+				
+				<button type="button" class="btn btn-success" ng-show="save" ng-click="salvarPlanejamento()">Salvar</button>
+				<button type="button" class="btn btn-success" ng-show="edit" ng-click="atualizarPlanejamento()">Atualizar</button>
+				<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar/Novo</button>
+				
+				<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="chamaExcluirPlanejamento()">Excluir</button>
+				<br />
+				<form class="form-signin" role="form" >
+					<div class="form-group">
+
+					</div>
+					<div class="form-group">
+						<label>Quadra/Região</label>
+
+						<select class="form-control"  ng-model="data.key"  ng-options="quadra.key as (quadra.nome) for quadra in todasQuadras"> >							
+							<option></option>
+						</select>
+					</div> 
+					<div class="form-group">
+						<label>Cultura</label>
+
+						<select class="form-control" ng-disabled="todasVariedadesPlanejamento.length>0"  ng-change="chengeCultura()" ng-model="data.key_cultura"  ng-options="cultura.key as (cultura.nome) for cultura in todasCulturas"> >							
+							<option></option>
+						</select>
+
+						
+					</div>
+					<div class="row">
+						<div class="col-sm-7">
+							<div class="form-group">
+								<label>Data do Plantio</label><br>
+								<input type="date" ng-model="data.data_plantio">
+
+
+
+							</div>
+						</div>
+						<div class="col-sm-5">
+							<div class="form-group">
+
+								<label>Área</label><br>
+
+								<input type="number" class="form-control" placeholder="ha" ng-model="data.area" />
+							</div>
+
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-sm-8">
+
+							<div class="form-group">
+								<input type="checkbox" ng-disabled=editCultura ng-model="data.separar_variedade"
+								ng-true-value="true" ng-false-value="false">	
+								<label>Separar por variedade</label>
+							</div>
+						</div>
+						<div class="col-sm-4">
+							<input type="checkbox" ng-model="data.ativo"
+							ng-true-value="true" ng-false-value="false">	<label>Ativo</label>
+						</div>
+
+					</div>
+
+
+				</form>
+
+				<hr/>
+
+				<div class="form-group">
+
+				</div>
+				<div class="">
+
+					<div class="form-group">
+						<label>Variedades</label>
+
+						<select class="form-control"  ng-disabled="edit_variedade" ng-model="formPlanejamento.variedade"  ng-options="variedade as (variedade.nome) for variedade in variedadesAdd"> >							
+							<option></option>
+						</select>
+
+					</div>
+					<div class="form-group">
+
+						<label>Área (Variedade)</label><br>
+
+						<input type="number" class="form-control" placeholder="ha" ng-disabled="data.area==null || data.area==0 " ng-model="formPlanejamento.area" />
+
+					</div>
+					<div class="form-group">
+
+						<button type="button" class="btn btn-default btn-xm btn-success"  ng-disabled="!edit" ng-show="!edit_variedade" ng-click="salvarVariedade()">
+							<i class="glyphicon glyphicon-plus-sign"></i> Inserir												
+						</button>
+						<button type="button" class="btn btn-default btn-xm btn-success" ng-show="edit_variedade" ng-click="atualizarVariedade()">Atualizar</button>
+						
+						<button type="button" class="btn btn-default btn-xm btn-cancel" ng-show="edit_variedade" ng-click="cancelarVariedade()">Cancelar</button>
+						<button type="button" class="btn btn-default btn-xm btn-danger" ng-show="edit_variedade" ng-click="questionaExcluirVariedade()">Excluir</button>
+					</div>
+					<br>
+					<div class="row">
+						<div ui-grid="gridOptionsVariedades" ui-grid-selection class="gridPlanejamentoVariedade"></div>	
+					</div>
+					<br>	
+					
+				</div>
+			</div>
+			<div class="col-sm-6">
+				<div ui-grid="gridOptions" ui-grid-selection class="gridPlanejamento"></div>	
+			</div>
+		</div>
+	</div>
+
+	<!--########################################################################################-->
+	<!-- Modal DELETE-->
+	<div class="modal fade" id="modalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Confirmação Exclusão</h4>
+				</div>
+
+				<div class="modal-body">
+					<p>Têm certeza que deseja excluir a Variedade '{{formSafra.descricao}}'?</p>
+					<p class="debug-url"></p>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+					<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="excluirPlanejamento()">Excluir</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="modal fade" id="modalDeletePlanejamento" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Confirmação Exclusão</h4>
+				</div>
+
+				<div class="modal-body">
+					<p>Têm certeza que deseja excluir a quadra/região '{{getQuadraNome(data.key)}}' da safra '{{safra.descricao}}'?</p>
+					<p class="debug-url"></p>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+					<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="excluirPlanejamento()">Excluir</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="modal fade" id="modalDeleteVariedade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Confirmação Exclusão</h4>
+				</div>
+
+				<div class="modal-body">
+					<p>Têm certeza que deseja excluir a Variedade '{{formPlanejamento.variedade.nome}}' deste Planejamento?</p>
+					<p class="debug-url"></p>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+					<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="excluirVariedade()">Excluir</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal Start here-->
+	<div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"
+	role="dialog" aria-hidden="true" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">
+					<span class="glyphicon glyphicon-time">
+					</span>&nbsp;&nbsp;Aguarde, carregando...
+				</h4>
+			</div>
+			<div class="modal-body">
+				<div class="progress">
+					<div class="progress-bar progress-bar-info
+					progress-bar-striped active"
+					style="width: 100%">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+<!-- Modal ends Here -->
+</div>

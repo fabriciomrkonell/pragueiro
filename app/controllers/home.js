@@ -47,7 +47,7 @@ function initMap() {
 
 
 		angular.extend($scope, {
-			versao: '1.2',
+			versao: '1.3',
 			quadras: [],
 			culturas:[],
 			vistorias:[],
@@ -1103,6 +1103,7 @@ function initMap() {
 				window.localStorage.setItem('intensidadeHeatMap', $scope.formMapa.intesidade);
 			}
 			//---------------
+
 			$scope.todascoordenadasCentroidMapaInfestacao=[];
 
 			$scope.qtde_quadra_coordenadas=0;
@@ -1177,6 +1178,7 @@ function initMap() {
 										{
 											if(vis_fina.latitude!=null && vis_fina.longitude!=null)
 											{
+												
 												/*
 												var cityCircle = new google.maps.Circle({
 													strokeColor: '#FF0000',
@@ -1215,9 +1217,9 @@ function initMap() {
 			});
 
 
-			
-			
-			
+
+
+
 		}
 
 
@@ -1282,7 +1284,7 @@ function initMap() {
 			var i=0;	
 		}
 
-		
+
 		function setaCoordenadasMapaInfestacao(todascoordenadasCentroid, todascoordenadasQuadraEspecifica)
 		{
 			console.log('setaCoordenadasMapaInfestacao');
@@ -1346,765 +1348,947 @@ function initMap() {
 					{
 						var bermudaTriangle = new google.maps.Polygon({
 							paths: [ mundo, cords[0]],
+						//paths: [cords[0]],
+						strokeColor: strokeColor,
+						strokeOpacity: strokeOpacity,
+						strokeWeight: strokeWeight,
+						fillColor: fillColor,
+						fillOpacity: fillOpacity
+					});
+						
+						bermudaTriangle.setMap(map_infestacao);
+/*
+						var bermudaTriangle2 = new google.maps.Polygon({
+						//paths: [ mundo, cords[0]],
+						paths: [cords[0]],
+						strokeColor: strokeColor,
+						strokeOpacity: strokeOpacity,
+						strokeWeight: strokeWeight,
+						fillColor: fillColor,
+						fillOpacity: fillOpacity
+					});
+
+
+						var bounds = new google.maps.LatLngBounds();
+
+						for (var i=0; i < bermudaTriangle2.getPath().getLength(); i++) {
+							bounds.extend(bermudaTriangle2.getPath().getAt(i));
+						}
+
+
+						var EuropeCoords3 = [
+						new google.maps.LatLng(bounds.getNorthEast().lat(), bounds.getNorthEast().lng()	),
+						new google.maps.LatLng(bounds.getSouthWest().lat(), bounds.getNorthEast().lng()	),
+						new google.maps.LatLng(bounds.getSouthWest().lat(), bounds.getSouthWest().lng()	),
+						new google.maps.LatLng(bounds.getNorthEast().lat(), bounds.getSouthWest().lng()	)];
+
+
+						var bermudaTriangle3 = new google.maps.Polygon({
+							paths: [ mundo, cords[0]],
+
 							strokeColor: strokeColor,
 							strokeOpacity: strokeOpacity,
 							strokeWeight: strokeWeight,
-							fillColor: fillColor,
+							fillColor: '#ffffff',
 							fillOpacity: fillOpacity
 						});
+						bermudaTriangle3.setMap(map_infestacao);
 
-						bermudaTriangle.setMap(map_infestacao);
-					}
-					if(cords.length==2)
+						
+						//paths: EuropeCoords3,
+						var listHeatGeral=[];
+
+						var old_lng=bounds.getSouthWest().lng()+0.0001;	
+						var iLgn=0;
+						do {
+
+							var old_lat=bounds.getSouthWest().lat()+0.0001;		
+							var iLat=0;
+							do {
+								var point = new google.maps.LatLng(old_lat,old_lng);
+								if(google.maps.geometry.poly.containsLocation(point,bermudaTriangle2))
+								{
+
+									listHeatGeral.push(point);
+								}
+								old_lat=old_lat+0.0008;
+								iLat=iLat+1;
+							}
+							while (bounds.getNorthEast().lat()>old_lat)
+
+								old_lng=old_lng +0.0008;
+							var point2 = new google.maps.LatLng(old_lat,bounds.getSouthWest().lng());
+							iLgn=iLgn+1;
+
+						}
+						while (bounds.getNorthEast().lng()>old_lng)
+
+							heatmap = new google.maps.visualization.HeatmapLayer({
+								data: listHeatGeral,
+								map: map_infestacao,
+								radius: $scope.formMapa.intesidade
+							});
+
+						var marker1 = new google.maps.Marker({
+							position: new google.maps.LatLng(bounds.getNorthEast().lat(), bounds.getNorthEast().lng()	),
+							map: map_infestacao,
+							label: '',
+							title: '1'
+						});
+
+						var marker1 = new google.maps.Marker({
+							position: new google.maps.LatLng(bounds.getSouthWest().lat(), bounds.getNorthEast().lng()	),
+							map: map_infestacao,
+							label: '',
+							title: '1'
+						});
+
+						var marker1 = new google.maps.Marker({
+							position: new google.maps.LatLng(bounds.getSouthWest().lat(), bounds.getSouthWest().lng()	),
+							map: map_infestacao,
+							label: '',
+							title: '1'
+						});
+
+						var marker1 = new google.maps.Marker({
+							position: new google.maps.LatLng(bounds.getNorthEast().lat(), bounds.getSouthWest().lng()	),
+							map: map_infestacao,
+							label: '',
+							title: '1'
+						});
+
+
+
+
+				
+				A PARTIR DAQUI TAVA COMENTANDO ANTES
+				var old_lat=bounds.getSouthWest().lat()+0.0001;			
+				for (var i = 0; i < 300; i++) {
+					var point = new google.maps.LatLng(old_lat,bounds.getSouthWest().lng());
+					if(google.maps.geometry.poly.containsLocation(point,bermudaTriangle))
 					{
-						var bermudaTriangle = new google.maps.Polygon({
-							paths: [ mundo, 
-							cords[0],
-							cords[1]
-							],
-							strokeColor: strokeColor,
-							strokeOpacity: strokeOpacity,
-							strokeWeight: strokeWeight,
-							fillColor: fillColor,
-							fillOpacity: fillOpacity
+						var marker11 = new google.maps.Marker({
+							position: new google.maps.LatLng(old_lat, bounds.getSouthWest().lng()	),
+							map: map_infestacao,
+							label: '',
+							title: '1'
 						});
-
-						bermudaTriangle.setMap(map_infestacao);
 					}
-					if(cords.length==3)
-					{
-						var bermudaTriangle = new google.maps.Polygon({
-							paths: [ mundo, 
-							cords[0],
-							cords[1],
-							cords[2]
-							],
-							strokeColor: strokeColor,
-							strokeOpacity: strokeOpacity,
-							strokeWeight: strokeWeight,
-							fillColor: fillColor,
-							fillOpacity: fillOpacity
-						});
-
-						bermudaTriangle.setMap(map_infestacao);
-					}
-					if(cords.length==4)
-					{
-						var bermudaTriangle = new google.maps.Polygon({
-							paths: [ mundo, 
-							cords[0],
-							cords[1],
-							cords[2],
-							cords[3]
-							],
-							strokeColor: strokeColor,
-							strokeOpacity: strokeOpacity,
-							strokeWeight: strokeWeight,
-							fillColor: fillColor,
-							fillOpacity: fillOpacity
-						});
-
-						bermudaTriangle.setMap(map_infestacao);
-					}
-					if(cords.length==5)
-					{
-						var bermudaTriangle = new google.maps.Polygon({
-							paths: [ mundo, 
-							cords[0],
-							cords[1],
-							cords[2],
-							cords[3],
-							cords[4]
-							],
-							strokeColor: strokeColor,
-							strokeOpacity: strokeOpacity,
-							strokeWeight: strokeWeight,
-							fillColor: fillColor,
-							fillOpacity: fillOpacity
-						});
-
-						bermudaTriangle.setMap(map_infestacao);
-					}
-					if(cords.length==6)
-					{
-						var bermudaTriangle = new google.maps.Polygon({
-							paths: [ mundo, 
-							cords[0],
-							cords[1],
-							cords[2],
-							cords[3],
-							cords[4],
-							cords[5]
-							],
-							strokeColor: strokeColor,
-							strokeOpacity: strokeOpacity,
-							strokeWeight: strokeWeight,
-							fillColor: fillColor,
-							fillOpacity: fillOpacity
-						});
-
-						bermudaTriangle.setMap(map_infestacao);
-					}
-					if(cords.length==7)
-					{
-						var bermudaTriangle = new google.maps.Polygon({
-							paths: [ mundo, 
-							cords[0],
-							cords[1],
-							cords[2],
-							cords[3],
-							cords[4],
-							cords[5],
-							cords[6]
-							],
-							strokeColor: strokeColor,
-							strokeOpacity: strokeOpacity,
-							strokeWeight: strokeWeight,
-							fillColor: fillColor,
-							fillOpacity: fillOpacity
-						});
-
-						bermudaTriangle.setMap(map_infestacao);
-					}
-					if(cords.length==8)
-					{
-						var bermudaTriangle = new google.maps.Polygon({
-							paths: [ mundo, 
-							cords[0],
-							cords[1],
-							cords[2],
-							cords[3],
-							cords[4],
-							cords[5],
-							cords[6],
-							cords[7]
-							],
-							strokeColor: strokeColor,
-							strokeOpacity: strokeOpacity,
-							strokeWeight: strokeWeight,
-							fillColor: fillColor,
-							fillOpacity: fillOpacity
-						});
-
-						bermudaTriangle.setMap(map_infestacao);
-					}
-					if(cords.length==9)
-					{
-						var bermudaTriangle = new google.maps.Polygon({
-							paths: [ mundo, 
-							cords[0],
-							cords[1],
-							cords[2],
-							cords[3],
-							cords[4],
-							cords[5],
-							cords[6],
-							cords[7],
-							cords[8]
-							],
-							strokeColor: strokeColor,
-							strokeOpacity: strokeOpacity,
-							strokeWeight: strokeWeight,
-							fillColor: fillColor,
-							fillOpacity: fillOpacity
-						});
-
-						bermudaTriangle.setMap(map_infestacao);
-					}
-
-					if(cords.length==10)
-					{
-						var bermudaTriangle = new google.maps.Polygon({
-							paths: [ mundo, 
-							cords[0],
-							cords[1],
-							cords[2],
-							cords[3],
-							cords[4],
-							cords[5],
-							cords[6],
-							cords[7],
-							cords[8],
-							cords[9]
-							],
-							strokeColor: strokeColor,
-							strokeOpacity: strokeOpacity,
-							strokeWeight: strokeWeight,
-							fillColor: fillColor,
-							fillOpacity: fillOpacity
-						});
-
-						bermudaTriangle.setMap(map_infestacao);
-					}
-
-					if(cords.length==11)
-					{
-						var bermudaTriangle = new google.maps.Polygon({
-							paths: [ mundo, 
-							cords[0],
-							cords[1],
-							cords[2],
-							cords[3],
-							cords[4],
-							cords[5],
-							cords[6],
-							cords[7],
-							cords[8],
-							cords[9],
-							cords[10]
-							],
-							strokeColor: strokeColor,
-							strokeOpacity: strokeOpacity,
-							strokeWeight: strokeWeight,
-							fillColor: fillColor,
-							fillOpacity: fillOpacity
-						});
-
-						bermudaTriangle.setMap(map_infestacao);
-					}
-					if(cords.length==12)
-					{
-						var bermudaTriangle = new google.maps.Polygon({
-							paths: [ mundo, 
-							cords[0],
-							cords[1],
-							cords[2],
-							cords[3],
-							cords[4],
-							cords[5],
-							cords[6],
-							cords[7],
-							cords[8],
-							cords[9],
-							cords[10],
-							cords[11]
-							],
-							strokeColor: strokeColor,
-							strokeOpacity: strokeOpacity,
-							strokeWeight: strokeWeight,
-							fillColor: fillColor,
-							fillOpacity: fillOpacity
-						});
-
-						bermudaTriangle.setMap(map_infestacao);
-					}
-					if(cords.length==13)
-					{
-						var bermudaTriangle = new google.maps.Polygon({
-							paths: [ mundo, 
-							cords[0],
-							cords[1],
-							cords[2],
-							cords[3],
-							cords[4],
-							cords[5],
-							cords[6],
-							cords[7],
-							cords[8],
-							cords[9],
-							cords[10],
-							cords[11],
-							cords[12]
-							],
-							strokeColor: strokeColor,
-							strokeOpacity: strokeOpacity,
-							strokeWeight: strokeWeight,
-							fillColor: fillColor,
-							fillOpacity: fillOpacity
-						});
-
-						bermudaTriangle.setMap(map_infestacao);
-					}
-					if(cords.length==14)
-					{
-						var bermudaTriangle = new google.maps.Polygon({
-							paths: [ mundo, 
-							cords[0],
-							cords[1],
-							cords[2],
-							cords[3],
-							cords[4],
-							cords[5],
-							cords[6],
-							cords[7],
-							cords[8],
-							cords[9],
-							cords[10],
-							cords[11],
-							cords[12],
-							cords[13]
-							],
-							strokeColor: strokeColor,
-							strokeOpacity: strokeOpacity,
-							strokeWeight: strokeWeight,
-							fillColor: fillColor,
-							fillOpacity: fillOpacity
-						});
-
-						bermudaTriangle.setMap(map_infestacao);
-					}
-					if(cords.length==15)
-					{
-						var bermudaTriangle = new google.maps.Polygon({
-							paths: [ mundo, 
-							cords[0],
-							cords[1],
-							cords[2],
-							cords[3],
-							cords[4],
-							cords[5],
-							cords[6],
-							cords[7],
-							cords[8],
-							cords[9],
-							cords[10],
-							cords[11],
-							cords[12],
-							cords[13],
-							cords[14]
-							],
-							strokeColor: strokeColor,
-							strokeOpacity: strokeOpacity,
-							strokeWeight: strokeWeight,
-							fillColor: fillColor,
-							fillOpacity: fillOpacity
-						});
-
-						bermudaTriangle.setMap(map_infestacao);
-					}
-
-					if(cords.length==16)
-					{
-						var bermudaTriangle = new google.maps.Polygon({
-							paths: [ mundo, 
-							cords[0],
-							cords[1],
-							cords[2],
-							cords[3],
-							cords[4],
-							cords[5],
-							cords[6],
-							cords[7],
-							cords[8],
-							cords[9],
-							cords[10],
-							cords[11],
-							cords[12],
-							cords[13],
-							cords[14],
-							cords[15]
-							],
-							strokeColor: strokeColor,
-							strokeOpacity: strokeOpacity,
-							strokeWeight: strokeWeight,
-							fillColor: fillColor,
-							fillOpacity: fillOpacity
-						});
-
-						bermudaTriangle.setMap(map_infestacao);
-					}
-					if(cords.length==17)
-					{
-						var bermudaTriangle = new google.maps.Polygon({
-							paths: [ mundo, 
-							cords[0],
-							cords[1],
-							cords[2],
-							cords[3],
-							cords[4],
-							cords[5],
-							cords[6],
-							cords[7],
-							cords[8],
-							cords[9],
-							cords[10],
-							cords[11],
-							cords[12],
-							cords[13],
-							cords[14],
-							cords[15],
-							cords[16]
-							],
-							strokeColor: strokeColor,
-							strokeOpacity: strokeOpacity,
-							strokeWeight: strokeWeight,
-							fillColor: fillColor,
-							fillOpacity: fillOpacity
-						});
-
-						bermudaTriangle.setMap(map_infestacao);
-					}
-					if(cords.length==18)
-					{
-						var bermudaTriangle = new google.maps.Polygon({
-							paths: [ mundo, 
-							cords[0],
-							cords[1],
-							cords[2],
-							cords[3],
-							cords[4],
-							cords[5],
-							cords[6],
-							cords[7],
-							cords[8],
-							cords[9],
-							cords[10],
-							cords[11],
-							cords[12],
-							cords[13],
-							cords[14],
-							cords[15],
-							cords[16],
-							cords[17]
-							],
-							strokeColor: strokeColor,
-							strokeOpacity: strokeOpacity,
-							strokeWeight: strokeWeight,
-							fillColor: fillColor,
-							fillOpacity: fillOpacity
-						});
-
-						bermudaTriangle.setMap(map_infestacao);
-					}
-					if(cords.length==19)
-					{
-						var bermudaTriangle = new google.maps.Polygon({
-							paths: [ mundo, 
-							cords[0],
-							cords[1],
-							cords[2],
-							cords[3],
-							cords[4],
-							cords[5],
-							cords[6],
-							cords[7],
-							cords[8],
-							cords[9],
-							cords[10],
-							cords[11],
-							cords[12],
-							cords[13],
-							cords[14],
-							cords[15],
-							cords[16],
-							cords[17],
-							cords[18]
-							],
-							strokeColor: strokeColor,
-							strokeOpacity: strokeOpacity,
-							strokeWeight: strokeWeight,
-							fillColor: fillColor,
-							fillOpacity: fillOpacity
-						});
-
-						bermudaTriangle.setMap(map_infestacao);
-					}
-					if(cords.length==20)
-					{
-						var bermudaTriangle = new google.maps.Polygon({
-							paths: [ mundo, 
-							cords[0],
-							cords[1],
-							cords[2],
-							cords[3],
-							cords[4],
-							cords[5],
-							cords[6],
-							cords[7],
-							cords[8],
-							cords[9],
-							cords[10],
-							cords[11],
-							cords[12],
-							cords[13],
-							cords[14],
-							cords[15],
-							cords[16],
-							cords[17],
-							cords[18],
-							cords[19]
-							],
-							strokeColor: strokeColor,
-							strokeOpacity: strokeOpacity,
-							strokeWeight: strokeWeight,
-							fillColor: fillColor,
-							fillOpacity: fillOpacity
-						});
-
-						bermudaTriangle.setMap(map_infestacao);
-					}
-					if(cords.length==21)
-					{
-						var bermudaTriangle = new google.maps.Polygon({
-							paths: [ mundo, 
-							cords[0],
-							cords[1],
-							cords[2],
-							cords[3],
-							cords[4],
-							cords[5],
-							cords[6],
-							cords[7],
-							cords[8],
-							cords[9],
-							cords[10],
-							cords[11],
-							cords[12],
-							cords[13],
-							cords[14],
-							cords[15],
-							cords[16],
-							cords[17],
-							cords[18],
-							cords[19],
-							cords[20]
-							],
-							strokeColor: strokeColor,
-							strokeOpacity: strokeOpacity,
-							strokeWeight: strokeWeight,
-							fillColor: fillColor,
-							fillOpacity: fillOpacity
-						});
-
-						bermudaTriangle.setMap(map_infestacao);
-					}
-					if(cords.length==22)
-					{
-						var bermudaTriangle = new google.maps.Polygon({
-							paths: [ mundo, 
-							cords[0],
-							cords[1],
-							cords[2],
-							cords[3],
-							cords[4],
-							cords[5],
-							cords[6],
-							cords[7],
-							cords[8],
-							cords[9],
-							cords[10],
-							cords[11],
-							cords[12],
-							cords[13],
-							cords[14],
-							cords[15],
-							cords[16],
-							cords[17],
-							cords[18],
-							cords[19],
-							cords[20],
-							cords[21]
-							],
-							strokeColor: strokeColor,
-							strokeOpacity: strokeOpacity,
-							strokeWeight: strokeWeight,
-							fillColor: fillColor,
-							fillOpacity: fillOpacity
-						});
-
-						bermudaTriangle.setMap(map_infestacao);
-					}
-
+					old_lat=old_lat+0.0001;
 				}
 
 
 
-			}
-			else
-			{
-				var todascoordenadasCentroidQuadraEspecifica=[];
-
-				var region = new Region(todascoordenadasCentroidQuadraEspecifica);			
-				$scope.centerMapa=new google.maps.LatLng(region.centroid().x, region.centroid().y);
-			}
-
-			if(!$scope.$$phase) 
-			{
-				$scope.$apply();
-			}
-
-			$('#myPleaseWait').modal('hide');
-		}
-
-		function setaCentroMapaInfestacao()
-		{
-			var region = new Region($scope.todascoordenadasCentroidMapaInfestacao);	
-			map_infestacao.setCenter(new google.maps.LatLng(region.centroid().x, region.centroid().y))	;
-			map_infestacao.setZoom(12);	
-		}
-
-		$scope.abrirMapa = function(vistoria) {
-			$('#myPleaseWait').modal('show');
-
-			var refCoordenadas = new Firebase(Constant.Url + '/coordenada/'+ vistoria.quadra.key);
-			refCoordenadas.on('value', function(snapshot) {
-				if(snapshot.numChildren()>0)
-				{
-					atualizaCoordenadasQuadra(vistoria,  snapshot.numChildren());
-				}
-				else
-				{
-					setaCoordenadasPontos(vistoria, null, null);
+				for (var i = 0; i < 300; i++) {
+					var point = new google.maps.LatLng(old_lat,bounds.getSouthWest().lng());
+					if (google.maps.geometry.poly.containsLocation(point,bermudaTriangle)) {
+						var marker11 = new google.maps.Marker({
+							position: new google.maps.LatLng(old_lat, bounds.getSouthWest().lng()	),
+							map: map_infestacao,
+							label: '',
+							title: '1'
+						});
+					}
+					old_lat=old_lat+0.0001;
 				}
 
-			});
-		}
-
-		function atualizaCoordenadasQuadra(vistoria, qdteRegistro)
-		{
-			var todascoordenadasQuadraEspecifica=[];
-			var todascoordenadasCentroidQuadraEspecifica=[];
-
-			var refCoordenadas = new Firebase(Constant.Url + '/coordenada/'+ vistoria.quadra.key);
-
-			var i=0;
-			refCoordenadas.on('child_added', function(snap) {
-				i++;
-
-
-				var coordenadas= snap.val();
-
-				var novo=[];
-				novo['latitude']=coordenadas.latitude;
-				novo['longitude']=coordenadas.longitude;
-				todascoordenadasQuadraEspecifica.push(new google.maps.LatLng(coordenadas.latitude, coordenadas.longitude));
-
-
-				var novoCentroid=[];
-				novoCentroid['x']=coordenadas.latitude;
-				novoCentroid['y']=coordenadas.longitude;
-				todascoordenadasCentroidQuadraEspecifica.push(novoCentroid);
-
-				if(qdteRegistro==i)
-				{
-					$('#myPleaseWait').modal('hide');
-					setaCoordenadasPontos(vistoria, todascoordenadasCentroidQuadraEspecifica, todascoordenadasQuadraEspecifica);
-
+				old_lat=bounds.getSouthWest().lat()+0.0001;
+				var old_lng=bounds.getSouthWest().lng()+0.0001;
+				for (var i = 0; i < 300; i++) {
+					var point = new google.maps.LatLng(old_lat,old_lng);
+					if (google.maps.geometry.poly.containsLocation(point,bermudaTriangle)) {
+						var marker11 = new google.maps.Marker({
+							position: new google.maps.LatLng(old_lat, old_lng	),
+							map: map_infestacao,
+							label: '',
+							title: '1'
+						});
+					}
+					old_lat=old_lat+0.0001;
+					old_lng=old_lng+0.0001;
 				}
 
-			});
-
-			var i=0;	
-		}
-
-		function setaCoordenadasPontos(vistoria, todascoordenadasCentroid, todascoordenadasQuadraEspecifica)
-		{
-			console.log('setaCoordenadas');
-
-			if(todascoordenadasCentroid != null && todascoordenadasCentroid.length>0 && todascoordenadasQuadraEspecifica.length>0)
-			{
-				console.log('setaCoordenadas tem');
-				var region = new Region(todascoordenadasCentroid);			
-				$scope.centerMapa=new google.maps.LatLng(region.centroid().x, region.centroid().y);
-				initMap(new google.maps.LatLng(region.centroid().x, region.centroid().y), 14);
-				$('#modalMapa').modal('show');
-
-
-				var bermudaTriangle = new google.maps.Polygon({
-					paths: todascoordenadasQuadraEspecifica,
-					strokeColor: '#212121',
-					strokeOpacity: 0.8,
-					strokeWeight: 3,
-					fillColor: '#50b300',
-					fillOpacity: 0.90
+				var marker1 = new google.maps.Marker({
+					position: new google.maps.LatLng(bounds.getSouthWest().lat(), bounds.getSouthWest().lng()	),
+					map: map_infestacao,
+					label: '',
+					title: '1'
 				});
-				bermudaTriangle.setMap(map);
-			}
-			else
-			{
-				var todascoordenadasCentroidQuadraEspecifica=[];
-				for(var x in vistoria.listPontos )
-				{
-					var novoCentroid=[];
-					novoCentroid['x']=vistoria.listPontos[x].latitude;
-					novoCentroid['y']=vistoria.listPontos[x].longitude;
-					todascoordenadasCentroidQuadraEspecifica.push(novoCentroid);				
-				}
+				marker1.addListener('click', function() {
+					infowindow.open(map_infestacao, marker1);
+				});
 
-				var region = new Region(todascoordenadasCentroidQuadraEspecifica);			
-				$scope.centerMapa=new google.maps.LatLng(region.centroid().x, region.centroid().y);
-				initMap(new google.maps.LatLng(region.centroid().x, region.centroid().y), 14);		
-				$('#modalMapa').modal('show');
-			}
-
-			for(var x in vistoria.listPontos )
-			{
 				var marker = new google.maps.Marker({
-					position: new google.maps.LatLng(vistoria.listPontos[x].latitude, vistoria.listPontos[x].longitude),
-					map: map,
-					label: ''+vistoria.listPontos[x].ponto
+					position: new google.maps.LatLng(bounds.getSouthWest().lat()+0.001, bounds.getSouthWest().lng()	),
+					map: map_infestacao,
+					label: '',
+					title: '1'
 				});
-			}
+				marker.addListener('click', function() {
+					infowindow.open(map_infestacao, marker);
+				});
 
-			if(!$scope.$$phase) 
+				var marker2 = new google.maps.Marker({
+					position: new google.maps.LatLng(bounds.getNorthEast().lat(), bounds.getNorthEast().lng()	),
+					map: map_infestacao,
+					label: '',
+					title: '2'
+				});
+				marker2.addListener('click', function() {
+					infowindow.open(map_infestacao, marker2);
+				});
+				*/
+			}
+			if(cords.length==2)
 			{
-				$scope.$apply();
+				var bermudaTriangle = new google.maps.Polygon({
+					paths: [ mundo, 
+					cords[0],
+					cords[1]
+					],
+					strokeColor: strokeColor,
+					strokeOpacity: strokeOpacity,
+					strokeWeight: strokeWeight,
+					fillColor: fillColor,
+					fillOpacity: fillOpacity
+				});
+
+				bermudaTriangle.setMap(map_infestacao);
+			}
+			if(cords.length==3)
+			{
+				var bermudaTriangle = new google.maps.Polygon({
+					paths: [ mundo, 
+					cords[0],
+					cords[1],
+					cords[2]
+					],
+					strokeColor: strokeColor,
+					strokeOpacity: strokeOpacity,
+					strokeWeight: strokeWeight,
+					fillColor: fillColor,
+					fillOpacity: fillOpacity
+				});
+
+				bermudaTriangle.setMap(map_infestacao);
+			}
+			if(cords.length==4)
+			{
+				var bermudaTriangle = new google.maps.Polygon({
+					paths: [ mundo, 
+					cords[0],
+					cords[1],
+					cords[2],
+					cords[3]
+					],
+					strokeColor: strokeColor,
+					strokeOpacity: strokeOpacity,
+					strokeWeight: strokeWeight,
+					fillColor: fillColor,
+					fillOpacity: fillOpacity
+				});
+
+				bermudaTriangle.setMap(map_infestacao);
+			}
+			if(cords.length==5)
+			{
+				var bermudaTriangle = new google.maps.Polygon({
+					paths: [ mundo, 
+					cords[0],
+					cords[1],
+					cords[2],
+					cords[3],
+					cords[4]
+					],
+					strokeColor: strokeColor,
+					strokeOpacity: strokeOpacity,
+					strokeWeight: strokeWeight,
+					fillColor: fillColor,
+					fillOpacity: fillOpacity
+				});
+
+				bermudaTriangle.setMap(map_infestacao);
+			}
+			if(cords.length==6)
+			{
+				var bermudaTriangle = new google.maps.Polygon({
+					paths: [ mundo, 
+					cords[0],
+					cords[1],
+					cords[2],
+					cords[3],
+					cords[4],
+					cords[5]
+					],
+					strokeColor: strokeColor,
+					strokeOpacity: strokeOpacity,
+					strokeWeight: strokeWeight,
+					fillColor: fillColor,
+					fillOpacity: fillOpacity
+				});
+
+				bermudaTriangle.setMap(map_infestacao);
+			}
+			if(cords.length==7)
+			{
+				var bermudaTriangle = new google.maps.Polygon({
+					paths: [ mundo, 
+					cords[0],
+					cords[1],
+					cords[2],
+					cords[3],
+					cords[4],
+					cords[5],
+					cords[6]
+					],
+					strokeColor: strokeColor,
+					strokeOpacity: strokeOpacity,
+					strokeWeight: strokeWeight,
+					fillColor: fillColor,
+					fillOpacity: fillOpacity
+				});
+
+				bermudaTriangle.setMap(map_infestacao);
+			}
+			if(cords.length==8)
+			{
+				var bermudaTriangle = new google.maps.Polygon({
+					paths: [ mundo, 
+					cords[0],
+					cords[1],
+					cords[2],
+					cords[3],
+					cords[4],
+					cords[5],
+					cords[6],
+					cords[7]
+					],
+					strokeColor: strokeColor,
+					strokeOpacity: strokeOpacity,
+					strokeWeight: strokeWeight,
+					fillColor: fillColor,
+					fillOpacity: fillOpacity
+				});
+
+				bermudaTriangle.setMap(map_infestacao);
+			}
+			if(cords.length==9)
+			{
+				var bermudaTriangle = new google.maps.Polygon({
+					paths: [ mundo, 
+					cords[0],
+					cords[1],
+					cords[2],
+					cords[3],
+					cords[4],
+					cords[5],
+					cords[6],
+					cords[7],
+					cords[8]
+					],
+					strokeColor: strokeColor,
+					strokeOpacity: strokeOpacity,
+					strokeWeight: strokeWeight,
+					fillColor: fillColor,
+					fillOpacity: fillOpacity
+				});
+
+				bermudaTriangle.setMap(map_infestacao);
 			}
 
+			if(cords.length==10)
+			{
+				var bermudaTriangle = new google.maps.Polygon({
+					paths: [ mundo, 
+					cords[0],
+					cords[1],
+					cords[2],
+					cords[3],
+					cords[4],
+					cords[5],
+					cords[6],
+					cords[7],
+					cords[8],
+					cords[9]
+					],
+					strokeColor: strokeColor,
+					strokeOpacity: strokeOpacity,
+					strokeWeight: strokeWeight,
+					fillColor: fillColor,
+					fillOpacity: fillOpacity
+				});
+
+				bermudaTriangle.setMap(map_infestacao);
+			}
+
+			if(cords.length==11)
+			{
+				var bermudaTriangle = new google.maps.Polygon({
+					paths: [ mundo, 
+					cords[0],
+					cords[1],
+					cords[2],
+					cords[3],
+					cords[4],
+					cords[5],
+					cords[6],
+					cords[7],
+					cords[8],
+					cords[9],
+					cords[10]
+					],
+					strokeColor: strokeColor,
+					strokeOpacity: strokeOpacity,
+					strokeWeight: strokeWeight,
+					fillColor: fillColor,
+					fillOpacity: fillOpacity
+				});
+
+				bermudaTriangle.setMap(map_infestacao);
+			}
+			if(cords.length==12)
+			{
+				var bermudaTriangle = new google.maps.Polygon({
+					paths: [ mundo, 
+					cords[0],
+					cords[1],
+					cords[2],
+					cords[3],
+					cords[4],
+					cords[5],
+					cords[6],
+					cords[7],
+					cords[8],
+					cords[9],
+					cords[10],
+					cords[11]
+					],
+					strokeColor: strokeColor,
+					strokeOpacity: strokeOpacity,
+					strokeWeight: strokeWeight,
+					fillColor: fillColor,
+					fillOpacity: fillOpacity
+				});
+
+				bermudaTriangle.setMap(map_infestacao);
+			}
+			if(cords.length==13)
+			{
+				var bermudaTriangle = new google.maps.Polygon({
+					paths: [ mundo, 
+					cords[0],
+					cords[1],
+					cords[2],
+					cords[3],
+					cords[4],
+					cords[5],
+					cords[6],
+					cords[7],
+					cords[8],
+					cords[9],
+					cords[10],
+					cords[11],
+					cords[12]
+					],
+					strokeColor: strokeColor,
+					strokeOpacity: strokeOpacity,
+					strokeWeight: strokeWeight,
+					fillColor: fillColor,
+					fillOpacity: fillOpacity
+				});
+
+				bermudaTriangle.setMap(map_infestacao);
+			}
+			if(cords.length==14)
+			{
+				var bermudaTriangle = new google.maps.Polygon({
+					paths: [ mundo, 
+					cords[0],
+					cords[1],
+					cords[2],
+					cords[3],
+					cords[4],
+					cords[5],
+					cords[6],
+					cords[7],
+					cords[8],
+					cords[9],
+					cords[10],
+					cords[11],
+					cords[12],
+					cords[13]
+					],
+					strokeColor: strokeColor,
+					strokeOpacity: strokeOpacity,
+					strokeWeight: strokeWeight,
+					fillColor: fillColor,
+					fillOpacity: fillOpacity
+				});
+
+				bermudaTriangle.setMap(map_infestacao);
+			}
+			if(cords.length==15)
+			{
+				var bermudaTriangle = new google.maps.Polygon({
+					paths: [ mundo, 
+					cords[0],
+					cords[1],
+					cords[2],
+					cords[3],
+					cords[4],
+					cords[5],
+					cords[6],
+					cords[7],
+					cords[8],
+					cords[9],
+					cords[10],
+					cords[11],
+					cords[12],
+					cords[13],
+					cords[14]
+					],
+					strokeColor: strokeColor,
+					strokeOpacity: strokeOpacity,
+					strokeWeight: strokeWeight,
+					fillColor: fillColor,
+					fillOpacity: fillOpacity
+				});
+
+				bermudaTriangle.setMap(map_infestacao);
+			}
+
+			if(cords.length==16)
+			{
+				var bermudaTriangle = new google.maps.Polygon({
+					paths: [ mundo, 
+					cords[0],
+					cords[1],
+					cords[2],
+					cords[3],
+					cords[4],
+					cords[5],
+					cords[6],
+					cords[7],
+					cords[8],
+					cords[9],
+					cords[10],
+					cords[11],
+					cords[12],
+					cords[13],
+					cords[14],
+					cords[15]
+					],
+					strokeColor: strokeColor,
+					strokeOpacity: strokeOpacity,
+					strokeWeight: strokeWeight,
+					fillColor: fillColor,
+					fillOpacity: fillOpacity
+				});
+
+				bermudaTriangle.setMap(map_infestacao);
+			}
+			if(cords.length==17)
+			{
+				var bermudaTriangle = new google.maps.Polygon({
+					paths: [ mundo, 
+					cords[0],
+					cords[1],
+					cords[2],
+					cords[3],
+					cords[4],
+					cords[5],
+					cords[6],
+					cords[7],
+					cords[8],
+					cords[9],
+					cords[10],
+					cords[11],
+					cords[12],
+					cords[13],
+					cords[14],
+					cords[15],
+					cords[16]
+					],
+					strokeColor: strokeColor,
+					strokeOpacity: strokeOpacity,
+					strokeWeight: strokeWeight,
+					fillColor: fillColor,
+					fillOpacity: fillOpacity
+				});
+
+				bermudaTriangle.setMap(map_infestacao);
+			}
+			if(cords.length==18)
+			{
+				var bermudaTriangle = new google.maps.Polygon({
+					paths: [ mundo, 
+					cords[0],
+					cords[1],
+					cords[2],
+					cords[3],
+					cords[4],
+					cords[5],
+					cords[6],
+					cords[7],
+					cords[8],
+					cords[9],
+					cords[10],
+					cords[11],
+					cords[12],
+					cords[13],
+					cords[14],
+					cords[15],
+					cords[16],
+					cords[17]
+					],
+					strokeColor: strokeColor,
+					strokeOpacity: strokeOpacity,
+					strokeWeight: strokeWeight,
+					fillColor: fillColor,
+					fillOpacity: fillOpacity
+				});
+
+				bermudaTriangle.setMap(map_infestacao);
+			}
+			if(cords.length==19)
+			{
+				var bermudaTriangle = new google.maps.Polygon({
+					paths: [ mundo, 
+					cords[0],
+					cords[1],
+					cords[2],
+					cords[3],
+					cords[4],
+					cords[5],
+					cords[6],
+					cords[7],
+					cords[8],
+					cords[9],
+					cords[10],
+					cords[11],
+					cords[12],
+					cords[13],
+					cords[14],
+					cords[15],
+					cords[16],
+					cords[17],
+					cords[18]
+					],
+					strokeColor: strokeColor,
+					strokeOpacity: strokeOpacity,
+					strokeWeight: strokeWeight,
+					fillColor: fillColor,
+					fillOpacity: fillOpacity
+				});
+
+				bermudaTriangle.setMap(map_infestacao);
+			}
+			if(cords.length==20)
+			{
+				var bermudaTriangle = new google.maps.Polygon({
+					paths: [ mundo, 
+					cords[0],
+					cords[1],
+					cords[2],
+					cords[3],
+					cords[4],
+					cords[5],
+					cords[6],
+					cords[7],
+					cords[8],
+					cords[9],
+					cords[10],
+					cords[11],
+					cords[12],
+					cords[13],
+					cords[14],
+					cords[15],
+					cords[16],
+					cords[17],
+					cords[18],
+					cords[19]
+					],
+					strokeColor: strokeColor,
+					strokeOpacity: strokeOpacity,
+					strokeWeight: strokeWeight,
+					fillColor: fillColor,
+					fillOpacity: fillOpacity
+				});
+
+				bermudaTriangle.setMap(map_infestacao);
+			}
+			if(cords.length==21)
+			{
+				var bermudaTriangle = new google.maps.Polygon({
+					paths: [ mundo, 
+					cords[0],
+					cords[1],
+					cords[2],
+					cords[3],
+					cords[4],
+					cords[5],
+					cords[6],
+					cords[7],
+					cords[8],
+					cords[9],
+					cords[10],
+					cords[11],
+					cords[12],
+					cords[13],
+					cords[14],
+					cords[15],
+					cords[16],
+					cords[17],
+					cords[18],
+					cords[19],
+					cords[20]
+					],
+					strokeColor: strokeColor,
+					strokeOpacity: strokeOpacity,
+					strokeWeight: strokeWeight,
+					fillColor: fillColor,
+					fillOpacity: fillOpacity
+				});
+
+				bermudaTriangle.setMap(map_infestacao);
+			}
+			if(cords.length==22)
+			{
+				var bermudaTriangle = new google.maps.Polygon({
+					paths: [ mundo, 
+					cords[0],
+					cords[1],
+					cords[2],
+					cords[3],
+					cords[4],
+					cords[5],
+					cords[6],
+					cords[7],
+					cords[8],
+					cords[9],
+					cords[10],
+					cords[11],
+					cords[12],
+					cords[13],
+					cords[14],
+					cords[15],
+					cords[16],
+					cords[17],
+					cords[18],
+					cords[19],
+					cords[20],
+					cords[21]
+					],
+					strokeColor: strokeColor,
+					strokeOpacity: strokeOpacity,
+					strokeWeight: strokeWeight,
+					fillColor: fillColor,
+					fillOpacity: fillOpacity
+				});
+
+				bermudaTriangle.setMap(map_infestacao);
+			}
+
+		}
+
+
+
+	}
+	else
+	{
+		var todascoordenadasCentroidQuadraEspecifica=[];
+
+		var region = new Region(todascoordenadasCentroidQuadraEspecifica);			
+		$scope.centerMapa=new google.maps.LatLng(region.centroid().x, region.centroid().y);
+	}
+
+	if(!$scope.$$phase) 
+	{
+		$scope.$apply();
+	}
+
+	$('#myPleaseWait').modal('hide');
+}
+
+function setaCentroMapaInfestacao()
+{
+	var region = new Region($scope.todascoordenadasCentroidMapaInfestacao);	
+	map_infestacao.setCenter(new google.maps.LatLng(region.centroid().x, region.centroid().y))	;
+	map_infestacao.setZoom(12);	
+}
+
+$scope.abrirMapa = function(vistoria) {
+	$('#myPleaseWait').modal('show');
+
+	var refCoordenadas = new Firebase(Constant.Url + '/coordenada/'+ vistoria.quadra.key);
+	refCoordenadas.on('value', function(snapshot) {
+		if(snapshot.numChildren()>0)
+		{
+			atualizaCoordenadasQuadra(vistoria,  snapshot.numChildren());
+		}
+		else
+		{
+			setaCoordenadasPontos(vistoria, null, null);
+		}
+
+	});
+}
+
+function atualizaCoordenadasQuadra(vistoria, qdteRegistro)
+{
+	var todascoordenadasQuadraEspecifica=[];
+	var todascoordenadasCentroidQuadraEspecifica=[];
+
+	var refCoordenadas = new Firebase(Constant.Url + '/coordenada/'+ vistoria.quadra.key);
+
+	var i=0;
+	refCoordenadas.on('child_added', function(snap) {
+		i++;
+
+
+		var coordenadas= snap.val();
+
+		var novo=[];
+		novo['latitude']=coordenadas.latitude;
+		novo['longitude']=coordenadas.longitude;
+		todascoordenadasQuadraEspecifica.push(new google.maps.LatLng(coordenadas.latitude, coordenadas.longitude));
+
+
+		var novoCentroid=[];
+		novoCentroid['x']=coordenadas.latitude;
+		novoCentroid['y']=coordenadas.longitude;
+		todascoordenadasCentroidQuadraEspecifica.push(novoCentroid);
+
+		if(qdteRegistro==i)
+		{
 			$('#myPleaseWait').modal('hide');
+			setaCoordenadasPontos(vistoria, todascoordenadasCentroidQuadraEspecifica, todascoordenadasQuadraEspecifica);
+
 		}
 
-		$scope.efetuaSelecionarTodasQuadras = function()
+	});
+
+	var i=0;	
+}
+
+function setaCoordenadasPontos(vistoria, todascoordenadasCentroid, todascoordenadasQuadraEspecifica)
+{
+	console.log('setaCoordenadas');
+
+	if(todascoordenadasCentroid != null && todascoordenadasCentroid.length>0 && todascoordenadasQuadraEspecifica.length>0)
+	{
+		console.log('setaCoordenadas tem');
+		var region = new Region(todascoordenadasCentroid);			
+		$scope.centerMapa=new google.maps.LatLng(region.centroid().x, region.centroid().y);
+		initMap(new google.maps.LatLng(region.centroid().x, region.centroid().y), 14);
+		$('#modalMapa').modal('show');
+
+
+		var bermudaTriangle = new google.maps.Polygon({
+			paths: todascoordenadasQuadraEspecifica,
+			strokeColor: '#212121',
+			strokeOpacity: 0.8,
+			strokeWeight: 3,
+			fillColor: '#50b300',
+			fillOpacity: 0.90
+		});
+		bermudaTriangle.setMap(map);
+	}
+	else
+	{
+		var todascoordenadasCentroidQuadraEspecifica=[];
+		for(var x in vistoria.listPontos )
 		{
-			$scope.selecionarTodasQuadras=true;
-			$scope.quadras.forEach(function(obj){
-				$scope.formMapa.quadras.push(obj.quadra);
-			});		
+			var novoCentroid=[];
+			novoCentroid['x']=vistoria.listPontos[x].latitude;
+			novoCentroid['y']=vistoria.listPontos[x].longitude;
+			todascoordenadasCentroidQuadraEspecifica.push(novoCentroid);				
 		}
 
-		$scope.DesEfetuaSelecionarTodasQuadras= function()
+		var region = new Region(todascoordenadasCentroidQuadraEspecifica);			
+		$scope.centerMapa=new google.maps.LatLng(region.centroid().x, region.centroid().y);
+		initMap(new google.maps.LatLng(region.centroid().x, region.centroid().y), 14);		
+		$('#modalMapa').modal('show');
+	}
+
+	for(var x in vistoria.listPontos )
+	{
+		var marker = new google.maps.Marker({
+			position: new google.maps.LatLng(vistoria.listPontos[x].latitude, vistoria.listPontos[x].longitude),
+			map: map,
+			label: ''+vistoria.listPontos[x].ponto
+		});
+	}
+
+	if(!$scope.$$phase) 
+	{
+		$scope.$apply();
+	}
+
+	$('#myPleaseWait').modal('hide');
+}
+
+$scope.efetuaSelecionarTodasQuadras = function()
+{
+	$scope.selecionarTodasQuadras=true;
+	$scope.quadras.forEach(function(obj){
+		$scope.formMapa.quadras.push(obj.quadra);
+	});		
+}
+
+$scope.DesEfetuaSelecionarTodasQuadras= function()
+{
+	$scope.selecionarTodasQuadras=false;
+	$scope.formMapa.quadras=[];
+}
+
+$scope.clickQuadras = function()
+{
+	$scope.selecionarTodasQuadras=false;;
+}
+
+$scope.setaExibirSomenteEncontradas = function()
+{
+	if($scope.exibirSomenteEn)
+	{
+		if(checkLocalHistoryCompatibilidade())
 		{
-			$scope.selecionarTodasQuadras=false;
-			$scope.formMapa.quadras=[];
+			window.localStorage.setItem('exibirSomentePragasEncontradas', 'S');
 		}
-
-		$scope.clickQuadras = function()
+		$scope.pragasExibir=$scope.pragasEncontradasGeral;
+	}
+	else
+	{
+		if(checkLocalHistoryCompatibilidade())
 		{
-			$scope.selecionarTodasQuadras=false;;
+			window.localStorage.setItem('exibirSomentePragasEncontradas', 'N');
 		}
+		$scope.pragasExibir=$scope.todasPragas;
+	}
+}
 
-		$scope.setaExibirSomenteEncontradas = function()
+
+$scope.setaExibirNomeQuadras = function()
+{
+	if($scope.exibirNomeQuadra)
+	{
+		if(checkLocalHistoryCompatibilidade())
 		{
-			if($scope.exibirSomenteEn)
-			{
-				if(checkLocalHistoryCompatibilidade())
-				{
-					window.localStorage.setItem('exibirSomentePragasEncontradas', 'S');
-				}
-				$scope.pragasExibir=$scope.pragasEncontradasGeral;
-			}
-			else
-			{
-				if(checkLocalHistoryCompatibilidade())
-				{
-					window.localStorage.setItem('exibirSomentePragasEncontradas', 'N');
-				}
-				$scope.pragasExibir=$scope.todasPragas;
-			}
+			window.localStorage.setItem('exibirNomeQuadra', 'S');
 		}
-
-
-		$scope.setaExibirNomeQuadras = function()
+	}
+	else
+	{
+		if(checkLocalHistoryCompatibilidade())
 		{
-			if($scope.exibirNomeQuadra)
-			{
-				if(checkLocalHistoryCompatibilidade())
-				{
-					window.localStorage.setItem('exibirNomeQuadra', 'S');
-				}
-			}
-			else
-			{
-				if(checkLocalHistoryCompatibilidade())
-				{
-					window.localStorage.setItem('exibirNomeQuadra', 'N');
-				}
-			}
-			$scope.gerarMapa();
+			window.localStorage.setItem('exibirNomeQuadra', 'N');
 		}
-		//############################################################################################################################
-		//############################################################################################################################
-		//RECUPERA NOME QUADRA/CULTURA
+	}
+	$scope.gerarMapa();
+}
+//############################################################################################################################
+//############################################################################################################################
+//RECUPERA NOME QUADRA/CULTURA
 		//############################################################################################################################
 		$scope.getCulturaNome = function(culturaId){
 			var retorno = '';

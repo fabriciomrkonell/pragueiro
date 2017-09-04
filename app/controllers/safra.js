@@ -462,7 +462,18 @@
 		$scope.salvarVariedade = function(fazenda, safra, formPlanejamento){
 			var fazendaTmp=fazenda;
 			var refVariedadeNovo = new Firebase(Constant.Url + '/filial/' + fazenda.key + '/safra/' + safra.key + '/quadra/'+formPlanejamento.key+'/variedades/'+formPlanejamento.key_variedade);
-			refVariedadeNovo.set(true);
+			
+			var frmVariedade={};
+			frmVariedade['key_variedade']=formPlanejamento.key_variedade;
+			frmVariedade['key_safra']=safra.key;
+			frmVariedade['key_quadra']=formPlanejamento.key;
+			if(formPlanejamento.area_variedade!=null)
+			{
+				frmVariedade['area']=formPlanejamento.area_variedade;
+			}
+
+			refVariedadeNovo.set(frmVariedade);
+
 			console.log(Constant.Url + '/filial/' + fazenda.key + '/safra/' + safra.key + '/quadra/'+formPlanejamento.key+'/variedades/'+formPlanejamento.key_variedade);
 			for (var i = 0; i < $scope.variedadesAdd.length; i++)
 			{			
