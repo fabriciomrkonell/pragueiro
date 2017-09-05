@@ -932,6 +932,7 @@ function initMap() {
 
 		function atualizaListaQuadras()
 		{
+			if($scope.safra==null) return;
 			atualizaVariedade($scope.fazenda.key);
 			$('#myPleaseWait').modal('show');
 			var refUser = new Firebase(Constant.Url + '/usuarioxauth/'+Session.getUser().uid);		
