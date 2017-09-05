@@ -26,14 +26,14 @@
 				<button type="button" class="btn btn-success" ng-show="save" ng-click="salvarSafra(data.fazenda, formSafra)">Salvar</button>
 				<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarSafra(formSafra)">Atualizar</button>
 				<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar/Novo</button>
-				<button type="button" class="btn btn-default btn-warning" ng-disabled="!edit" ng-click="showQuadras(data.fazenda, formSafra)">Quadra</button>
-				<button type="button" class="btn btn-default btn-warning" ng-disabled="!edit" ng-click="getHistoricoQuadrasCulturas(data.fazenda, formSafra)">Histórico</button>
+				<button type="button" class="btn btn-default btn-warning" ng-disabled="true" ng-click="showQuadras(data.fazenda, formSafra)">Quadra</button>
+				<button type="button" class="btn btn-default btn-warning" ng-disabled="true" ng-click="getHistoricoQuadrasCulturas(data.fazenda, formSafra)">Histórico</button>
 				<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="chamaExcluirSafra(formSafra)">Excluir</button>
 				<br />
 				<form class="form-signin" role="form" >
 					<div class="form-group">
-						<label>Descriçāo</label>
-						<input type="text" class="form-control" placeholder="Descriçāo" name="descricao" ng-model="formSafra.key" />
+						<label>Código Interno</label>
+						<input type="text" class="form-control" ng-disabled="true" placeholder="Descriçāo" name="descricao" ng-model="formSafra.key" />
 					</div>
 					<div class="form-group">
 						<label>Descriçāo</label>

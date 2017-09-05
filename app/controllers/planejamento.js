@@ -520,7 +520,6 @@
 				$scope.edit = true;
 				$scope.save=false;
 			}
-
 		};
 
 		$scope.atualizarPlanejamento = function(){
@@ -639,7 +638,6 @@
 					});
 				}
 				data['variedades']=$scope.todasVariedadesPlanejamento;
-
 			}
 			$scope.gridOptionsVariedades.data = $scope.todasVariedadesPlanejamento;
 		};
@@ -983,6 +981,9 @@
 		
 		$scope.clearForm = function(){
 			$scope.data=null;
+			$scope.data ={};
+			$scope.data['ativo']=true;
+
 			$scope.todasVariedadesPlanejamento=[];
 			$scope.gridOptionsVariedades.data = $scope.todasVariedadesPlanejamento;
 			return true;

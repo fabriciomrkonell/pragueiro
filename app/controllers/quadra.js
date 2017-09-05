@@ -165,6 +165,7 @@ function showDicas()
 							$scope.chengeFazenda($scope.fazendas[0]);
 							$scope.data.fazenda=$scope.fazendas[0];
 						}
+						i++;
 						if(!$scope.$$phase) {
 							$scope.$apply();
 						}
@@ -208,6 +209,9 @@ function showDicas()
 			}
 			else
 			{
+				$scope.quadras=[];
+				$scope.gridOptions.data = $scope.quadras;
+				
 				$scope.todascoordenadasgeo =[];
 
 				var refCoordenadageo= new Firebase(Constant.Url + '/coordenadageo/'+fazenda.key);
@@ -236,7 +240,7 @@ function showDicas()
 
 				});
 				
-				$scope.quadras=[];
+
 
 				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
 				var refNovoQuadra = new Firebase.util.NormalizedCollection(

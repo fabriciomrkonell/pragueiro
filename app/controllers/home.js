@@ -41,13 +41,13 @@ function initMap() {
 
 	angular.module('Pragueiro.controllers').registerCtrl('homeCtrl', homeCtrl);
 
-	homeCtrl.$inject = ['$scope', 'Constant', 'Session', '$firebaseArray', '$firebaseObject', 'Notify', '$routeParams', '$geofire', 'NgMap', '$location', '$anchorScroll'];
+	homeCtrl.$inject = ['$scope', 'Constant', 'Session', '$firebaseArray', '$firebaseObject', 'Notify', '$routeParams', '$geofire', 'NgMap', '$location', '$anchorScroll', '$window'];
 
-	function homeCtrl($scope, Constant, Session, $firebaseArray, $firebaseObject, Notify, $routeParams,  $geofire, NgMap, $location, $anchorScroll) {
+	function homeCtrl($scope, Constant, Session, $firebaseArray, $firebaseObject, Notify, $routeParams,  $geofire, NgMap, $location, $anchorScroll, $window) {
 
 
 		angular.extend($scope, {
-			versao: '1.3',
+			versao: '1.4',
 			quadras: [],
 			culturas:[],
 			vistorias:[],
@@ -142,6 +142,8 @@ function initMap() {
 	$scope.cc=1*$scope.chart.data[3][1];
 
 	initMap(new google.maps.LatLng(-20, -55), 4 );
+
+
 
 
 		//############################################################################################################################
