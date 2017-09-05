@@ -43,8 +43,10 @@
 			}
 		});
 		
-		var fazendaSelecioanda;
+		$scope.fazendaSelecioanda;
 
+		$scope.fazendas=[];
+		$scope.qtde_fazendas = 0 ; 
 		$scope.qtde_quadras = 0 ; 
 		$scope.qtde_culturas = 0;
 		$scope.qtde_variedades = 0;
@@ -160,7 +162,7 @@
 					var i=0;
 
 					refNovo.on('child_added', function(snap) {
-
+						$scope.qtde_fazendas ++;
 						var obj = snap.val();
 						$scope.fazendas.push(obj.filial);
 
@@ -195,22 +197,36 @@
 		$scope.chengeFazenda = function(fazenda){
 			if (fazenda === null) return false;
 			$scope.planejamentos=[];
-			fazendaSelecioanda = fazenda;
+			$scope.clearForm();
+			$scope.edit = false;
+			$scope.save = true;
+			$scope.gridOptions.data = $scope.planejamentos;
+			$scope.fazendaSelecioanda = fazenda;
+			$scope.safra = {};
 			$scope.safras = [];
 			for (var propertyName in fazenda.safra) {
 				$scope.safras.push(fazenda.safra[propertyName]);
 			}
-			
-			$scope.chengeSafra($scope.safras[0]);
-			$scope.safra=$scope.safras[0];
+			if(verificaFinalizacaoCarregamento())
+			{			
+				$scope.chengeSafra($scope.safras[0]);
+				$scope.safra=$scope.safras[0];
+			}
 		};
 		//-------------------------------------------------------------------
 		$scope.chengeSafra = function(safra){
-			if (fazendaSelecioanda === null) return false;
+			
+
+			
+			$scope.clearForm();
+			$scope.edit = false;
+			$scope.save = true;
 			$scope.planejamentos=[];
 			$scope.gridOptions.data = $scope.planejamentos;
 
-			var refSafraXquadra = new Firebase(Constant.Url + '/filial/' + fazendaSelecioanda.key + '/safra/' + safra.key+'/quadra');
+			if ($scope.fazendaSelecioanda === null || safra==null) return false;
+
+			var refSafraXquadra = new Firebase(Constant.Url + '/filial/' + $scope.fazendaSelecioanda.key + '/safra/' + safra.key+'/quadra');
 			refSafraXquadra.on('child_added', function(snap) {
 
 				var objNovo = snap.val();
@@ -224,8 +240,8 @@
 
 				});
 				if (posicao == null) {
-					$scope.todasQuadras.forEach(function(obj2) {
-						if (obj2.key!=null && objNovo.key === obj2.key) {
+					$scope.fazendaSelecioanda.todasQuadras.forEach(function(obj2) {
+						if (obj2.key!=null && objNovo.key == obj2.key) {
 							objNovo['quadra'] = obj2;
 						}
 					});
@@ -313,6 +329,7 @@
 			} else {
 
 				$scope.todasQuadras = [];
+				fazenda.filial['todasQuadras']=[];
 
 				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
 				var refNovoQuadra = new Firebase.util.NormalizedCollection(
@@ -328,6 +345,7 @@
 					refNovoQuadra.on('child_added', function(snap) {
 						var objNovo = snap.val();
 						$scope.todasQuadras.push(objNovo['Quadras']);
+						fazenda.filial.todasQuadras.push(objNovo['Quadras']);
 						if (!$scope.$$phase) {
 							$scope.$apply();
 						}
@@ -442,9 +460,19 @@
 		
 		function verificaFinalizacaoCarregamento()
 		{
+			console.log(' --------------------- ');
+
+			console.log('todasQuadras: ' + $scope.todasQuadras.length + ' - qde: ' + $scope.qtde_quadras);
+			console.log('todasCulturas: ' + $scope.todasCulturas.length + ' - qde: ' + $scope.qtde_culturas);
+			console.log('todasVariedades: ' + $scope.todasVariedades.length + ' - qde: ' + $scope.qtde_variedades);
+			console.log('fazendas: ' + $scope.fazendas.length + ' - qde: ' + $scope.qtde_fazendas);
+
+			console.log(' --------------------- ');
+
 			if($scope.todasQuadras.length==$scope.qtde_quadras
 				&& $scope.todasCulturas.length==$scope.qtde_culturas
 				&& $scope.todasVariedades.length==$scope.qtde_variedades
+				&& $scope.fazendas.length == $scope.qtde_fazendas
 				)
 			{
 				return true;
@@ -481,7 +509,10 @@
 				mPlanejamento['key_safra']=$scope.safra.key;
 				mPlanejamento['key'] = $scope.data.key;
 				mPlanejamento['key_cultura'] = $scope.data.key_cultura;
-				mPlanejamento['area'] = $scope.data.area;
+				if( $scope.data.area!=null)
+				{
+					mPlanejamento['area'] = $scope.data.area;
+				}
 				mPlanejamento['ativo'] = $scope.data.ativo;
 
 				if( $scope.data.separar_variedade!=null)
@@ -848,13 +879,7 @@
 		//############################################################################################################################
 
 
-
-		
-
-		
 		//-------------------------------------------------------------------
-
-
 
 		$scope.chengeCultura = function(key_cultura){
 			if(key_cultura === null) return false;
@@ -926,7 +951,7 @@
 			if($scope.safra == null){
 				Notify.errorBottom('O campo safra é inválido!');
 				return true;
-			}
+			}			
 			if(data.key ==null || data.key == ''){
 				Notify.errorBottom('O campo quadra/região é inválido!');
 				return true;

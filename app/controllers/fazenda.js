@@ -194,7 +194,7 @@
 				refNovo.set(true);
 
 				var refNovoUsuXFil = new Firebase(Constant.Url + '/usuario/'+key_usuario+'/filial/'+ref.key());
-				refNovoUsuXFil.set('true');
+				refNovoUsuXFil.set(true);
 
 				atualizaListaFiliais();
 			});

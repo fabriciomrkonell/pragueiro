@@ -13,7 +13,7 @@
 				<form class="form-signin" >
 					<div class="form-group">
 						<label>Fazenda</label>
-						<select class="form-control" ng-options="fazenda.nome for fazenda in fazendas" ng-model="fazenda" ng-change="chengeFazenda(data.fazenda)">
+						<select class="form-control" ng-options="fazenda.nome for fazenda in fazendas" ng-model="fazenda" ng-change="chengeFazenda(fazenda)">
 						</select>
 					</div>
 				</form>
@@ -22,7 +22,7 @@
 				<form class="form-signin" role="form" >
 					<div class="form-group">
 						<label>Safra</label>						
-						<select class="form-control"   ng-options="safra as (safra.descricao) for safra in safras"  ng-model="safra"  ng-change="chengeSafra(data.safra)" > 							
+						<select class="form-control"   ng-options="safra as (safra.descricao) for safra in safras"  ng-model="safra"  ng-change="chengeSafra(safra)" > 							
 							<option></option>
 						</select>
 					</div>
@@ -46,7 +46,7 @@
 					<div class="form-group">
 						<label>Quadra/Região</label>
 
-						<select class="form-control"  ng-model="data.key"  ng-options="quadra.key as (quadra.nome) for quadra in todasQuadras"> >							
+						<select class="form-control"  ng-model="data.key"  ng-options="quadra.key as (quadra.nome) for quadra in fazendaSelecioanda.todasQuadras"> >							
 							<option></option>
 						</select>
 					</div> 
