@@ -211,7 +211,7 @@ function showDicas()
 			{
 				$scope.quadras=[];
 				$scope.gridOptions.data = $scope.quadras;
-				
+
 				$scope.todascoordenadasgeo =[];
 
 				var refCoordenadageo= new Firebase(Constant.Url + '/coordenadageo/'+fazenda.key);
@@ -385,7 +385,7 @@ function showDicas()
 			data.fazenda=fazendaTmp;
 			$scope.cancelar();
 
-			$('#modalAviso').modal('show');
+			//$('#modalAviso').modal('show');
 		};
 
 

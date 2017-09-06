@@ -495,7 +495,7 @@
 		// PLANEJAMENTO
 		//############################################################################################################################
 
-		$scope.salvarPlanejamento = function(){
+		$scope.salvarPlanejamento = function(novo){
 			if(validForm($scope.data)) return true;
 
 			var retorna=false;
@@ -556,8 +556,17 @@
 
 				Notify.successBottom('Planejamento salvo com sucesso!');
 
-				$scope.edit = true;
-				$scope.save=false;
+				if(!novo)
+				{
+					$scope.edit = true;
+					$scope.save=false;
+				}
+				else
+				{
+					$scope.clearForm();
+					$scope.edit = false;
+					$scope.save=true;
+				}
 			}
 		};
 
@@ -710,6 +719,8 @@
 				}		
 
 				$scope.clearForm();
+				$scope.edit = false;
+				$scope.save=true;
 			}
 		};
 
