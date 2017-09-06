@@ -149,6 +149,8 @@
 			{
 				//$('#myPleaseWait').modal('show');
 				$scope.variedades=[];
+				$scope.gridOptions.data = $scope.variedades;
+				$scope.clear();
 
 				var refUsuarios= new Firebase(Constant.Url + '/variedade/'+fazenda.key);
 /*

@@ -144,6 +144,7 @@
 				//$('#myPleaseWait').modal('show');
 
 				$scope.tipequs=[];
+				$scope.gridOptions.data=$scope.tipequs;
 
 				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
 				var refNovoQuadra = new Firebase.util.NormalizedCollection(

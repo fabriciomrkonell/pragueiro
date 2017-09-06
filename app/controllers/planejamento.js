@@ -144,6 +144,8 @@
 			var refUser = new Firebase(Constant.Url + '/usuarioxauth/' + Session.getUser().uid);
 			var obj = $firebaseObject(refUser);
 			var key_usuario;
+
+			var i=0;
 			obj.$loaded().then(function() {
 				key_usuario = obj.$value;
 
@@ -167,29 +169,32 @@
 						$scope.fazendas.push(obj.filial);
 
 
-						if(obj.filial.quadra!=null)
+						if(i==0)
 						{
-							$scope.qtde_quadras =+ Object.keys(obj.filial.quadra).length;
+							if(obj.filial.quadra!=null)
+							{
+								$scope.qtde_quadras =+ Object.keys(obj.filial.quadra).length;
+							}
+							else
+							{
+								$scope.qtde_quadras =+ 0;
+							}
+							if(obj.filial.variedade!=null)
+							{
+								$scope.qtde_variedades =+ Object.keys(obj.filial.variedade).length;
+							}
+							else
+							{
+								$scope.qtde_variedades =+ 0;
+							}
 						}
-						else
-						{
-							$scope.qtde_quadras =+ 0;
-						}
-						if(obj.filial.variedade!=null)
-						{
-							$scope.qtde_variedades =+ Object.keys(obj.filial.variedade).length;
-						}
-						else
-						{
-							$scope.qtde_variedades =+ 0;
-						}
-
 						recuperaQuadra(obj);
 						recuperaVariedade(obj);
 
 						if (!$scope.$$phase) {
 							$scope.$apply();
 						}
+						i++;
 					});
 
 			}); // final do load
@@ -217,7 +222,7 @@
 		$scope.chengeSafra = function(safra){
 			
 
-			
+
 			$scope.clearForm();
 			$scope.edit = false;
 			$scope.save = true;
@@ -349,11 +354,14 @@
 						if (!$scope.$$phase) {
 							$scope.$apply();
 						}
-						if(verificaFinalizacaoCarregamento())
+						if(fazenda.filial.key==$scope.fazendas[0].key)
 						{
-							$scope.chengeFazenda($scope.fazendas[0]);
-							$scope.fazenda=$scope.fazendas[0];
-							$('#myPleaseWait').modal('hide');
+							if(verificaFinalizacaoCarregamento())
+							{
+								$scope.chengeFazenda($scope.fazendas[0]);
+								$scope.fazenda=$scope.fazendas[0];
+								$('#myPleaseWait').modal('hide');
+							}
 						}
 					});
 

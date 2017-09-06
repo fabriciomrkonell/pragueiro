@@ -1123,6 +1123,8 @@ $scope.chengeFazenda = function(fazenda) {
 		$scope.safras.push(fazenda.safra[propertyName]);
 	}
 	$scope.ordsers=[];
+	$scope.gridOptions.data = $scope.ordsers;
+	
 	listenerCodigo(fazenda);
 
 	refOrdser = new Firebase(Constant.Url + '/ordser/' + fazenda.key);

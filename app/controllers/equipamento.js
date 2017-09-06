@@ -121,7 +121,7 @@
 					
 					refNovo.on('child_added', function(snap) {
 						
-
+						
 						//console.log('Adicionou filial', snap.name(), snap.val());
 						var obj= snap.val();
 						//recuperaTipequi(obj);
@@ -136,13 +136,10 @@
 
 
 						if(!$scope.$$phase) {
+							$('#myPleaseWait').modal('hide');
 							$scope.$apply();
 						}
-
-						
-
-						
-
+						i++;
 					});
 
 					refNovo.on('child_changed', function(snap) {
@@ -212,9 +209,14 @@
 				else
 				{
 					$('#myPleaseWait').modal('hide');
+					if(!$scope.$$phase) {
+						$scope.$apply();
+					}
+
 				}
 
 				$scope.equipamentos=[];
+				$scope.gridOptions.data = $scope.equipamentos;
 
 				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
 				var refNovoQuadra = new Firebase.util.NormalizedCollection(

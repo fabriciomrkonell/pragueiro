@@ -147,6 +147,7 @@
 				//$('#myPleaseWait').modal('show');	
 
 				$scope.produtos=[];
+				$scope.gridOptions.data = $scope.produtos;
 
 				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
 				var refNovoQuadra = new Firebase.util.NormalizedCollection(
