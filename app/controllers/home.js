@@ -47,7 +47,7 @@ function initMap() {
 
 
 		angular.extend($scope, {
-			versao: '1.7',
+			versao: '1.8',
 			quadras: [],
 			culturas:[],
 			vistorias:[],
@@ -104,7 +104,7 @@ function initMap() {
 		$scope.mCountTamanhos = 0;
 		$scope.mCont = 0;
 
-		//gravarAcesso();
+		gravarAcesso();
 		atualizaListaFiliais();
 		atualizaCulturas();
 		atualizaUsuarios();
@@ -2588,7 +2588,22 @@ $scope.setaExibirNomeQuadras = function()
 			map_infestacao = new google.maps.Map(document.getElementById('map_infestacao'), mapOptions);
 		};
 
+		function castObjToArray(myObj)
+		{
+			if(myObj==null)
+			{
+				var sem_nada=[];
+				return sem_nada;
+			}
+			else
+			{
+				var array = $.map(myObj, function(value, index) {
+					return [value];
+				});
+				return array;
 
+			}
+		}
 
 		function Point(x, y) {
 			this.x = x;

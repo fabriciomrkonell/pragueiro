@@ -1,5 +1,6 @@
 <div ng-controller="pragaCtrl" class="ng-scope ng_scope">
 	<div class="container container-view">
+
 		<hr/>
 		<div class="row">
 			<div class="col-sm-6">
@@ -22,77 +23,80 @@
 					</div>	
 
 					<div class="form-group">
+						<label>Classe de Praga</label>
+
+						<select class="form-control"  ng-model="data.key_clapra" ng-options="cl.key as (cl.nome) for cl in todasClapras" >
+							<option></option>
+						</select>
+
+
+					</div>
+
+
+
+					<div class="form-group">
 						<label>img</label>
 						<input type="text" class="form-control" placeholder="Nome" ng-model="data.img" />
 					</div>	
 
-					<div class="form-group">
-						<input type="checkbox"  ng-model="formSafra.ativo"
-						ng-true-value="true" ng-false-value="false">	
-						<label>Ativo</label>						
+					<div class="row">
+						<div class="col-sm-5">
+							<div class="form-group">
+								<input type="checkbox"  ng-model="data.ativo"
+								ng-true-value="true" ng-false-value="false">	
+								<label>Ativo</label>						
+							</div>
+						</div>
+						<div class="col-sm-5">
+							<div class="form-group">
+								<input type="checkbox"  ng-model="data.tamanhos"
+								ng-true-value="true" ng-false-value="false">	
+								<label>Possui Tamanhos</label>						
+							</div>
+						</div>
 					</div>
 					<div class="form-group">
 						<label>Texto</label>
-						<input type="text" class="form-control" placeholder="Nome" ng-model="data.texto" />
+						<textarea type="text" class="form-control" placeholder="Nome" ng-model="data.texto" ></textarea>
 					</div>	
 					
 					
 				</form>
-				<button type="button" class="btn btn-success" ng-show="!edit" ng-click="salvarPraga(data)">Salvar</button>
-				<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarPraga(data)">Atualizar</button>
-				<button type="button"  class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar</button>
-			</form>
-		</div>
-		<div class="col-sm-6">
-			<table class="table table-condensed table-bordered">
-				<thead>
-					<tr>
-						<th>Key</th>
-						<th>Nome científico</th>
-						<th>Descrição</th>
-						<th class="text-center" width="80px">Ações</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr ng-repeat="praga in pragas">
-						<td>{{praga.key}}</td>
-						<td>{{praga.nome_cientifico}}</td>
-						<td>{{praga.descricao}}</td>
-						<td class="text-center" width="70px">
-							<button type="button" class="btn btn-default btn-xs" ng-click="editar(praga)">
-								<i class="glyphicon glyphicon-pencil"></i>
-							</button>
-							<button type="button" class="btn btn-danger btn-xs" ng-click="excluir(praga)">
-								<i class="glyphicon glyphicon-remove"></i>
-							</button>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
-</div>
-<!-- Modal Start here-->
-<div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"
-role="dialog" aria-hidden="true" data-backdrop="static">
-<div class="modal-dialog modal-sm">
-	<div class="modal-content">
-		<div class="modal-header">
-			<h4 class="modal-title">
-				<span class="glyphicon glyphicon-time">
-				</span>&nbsp;&nbsp;Aguarde, carregando...
-			</h4>
-		</div>
-		<div class="modal-body">
-			<div class="progress">
-				<div class="progress-bar progress-bar-info
-				progress-bar-striped active"
-				style="width: 100%">
+				<div class="form-group">
+					<button type="button" class="btn btn-success" ng-show="!edit" ng-click="salvarPraga(data)">Salvar</button>
+					<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarPraga(data)">Atualizar</button>
+					<button type="button"  class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar</button>
+				</div>
+				<div class="form-group">
+					<label>Tamanhos</label>
+					<div ui-grid="gridOptionsTamanhos" ui-grid-selection class="gridClapra"></div>	
+				</div>
+
+			</div>
+
+			<div class="col-sm-6">
+				<div ui-grid="gridOptions" ui-grid-selection class="gridClapra"></div>	
 			</div>
 		</div>
 	</div>
-</div>
-</div>
-</div>
-<!-- Modal ends Here -->
+
+	<div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"	role="dialog" aria-hidden="true" data-backdrop="static">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">
+						<span class="glyphicon glyphicon-time">
+
+						</span>&nbsp;&nbsp;Aguarde, carregando...
+					</h4>
+				</div>
+				<div class="modal-body">
+					<div class="progress">
+						<div class="progress-bar progress-bar-info progress-bar-striped active" style="width: 100%">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>

@@ -52,6 +52,7 @@
 		$scope.qtde_variedades = 0;
 		$scope.soma_area=0;
 
+
 		$scope.todasQuadras=[];
 		$scope.todasVariedades=[];
 		$scope.todasCulturas=[];
@@ -111,9 +112,19 @@
 			multiSelect : false,
 			modifierKeysToMultiSelect : false,
 
+
+
 			columnDefs : [
-			{ field: "nome", displayName: "Variedade", width: 150 },
-			{ field: "area", displayName: "Área", width: 120 },			
+			{ field: "variedade.nome", displayName: "Variedade", width: 150 },
+			{ field: "area", displayName: "Área", width: 100 },		
+			{ field: "dias", displayName: "Dias", width: 100 },	
+			{ field: "pn", displayName: "PN", width: 80 },	
+			{ field: "pms", displayName: "PMS", width: 120 },	
+			{ field: "perger", displayName: "% Germ.", width: 120 },	
+			{ field: "pitm", displayName: "Pits/m", width: 120 },	
+			{ field: "stem", displayName: "Stes/m", width: 120 },	
+			{ field: "kgha", displayName: "KG/ha", width: 120 },	
+			{ field: "qtdekg", displayName: "Qtde KG", width: 120 },	
 			],
 			appScopeProvider: {
 				mapValue: function(row) {
@@ -198,7 +209,7 @@
 					});
 
 			}); // final do load
-		}
+		}		
 		$scope.chengeFazenda = function(fazenda){
 			if (fazenda === null) return false;
 			$scope.planejamentos=[];
@@ -653,12 +664,48 @@
 					{
 						$scope.variedadesAdd.forEach(function(variedade) {
 							if (objVar === variedade.key) {
-								var obj=variedade;
+								var obj={};
+								obj['key']=objVar;
+								obj['variedade']=variedade;
 								if(data.variedades[objVar].area!=null)
 								{
 									obj['area']=data.variedades[objVar].area;
 									$scope.soma_area = $scope.soma_area + data.variedades[objVar].area;
 								}
+
+								if(data.variedades[objVar].dias!=null)
+								{
+									obj['dias']=data.variedades[objVar].dias;
+								}
+								if(data.variedades[objVar].pn!=null)
+								{
+									obj['pn']=data.variedades[objVar].pn;
+								}
+								if(data.variedades[objVar].pms!=null)
+								{
+									obj['pms']=data.variedades[objVar].pms;
+								}
+								if(data.variedades[objVar].perger!=null)
+								{
+									obj['perger']=data.variedades[objVar].perger;
+								}
+								if(data.variedades[objVar].pitm!=null)
+								{
+									obj['pitm']=data.variedades[objVar].pitm;
+								}
+								if(data.variedades[objVar].stem!=null)
+								{
+									obj['stem']=data.variedades[objVar].stem;
+								}
+								if(data.variedades[objVar].kgha!=null)
+								{
+									obj['kgha']=data.variedades[objVar].kgha;
+								}
+								if(data.variedades[objVar].qtdekg!=null)
+								{
+									obj['qtdekg']=data.variedades[objVar].qtdekg;
+								}
+
 								$scope.todasVariedadesPlanejamento.push(obj);
 							}
 						});
@@ -672,12 +719,48 @@
 					{
 						$scope.variedadesAdd.forEach(function(variedade) {
 							if (var_pla.key === variedade.key) {
-								var obj=variedade;
+								var obj={};
+								obj['key']=var_pla.key;
+								obj['variedade']=variedade;
 								if(var_pla.area!=null)
 								{
 									obj['area']=var_pla.area;
 									$scope.soma_area = $scope.soma_area + var_pla.area;
 								}
+
+								if(var_pla.dias!=null)
+								{
+									obj['dias']=var_pla.dias;
+								}
+								if(var_pla.pn!=null)
+								{
+									obj['pn']=var_pla.pn;
+								}
+								if(var_pla.pms!=null)
+								{
+									obj['pms']=var_pla.pms;
+								}
+								if(var_pla.perger!=null)
+								{
+									obj['perger']=var_pla.perger;
+								}
+								if(var_pla.pitm!=null)
+								{
+									obj['pitm']=var_pla.pitm;
+								}
+								if(var_pla.stem!=null)
+								{
+									obj['stem']=var_pla.stem;
+								}
+								if(var_pla.kgha!=null)
+								{
+									obj['kgha']=var_pla.kgha;
+								}
+								if(var_pla.qtdekg!=null)
+								{
+									obj['qtdekg']=var_pla.qtdekg;
+								}
+
 								$scope.todasVariedadesPlanejamento.push(obj);
 							}
 						});
@@ -770,10 +853,45 @@
 				frmVariedade['key_variedade']=$scope.formPlanejamento.variedade.key;
 				frmVariedade['key_safra']=$scope.safra.key;
 				frmVariedade['key_quadra']=$scope.data.key;
+				frmVariedade['key']=$scope.formPlanejamento.variedade.key;
+				if($scope.formPlanejamento.dias!=null)
+				{
+					frmVariedade['dias']=$scope.formPlanejamento.dias;
+				}
+				if($scope.formPlanejamento.pn!=null)
+				{
+					frmVariedade['pn']=$scope.formPlanejamento.pn;
+				}
+				if($scope.formPlanejamento.pms!=null)
+				{
+					frmVariedade['pms']=$scope.formPlanejamento.pms;
+				}
+				if($scope.formPlanejamento.perger!=null)
+				{
+					frmVariedade['perger']=$scope.formPlanejamento.perger;
+				}
+				if($scope.formPlanejamento.pitm!=null)
+				{
+					frmVariedade['pitm']=$scope.formPlanejamento.pitm;
+				}
+				if($scope.formPlanejamento.stem!=null)
+				{
+					frmVariedade['stem']=$scope.formPlanejamento.stem;
+				}
+				if($scope.formPlanejamento.kgha!=null)
+				{
+					frmVariedade['kgha']=$scope.formPlanejamento.kgha;
+				}
+				if($scope.formPlanejamento.qtdekg!=null)
+				{
+					frmVariedade['qtdekg']=$scope.formPlanejamento.qtdekg;
+				}
 
 				refVariedadeNovo.set(frmVariedade);
 
-				$scope.todasVariedadesPlanejamento.push($scope.formPlanejamento.variedade);
+				frmVariedade['variedade']=$scope.formPlanejamento.variedade;
+
+				$scope.todasVariedadesPlanejamento.push(frmVariedade);
 
 
 				var refVariedade= new Firebase(Constant.Url + '/variedade/' + $scope.fazenda.key + '/' + $scope.formPlanejamento.variedade.key_cultura + '/' + $scope.formPlanejamento.variedade.key+  '/quadras/' + $scope.safra.key + '/' + $scope.data.key);
@@ -810,20 +928,54 @@
 			frmVariedade['key_variedade']=$scope.formPlanejamento.variedade.key;
 			frmVariedade['key_safra']=$scope.safra.key;
 			frmVariedade['key_quadra']=$scope.data.key;
+			frmVariedade['key']=$scope.formPlanejamento.variedade.key;
+			if($scope.formPlanejamento.dias!=null)
+			{
+				frmVariedade['dias']=$scope.formPlanejamento.dias;
+			}
+			if($scope.formPlanejamento.pn!=null)
+			{
+				frmVariedade['pn']=$scope.formPlanejamento.pn;
+			}
+			if($scope.formPlanejamento.pms!=null)
+			{
+				frmVariedade['pms']=$scope.formPlanejamento.pms;
+			}
+			if($scope.formPlanejamento.perger!=null)
+			{
+				frmVariedade['perger']=$scope.formPlanejamento.perger;
+			}
+			if($scope.formPlanejamento.pitm!=null)
+			{
+				frmVariedade['pitm']=$scope.formPlanejamento.pitm;
+			}
+			if($scope.formPlanejamento.stem!=null)
+			{
+				frmVariedade['stem']=$scope.formPlanejamento.stem;
+			}
+			if($scope.formPlanejamento.kgha!=null)
+			{
+				frmVariedade['kgha']=$scope.formPlanejamento.kgha;
+			}
+			if($scope.formPlanejamento.qtdekg!=null)
+			{
+				frmVariedade['qtdekg']=$scope.formPlanejamento.qtdekg;
+			}
 
 			refVariedadeNovo.set(frmVariedade);
 
+			frmVariedade['variedade']=$scope.formPlanejamento.variedade;
 
 			var posicao = null;
 			var x=0;
 			$scope.todasVariedadesPlanejamento.forEach(function(obj2) {
-				if (obj2.key_variedade!=null && obj2.key_variedade == objNovo.key) {
+				if (obj2.key!=null && obj2.key == frmVariedade.key) {
 					posicao = x;
 				}
 				x++;
 			});
-			if (posicao == null) {
-				$scope.todasVariedadesPlanejamento[posicao] = $scope.formPlanejamento.variedade;				
+			if (posicao != null) {
+				$scope.todasVariedadesPlanejamento[posicao] = frmVariedade;				
 			}
 
 
@@ -837,8 +989,7 @@
 		};
 
 		$scope.ChamarEditarVariedade = function(data){
-			$scope.formPlanejamento.variedade=data;
-			$scope.formPlanejamento.area=data.area;
+			$scope.formPlanejamento=data;
 			$scope.edit_variedade=true;
 		}
 
@@ -892,6 +1043,17 @@
 			return true;
 		};
 
+		$scope.chengeQtdeKg = function(){
+			if($scope.formPlanejamento.area!=null && $scope.formPlanejamento.kgha!=null)
+			{
+				$scope.formPlanejamento.qtdekg = $scope.formPlanejamento.area * $scope.formPlanejamento.kgha;
+			}
+			else
+			{
+				$scope.formPlanejamento.qtdekg = null;
+			}
+		}
+
 		//############################################################################################################################
 		//############################################################################################################################
 		// FAZENDA X SAFRA X QUADRA X CULTURA
@@ -915,6 +1077,11 @@
 			}
 		};
 
+
+		$scope.chengeVariedade = function(){
+			if($scope.formPlanejamento.variedade == null || $scope.formPlanejamento.variedade.dias==null) return false;
+			$scope.formPlanejamento.dias=$scope.formPlanejamento.variedade.dias;
+		};
 
 		//############################################################################################################################
 		//############################################################################################################################
@@ -1033,9 +1200,19 @@
 			return true;
 		};
 
+
+
 		$scope.clearFormVariedade= function(){
 			$scope.formPlanejamento.variedade=null;
 			$scope.formPlanejamento.area= '';
+			$scope.formPlanejamento.dias= '';
+			$scope.formPlanejamento.pn= '';
+			$scope.formPlanejamento.pms= '';
+			$scope.formPlanejamento.perger= '';
+			$scope.formPlanejamento.pitm= '';
+			$scope.formPlanejamento.stem= '';
+			$scope.formPlanejamento.kgha= '';
+			$scope.formPlanejamento.qtdekg= '';
 			$scope.edit_variedade=false;
 			return true;
 		};

@@ -54,11 +54,9 @@
 					<div class="form-group">
 						<label>Cultura</label>
 
-						<select class="form-control" ng-disabled="todasVariedadesPlanejamento.length>0"  ng-change="chengeCultura()" ng-model="data.key_cultura"  ng-options="cultura.key as (cultura.nome) for cultura in todasCulturas"> >							
+						<select class="form-control" ng-disabled="todasVariedadesPlanejamento.length>0"  ng-change="chengeCultura()" ng-model="data.key_cultura"  ng-options="cultura.key as (cultura.nome) for cultura in todasCulturas"> 							
 							<option></option>
-						</select>
-
-						
+						</select>						
 					</div>
 					<div class="row">
 						<div class="col-sm-7">
@@ -110,17 +108,55 @@
 					<div class="form-group">
 						<label>Variedades</label>
 
-						<select class="form-control"  ng-disabled="edit_variedade" ng-model="formPlanejamento.variedade"  ng-options="variedade as (variedade.nome) for variedade in variedadesAdd"> >							
+						<select class="form-control"  ng-change="chengeVariedade()" ng-disabled="edit_variedade" ng-model="formPlanejamento.variedade"  ng-options="variedade as (variedade.nome) for variedade in variedadesAdd"> >							
 							<option></option>
 						</select>
 
 					</div>
-					<div class="form-group">
-
-						<label>Área (Variedade)</label><br>
-
-						<input type="number" class="form-control" placeholder="ha" ng-disabled="data.area==null || data.area==0 " ng-model="formPlanejamento.area" />
-
+					<div class="row">
+						<div class="form-group col-sm-3">
+							<label>Área (Variedade)</label><br>
+							<input type="number" class="form-control" placeholder="ha"   ng-disabled="data.area==null || data.area==0 " ng-model="formPlanejamento.area" ng-change="chengeQtdeKg()"/>
+						</div>
+						<div class="form-group col-sm-2">
+							<label>Dias/Ciclo</label><br>
+							<input type="number" class="form-control" placeholder="dias"  ng-model="formPlanejamento.dias" />
+						</div>
+						<div class="form-group col-sm-3">
+							<label>PN<br></label>
+							<input type="number" class="form-control" placeholder="dias"  ng-model="formPlanejamento.pn" />
+						</div>
+						<div class="form-group col-sm-3">
+							<label>PMS<br></label>
+							<input type="number" class="form-control" placeholder="PMS"  ng-model="formPlanejamento.pms" />
+						</div>
+					</div>
+					<div class="row">
+						
+						<div class="form-group col-sm-3">
+							<label>% Germinação</label><br>
+							<input type="number" class="form-control" placeholder="%"  ng-model="formPlanejamento.perger" />
+						</div>
+						<div class="form-group col-sm-2">
+							<label>Pits/m<br></label>
+							<input type="number" class="form-control" placeholder="Pits"  ng-model="formPlanejamento.pitm" />
+						</div>
+						<div class="form-group col-sm-3">
+							<label>Stes/m<br></label>
+							<input type="number" class="form-control" placeholder="Stes"  ng-model="formPlanejamento.stem" />
+						</div>
+						<div class="form-group col-sm-3">
+							<label>KG/ha<br></label>
+							<input type="number" class="form-control" placeholder="KG"  ng-model="formPlanejamento.kgha"  ng-change="chengeQtdeKg()" />
+						</div>
+						<div class="form-group col-sm-3">
+							<label>Qtde KG<br></label>
+							<input type="number" class="form-control" placeholder="Qtde"  ng-disabled="true" ng-model="formPlanejamento.qtdekg" />
+						</div>
+					</div>
+					<div class="row">
+						
+						
 					</div>
 					<div class="form-group">
 
@@ -128,7 +164,7 @@
 							<i class="glyphicon glyphicon-plus-sign"></i> Inserir												
 						</button>
 						<button type="button" class="btn btn-default btn-xm btn-success" ng-show="edit_variedade" ng-click="atualizarVariedade()">Atualizar</button>
-						
+
 						<button type="button" class="btn btn-default btn-xm btn-cancel" ng-show="edit_variedade" ng-click="cancelarVariedade()">Cancelar</button>
 						<button type="button" class="btn btn-default btn-xm btn-danger" ng-show="edit_variedade" ng-click="questionaExcluirVariedade()">Excluir</button>
 					</div>
@@ -137,7 +173,7 @@
 						<div ui-grid="gridOptionsVariedades" ui-grid-selection class="gridPlanejamentoVariedade"></div>	
 					</div>
 					<br>	
-					
+
 				</div>
 			</div>
 			<div class="col-sm-6">

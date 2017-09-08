@@ -11,8 +11,6 @@
 		angular.extend($scope, {
 			edit: false,
 			save: true,
-			desabilitaFazenda: false,
-			fazendas: [],
 			clapras: [],
 			clapraFilial: [],
 			data: {
@@ -20,11 +18,10 @@
 			}
 		});
 
-
-		var ref = new Firebase(Constant.Url + '/clapra');
-		$scope.todasClapras = $firebaseArray(ref);
+		$scope.tipo = ['Praga', 'Doença'];
 		$scope.numeracao_codigo = 1;
-		//var refFazendas = new Firebase(Constant.Url + '/filial');
+		$scope.todasClapras=[];
+		
 		listenerCodigo();
 		recuperaClapra();
 
@@ -64,7 +61,7 @@
 
 		//############################################################################################################################
 		//############################################################################################################################
-		// FAZENDA/FILIAL
+		// 
 		//############################################################################################################################
 
 		function recuperaClapra() {
@@ -75,34 +72,62 @@
 
 				var objNovo = snapshot.val();
 				$scope.todasClapras.push(objNovo);
-				
+				$scope.gridOptions.data=$scope.todasClapras;	
 				if (!$scope.$$phase) {
 					$scope.$apply();
-				}
-				$scope.gridOptions.data=$scope.todasClapras;				
 
-			}, function(error) {
-				console.error(error);
+					$scope.gridOptions.data=$scope.todasClapras;	
+				}
+
+
+			});
+
+			baseRef.on('child_changed', function(snap) {
+				var objNovo= snap.val();
+				var x=0;
+				var posicao=null;
+				$scope.todasClapras.forEach(function(obj){
+					if(obj.key === objNovo.key)
+					{ 
+						posicao=x;
+					}
+					x++;
+
+				});
+				if(posicao!=null)
+					$scope.todasClapras[posicao]=objNovo;
+
+				if(!$scope.$$phase) {
+					$scope.$apply();
+				}
 			});
 		}
 
 
 		function listenerCodigo() {
 
-			$scope.numeracao_codigo = 1;
+
 			var refOrdser = new Firebase(Constant.Url + '/clapra/' );
 
 			refOrdser.on('child_added', function(snap) {
 				$scope.numeracao_codigo++;
-				if ($scope.data.key == null || $scope.data.key == '') {
+				if (!$scope.edit) {
 					$scope.data.key=$scope.numeracao_codigo;
+					$scope.data.codigo = zeroFill($scope.numeracao_codigo, 3);
+					if (!$scope.$$phase) {
+						$scope.$apply();
+					}
 				}
 			});
 
 			refOrdser.on('child_removed', function(snap) {
 				$scope.numeracao_codigo--;
-				if ($scope.data.key == null || $scope.data.key == '') {
+				if (!$scope.edit) {
 					$scope.data.key=$scope.numeracao_codigo;
+					$scope.data.codigo = zeroFill($scope.numeracao_codigo, 3);
+					if (!$scope.$$phase) {
+						$scope.$apply();
+					}
 				}
 			});
 			
@@ -158,7 +183,7 @@
 			Notify.successBottom('Classe de Pragas inserida com sucesso!');
 		};
 
-		$scope.editarsalvarClapra = function(data){
+		$scope.editarClapra = function(data){
 			if(validForm(data)) return false;
 			delete data.$$hashKey;		
 			var refClapra= new Firebase(Constant.Url + '/clapra/'+data.key);
@@ -170,23 +195,18 @@
 		};
 
 		$scope.cancelar = function(){
-			var fazendaTmp=$scope.data.fazenda;
 			$scope.clear();
-			$scope.setaFazenda(fazendaTmp);	
-			$scope.chengeFazenda($scope.data.fazenda);	
+
 			$scope.edit = false;
 			$scope.save=true;
 		};
 
 		$scope.editar = function(obj){
-			$scope.desabilitaFazenda=true;
-			var fazendaTmp=$scope.data.fazenda;
-			$scope.data = obj;
-			$scope.data.fazenda=fazendaTmp;
+			
+			$scope.data = obj;		
 			$scope.edit = true;
 			$scope.save = false;
 
-			$scope.desabilitaFazenda=true;		
 
 		};
 		$scope.excluir = function(){
@@ -200,10 +220,9 @@
 
 				var refEquipeNovo = new Firebase(Constant.Url + '/clapra/'+objeto.key);
 				refEquipeNovo.remove();
-				var refEquipeNovo = new Firebase(Constant.Url + '/filial/'+ $scope.data.fazenda.key + '/clapra/'+objeto.key);
-				refEquipeNovo.remove();						
+
 				Notify.successBottom('Classe de Pragas removida com sucesso!');
-				$scope.chengeFazenda(fazendaTmp);
+				
 				$scope.cancelar();
 
 			}
@@ -217,17 +236,6 @@
 		//UTEIS
 		//############################################################################################################################
 
-		$scope.setaFazenda = function(fazenda){
-			if(fazenda === null) return false;
-
-			$scope.fazendas.forEach(function(item){
-				if(item.key === fazenda.key) 	
-				{
-					$scope.data.fazenda = item;		
-				}
-			});
-			
-		};
 
 		function setMessageError(message){
 			Notify.errorBottom(message);
@@ -248,7 +256,6 @@
 		};
 		
 		$scope.clear = function(){
-			//var fazendaTmp=$scope.data.fazenda;
 			angular.extend($scope.data, {
 				ativo: true,
 				nome: '',
@@ -256,19 +263,21 @@
 				codigo: '',
 				key:''
 			});
-			//$scope.data.fazenda=fazendaTmp;
-			$scope.desabilitaFazenda=false;
 			$scope.edit=false;
 			$scope.save = true;
 			if(!$scope.$$phase) {
 				$scope.$apply();
 			}
-			//$scope.chengeFazenda($scope.fazenda);
-			//$scope.data.fazenda=fazendaTmp;
 		};
 		
 
-		//$scope.clear();
+		function zeroFill(number, width) {
+			width -= number.toString().length;
+			if (width > 0) {
+				return new Array(width + (/\./.test(number) ? 2 : 1)).join('0') + number;
+			}
+			return number + "";
+		}
 
 	}
 

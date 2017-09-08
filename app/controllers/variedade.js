@@ -24,6 +24,7 @@
 				nome_tecnologia: '',
 				nome: '',
 				qtd:0,
+				dias:'',
 				key:''
 				
 			}
@@ -401,6 +402,7 @@
 				nome_tecnologia: '',
 				nome: '',
 				qtd:0,
+				dias:'',
 				key:''
 			});
 			//$scope.data.fazenda=fazendaTmp;

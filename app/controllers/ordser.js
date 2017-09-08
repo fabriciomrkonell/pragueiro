@@ -1124,7 +1124,7 @@ $scope.chengeFazenda = function(fazenda) {
 	}
 	$scope.ordsers=[];
 	$scope.gridOptions.data = $scope.ordsers;
-	
+
 	listenerCodigo(fazenda);
 
 	refOrdser = new Firebase(Constant.Url + '/ordser/' + fazenda.key);
@@ -2077,7 +2077,6 @@ $scope.adicionarExecucao = function(data, data_execucao) {
 		delete execucaoTmp.area;
 	}
 	delete execucaoTmp.filial;
-	delete execucaoTmp.$$hashKey;
 	delete execucaoTmp.$$hashKey;
 	delete execucaoTmp.equipamento;
 	delete execucaoTmp.funcionario;
