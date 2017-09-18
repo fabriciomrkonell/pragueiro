@@ -2,17 +2,17 @@
 
 	'use strict';
 
-	angular.module('Pragueiro.controllers').registerCtrl('clapraCtrl', clapraCtrl);
+	angular.module('Pragueiro.controllers').registerCtrl('controleacessoCtrl', controleacessoCtrl);
 
-	clapraCtrl.$inject = ['$scope', '$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Notify'];
+	controleacessoCtrl.$inject = ['$scope', '$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Notify'];
 
-	function clapraCtrl($scope, $firebaseArray, $firebaseObject, Session, Constant, Notify) {
+	function controleacessoCtrl($scope, $firebaseArray, $firebaseObject, Session, Constant, Notify) {
 
 		angular.extend($scope, {
 			edit: false,
 			save: true,
-			clapras: [],
-			clapraFilial: [],
+			controleacessos: [],
+			controleacessoFilial: [],
 			data: {
 				ativo:true				
 			}
@@ -20,10 +20,9 @@
 
 		$scope.tipo = ['Praga', 'Doença'];
 		$scope.numeracao_codigo = 1;
-		$scope.todasClapras=[];
+		$scope.todosControleacessos=[];
 		
-		listenerCodigo();
-		recuperaClapra();
+		
 
 		$scope.gridOptions = { 
 			enableRowSelection: true, 
@@ -35,13 +34,20 @@
 			modifierKeysToMultiSelect : false,
 
 			columnDefs : [
+			{ field: "key", displayName: "Intero", width: 80 },
+			{ field: "ordem", displayName: "Ordem", width: 80 },
 			{ field: "codigo", displayName: "Código", width: 80 },
 			{ field: "nome", displayName: "Nome", width: 240 },
 			{ field: "ativo", displayName: "Ativo", width: 150,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" },
+			{ field: "grupo", displayName: "Grupo", width: 150,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValueGrupo(row)}}</div>" }
+
 			],
 			appScopeProvider: {
 				mapValue: function(row) {
 					return row.entity.ativo ? 'Sim' : 'Não';
+				},
+				mapValueGrupo: function(row) {
+					return row.entity.grupo ? 'Sim' : 'Não';
 				}
 			}
 			
@@ -59,24 +65,27 @@
 			});
 		};
 
+		listenerCodigo();
+		recuperaControleacesso();
+
 		//############################################################################################################################
 		//############################################################################################################################
 		// 
 		//############################################################################################################################
 
-		function recuperaClapra() {
+		function recuperaControleacesso() {
 
-			var baseRef = new Firebase(Constant.Url+'/clapra');
+			var baseRef = new Firebase(Constant.Url+'/controleacesso');
 
 			baseRef.on('child_added', function(snapshot) {
 
 				var objNovo = snapshot.val();
-				$scope.todasClapras.push(objNovo);
-				$scope.gridOptions.data=$scope.todasClapras;	
+				$scope.todosControleacessos.push(objNovo);
+				$scope.gridOptions.data=$scope.todosControleacessos;	
 				if (!$scope.$$phase) {
 					$scope.$apply();
 
-					$scope.gridOptions.data=$scope.todasClapras;	
+					$scope.gridOptions.data=$scope.todosControleacessos;	
 				}
 
 
@@ -86,7 +95,7 @@
 				var objNovo= snap.val();
 				var x=0;
 				var posicao=null;
-				$scope.todasClapras.forEach(function(obj){
+				$scope.todosControleacessos.forEach(function(obj){
 					if(obj.key === objNovo.key)
 					{ 
 						posicao=x;
@@ -95,7 +104,7 @@
 
 				});
 				if(posicao!=null)
-					$scope.todasClapras[posicao]=objNovo;
+					$scope.todosControleacessos[posicao]=objNovo;
 
 				if(!$scope.$$phase) {
 					$scope.$apply();
@@ -107,7 +116,7 @@
 		function listenerCodigo() {
 
 
-			var refOrdser = new Firebase(Constant.Url + '/clapra/' );
+			var refOrdser = new Firebase(Constant.Url + '/controleacesso/' );
 
 			refOrdser.on('child_added', function(snap) {
 				$scope.numeracao_codigo++;
@@ -143,65 +152,78 @@
 		
 
 		$scope.clonar = function(){		
-			$scope.todasClapras.forEach(function(obj){
+			$scope.todosControleacessos.forEach(function(obj){
 				var objClonado= obj;
 				delete 	objClonado.$$hashKey;
-				var refNovo = new Firebase(Constant.Url + '/filial/-KtH3-hl4fZVNnCHZnFn/clapraemp/' + obj.key);
+				var refNovo = new Firebase(Constant.Url + '/filial/-KtH3-hl4fZVNnCHZnFn/controleacessoemp/' + obj.key);
 				refNovo.set(true);
 			});
 			Notify.successBottom('Praga clonada com sucesso!');
 		};
 
-		$scope.getDadosClapra = function(obj, nomeColuna){
+		$scope.getDadosControleacesso = function(obj, nomeColuna){
 			var retorno = '';
 			if(nomeColuna=='nome')
 			{
-				$scope.todasClapras.forEach(function(item){
+				$scope.todosControleacessos.forEach(function(item){
 					if(item.$id === obj.$id) retorno = item['nome'];
 				});
 			}
 			if(nomeColuna=='codigo')
 			{
-				$scope.todasClapras.forEach(function(item){
+				$scope.todosControleacessos.forEach(function(item){
 					if(item.$id === obj.$id) retorno = item['codigo'];
 				});
 			}
 			if(nomeColuna=='ativo')
 			{
-				$scope.todasClapras.forEach(function(item){
+				$scope.todosControleacessos.forEach(function(item){
 					if(item.$id === obj.$id) retorno = item['ativo'];
 				});
 			}
 			if(nomeColuna=='coordenadas')
 			{
-				$scope.todasClapras.forEach(function(item){
+				$scope.todosControleacessos.forEach(function(item){
 					if(item.$id === obj.$id) retorno = item['coordenadas'];
 				});
 			}
 			return retorno;
 		};
 
-		$scope.salvarClapra = function(data){
+		$scope.salvarControleacesso = function(data){
 			if(validForm(data)) return false;			
 			delete data.$$hashKey;	
 			
-			var refClapra= new Firebase(Constant.Url + '/clapra/' + data.key);
-			
-			refClapra.set(data);
+			var refControleacesso= new Firebase(Constant.Url + '/controleacesso/' );
+			data.key = refControleacesso.push().key();
+
+			data.visualizacao=false;
+			data.inclusao=false;
+			data.edicao=false;
+			data.exclusao=false;
+
+			var refNovo= new Firebase(Constant.Url + '/controleacesso/' + data.key);
+			refNovo.set(data);
 
 			$scope.clear();			
-			Notify.successBottom('Classe de Pragas inserida com sucesso!');
+			Notify.successBottom('Controle de acesso/Menu inserida com sucesso!');
 		};
 
-		$scope.editarClapra = function(data){
+		$scope.editarControleacesso = function(data){
 			if(validForm(data)) return false;
 			delete data.$$hashKey;		
-			var refClapra= new Firebase(Constant.Url + '/clapra/'+data.key);
-			refClapra.set(data);
+			var refControleacesso= new Firebase(Constant.Url + '/controleacesso/'+data.key);
+
+			data.visualizacao=false;
+			data.inclusao=false;
+			data.edicao=false;
+			data.exclusao=false;
+
+			refControleacesso.set(data);
 
 			$scope.clear();
 
-			Notify.successBottom('Classe de Pragas atualizada com sucesso!');
+			Notify.successBottom('Controle de acesso/Menu atualizada com sucesso!');
 		};
 
 		$scope.cancelar = function(){
@@ -223,15 +245,15 @@
 			$('#modalDelete').modal('show');
 		};
 
-		$scope.excluirClapra = function(objeto){
+		$scope.excluirControleacesso = function(objeto){
 			$('#modalDelete').modal('hide');
 			if(objeto!=null)
 			{					
 
-				var refEquipeNovo = new Firebase(Constant.Url + '/clapra/'+objeto.key);
+				var refEquipeNovo = new Firebase(Constant.Url + '/controleacesso/'+objeto.key);
 				refEquipeNovo.remove();
 
-				Notify.successBottom('Classe de Pragas removida com sucesso!');
+				Notify.successBottom('Controle de acesso/Menu removida com sucesso!');
 				
 				$scope.cancelar();
 
@@ -253,8 +275,16 @@
 
 		function validForm(data){
 
-			if(data.nome === ''){
-				setMessageError('O campo nome é inválido!');
+			if(data.nome == ''){
+				setMessageError('O campo nome é obrigatório!');
+				return true;
+			}
+			if(data.codigo == ''){
+				setMessageError('O campo Código é obrigatório!');
+				return true;
+			}
+			if(data.ordem == ''){
+				setMessageError('O campo Ordem é obrigatório!');
 				return true;
 			}
 			if(data.ativo === ''){

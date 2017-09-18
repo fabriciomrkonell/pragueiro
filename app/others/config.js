@@ -27,6 +27,11 @@
         resolve: {
           deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/index.js'])
         }
+      }).when('/controleacesso', {
+        templateUrl: '/views/partials/controleacesso.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/controleacesso.js'])
+        }
       }).when('/erros', {
         templateUrl: '/views/partials/erros.html',
         resolve: {
@@ -63,6 +68,11 @@
         resolve: {
           deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/aplicacao.js'])
         }
+      }).when('/configuracoes', {
+        templateUrl: '/views/partials/configuracoes.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/configuracoes.js'])
+        }
       }).when('/perfil', {
         templateUrl: '/views/partials/perfil.html',
         resolve: {
@@ -77,6 +87,16 @@
         templateUrl: '/views/partials/praga.html',
         resolve: {
           deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/praga.js'])
+        }
+      }).when('/clapraemp', {
+        templateUrl: '/views/partials/clapraemp.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/clapraemp.js'])
+        }
+      }).when('/praemp', {
+        templateUrl: '/views/partials/praemp.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/praemp.js'])
         }
       }).when('/variedade', {
         templateUrl: '/views/partials/variedade.html',

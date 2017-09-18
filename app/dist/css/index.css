@@ -8,6 +8,41 @@
 	height: 300px;
 }
 
+.gridPermissoes
+{
+	width: 100%;
+	height: 500px;
+}
+
+.gridPermissoes
+{
+	width: 100%;
+	height: 700px;
+}
+
+
+
+.gridCulturaConfiguracoes
+{
+	width: 100%;
+	height: 700px;
+}
+
+.gridTamanho {
+	width: 100%;
+	height: 150px;
+}
+
+.gridValores{
+	width: 100%;
+	height: 150px;
+}
+
+.gridPraga {
+	width: 100%;
+	height: 700px;
+}
+
 .gridPlanejamento{
 	width: 100%;
 	height: 700px;
@@ -112,6 +147,10 @@
 .panel_mapa{
 	margin-top: -30px;
 	padding: 20px;
+}
+
+.permissao {
+	color: #020202;
 }
 
 .container {

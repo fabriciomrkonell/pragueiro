@@ -399,8 +399,10 @@
 			var refEquipamentoNovo = new Firebase(Constant.Url + '/equipamento/'+key);
 			data.key=key;
 			refEquipamentoNovo.set(data);
+
 			var refEquipamentoNovo = new Firebase(Constant.Url + '/filial/'+fazendaTmp.key + '/equipamento/'+key);
 			refEquipamentoNovo.set(true);
+
 			$scope.chengeFazenda(fazendaTmp);
 			$scope.clear();						
 			$scope.setaFazenda(fazendaTmp);	
@@ -463,7 +465,7 @@
 
 				var refEquipamentoNovo = new Firebase(Constant.Url + '/equipamento/'+objeto.key);
 				refEquipamentoNovo.remove();
-				var refEquipamentoNovo = new Firebase(Constant.Url + '/equipamento/'+ $scope.data.fazenda.key + '/equipamento/'+objeto.key);
+				var refEquipamentoNovo = new Firebase(Constant.Url + '/filial/'+ $scope.data.fazenda.key + '/equipamento/'+objeto.key);
 				refEquipamentoNovo.remove();						
 				Notify.successBottom('Equipamento removida com sucesso!');
 				$scope.chengeFazenda(fazendaTmp);

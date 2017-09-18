@@ -2,11 +2,11 @@
 
 	'use strict';
 
-	angular.module('Pragueiro.controllers').registerCtrl('pragaCtrl', pragaCtrl);
+	angular.module('Pragueiro.controllers').registerCtrl('praempCtrl', praempCtrl);
 
-	pragaCtrl.$inject = ['$scope', 'Constant', 'Session', '$firebaseArray', '$firebaseObject', 'Notify', '$interval'];
+	praempCtrl.$inject = ['$scope', 'Constant', 'Session', '$firebaseArray', '$firebaseObject', 'Notify', '$interval'];
 
-	function pragaCtrl($scope, Constant, Session, $firebaseArray, $firebaseObject, Notify, $interval) {
+	function praempCtrl($scope, Constant, Session, $firebaseArray, $firebaseObject, Notify, $interval) {
 
 		angular.extend($scope, {
 			edit: false,			
@@ -15,6 +15,7 @@
 				ativo:true,
 				tamanhos:false,
 				texto: ' ',
+				key_praga:'40',
 				valor:[],
 				tamanho:[]
 			},
@@ -34,13 +35,16 @@
 		$scope.tipos = [{nome:'Praga', key:'PRA'},
 		{nome:'Doença', key:'DOE'}];
 		$scope.todasPragas= [];
+		$scope.todasPragasPadrao= [];
 		$scope.todasClapras= [];
 
 		$scope.qtde_clapras=0;
+		$scope.qtde_qtde_praemp=0;
+		$scope.qtde_pragas=0;
 
 		$scope.tamanhos=[];
 		$scope.valor=[];
-		recuperaCulturaQtde();
+		recuperaQtdePragaPadrao();
 
 		$scope.gridOptions = { 
 			enableRowSelection: true, 
@@ -52,7 +56,7 @@
 			modifierKeysToMultiSelect : false,
 
 			columnDefs : [
-			{ field: "key", displayName: "Código", width: 80 },
+			{ field: "codigo", displayName: "Código", width: 80 },
 			{ field: "descricao", displayName: "Descrição", width: 240 },
 			{ field: "ativo", displayName: "Ativo", width: 70,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" },
 			{ field: "postam", displayName: "Tamanhos", width: 100,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValueTamanhos(row)}}</div>" },
@@ -149,116 +153,252 @@
 				$scope.ChamarEditarValor(row.entity);
 			});
 		};
+
+			//############################################################################################################################
 		//############################################################################################################################
-		//############################################################################################################################
-		// Praga
+		// FAZENDA/FILIAL
 		//############################################################################################################################
 
-		function buscaPragas()
+		function atualizaListaFiliais()
 		{
-			var baseRef1 = new Firebase(Constant.Url+'/praga');
+			$('#myPleaseWait').modal('show');
 
-			baseRef1.on('child_added', function(snapshot1) {
+			var refUser = new Firebase(Constant.Url + '/usuarioxauth/'+Session.getUser().uid);		
+			var obj = $firebaseObject(refUser);
+			var key_usuario;
+			obj.$loaded().then(function() {
+				key_usuario= obj.$value;
+				
+				$scope.fazendas=[];
+				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
+				var refNovo = new Firebase.util.NormalizedCollection(
+					[baseRef.child("/usuario/"+key_usuario+"/filial/"), "$key"],
+					baseRef.child("/filial")
+					).select(
+					{"key":"$key.$key","alias":"key"},
+					{"key":"filial.$value","alias":"filial"}
+					).ref();
 
-				var objNovo = snapshot1.val();
-				$scope.todasPragas.push(objNovo);
-				$scope.gridOptions.data=$scope.todasPragas;	
-				if (!$scope.$$phase) {
-					$scope.$apply();
-					$scope.gridOptions.data=$scope.todasPragas;	
-				}
+					var i=0;
+					refNovo.on('child_added', function(snap) {
+						$('#myPleaseWait').modal('hide');
 
+						//console.log('Adicionou filial', snap.name(), snap.val());
+						var obj= snap.val();
+						$scope.fazendas.push(obj.filial);
 
-			});
-
-			baseRef1.on('child_changed', function(snap) {
-				var objNovo= snap.val();
-				var x=0;
-				var posicao=null;
-				$scope.todasPragas.forEach(function(obj){
-					if(obj.key === objNovo.key)
-					{ 
-						posicao = $scope.todasPragas.indexOf(obj);
+						if(i==0)
+						{
+							$scope.fazenda=$scope.fazendas[0];
+							$scope.chengeFazenda($scope.fazendas[0]);							
+						}
+						i++;
+						if(!$scope.$$phase) {
+							$scope.$apply();
+						}
+					});
+					
+					if($scope.fazendas.length==0)
+					{
+						$('#myPleaseWait').modal('hide');
 					}
-					x++;
+			});// final do load
+		}		
 
-				});
-				if(posicao!=null)
-					$scope.todasPragas[posicao]=objNovo;
+		//---------------------
+		$scope.chengeFazenda = function(fazenda)
+		{
+			if(fazenda === null) 
+			{
+				$scope.todasPragas =null;
+			}
+			else
+			{		
 
-				if(!$scope.$$phase) {
-					$scope.$apply();
-				}
-			});
-
-		}
-
-		//-------------------------------------------------------------------
-		function recuperaCulturaQtde() {
-
-			var baseRef = new Firebase(Constant.Url+'/clapra');
-			baseRef.on('value', function(snapshot2) {
-				$scope.qtde_clapras= snapshot2.numChildren();
-				if(	$scope.qtde_clapras==0)
+				
+				if(fazenda.clapraemp!=null)
 				{
-					buscaPragas();
+					$scope.qtde_clapras = castObjToArray(fazenda.clapraemp).length;
+					recuperaClapra(fazenda.key);
+				}
+				if(fazenda.praemp!=null)
+				{
+					$scope.qtde_praemp = castObjToArray(fazenda.praemp).length;
 				}
 				else
 				{
-					recuperaClapra();
+					$scope.qtde_praemp=0;
+				}
+
+			}
+		};
+
+		function recuperaQtdePragaPadrao() {
+
+			var baseRef = new Firebase(Constant.Url+'/praga');
+			baseRef.on('value', function(snapshot2) {
+				$scope.qtde_pragas= snapshot2.numChildren();
+				if(	$scope.qtde_pragas==0)
+				{
+					atualizaListaFiliais();
+				}
+				else
+				{				
+					recuperaPragasPadrao();
 				}
 			});
 		}
-		
-		function recuperaClapra() {
 
-			var baseRef2 = new Firebase(Constant.Url+'/clapra');
+		//---------------------
+		function recuperaPragasPadrao() {
+
+			var baseRef2 = new Firebase(Constant.Url+'/praga');
 
 			baseRef2.on('child_added', function(snapshot3) {
 
 				var objNovo3 = snapshot3.val();
-				$scope.todasClapras.push(objNovo3);		
+				$scope.todasPragasPadrao.push(objNovo3);		
 
-				if(	$scope.qtde_clapras==$scope.todasClapras.length)
+				if(	$scope.qtde_pragas==$scope.todasPragasPadrao.length)
 				{
-					buscaPragas();
+					atualizaListaFiliais();
 					if(!$scope.$$phase) {
 						$scope.$apply();
 					}
-				}
-
-				
+				}			
 
 			}, function(error) {
 				console.error(error);
 			});
 		}
 
+		//---------------------
+		$scope.buscaPragas = function(fazenda)
+		{
+			if(fazenda === null) 
+			{
+				$scope.todasPragas =null;
+			}
+			else
+			{			
+
+				$scope.todasPragas=[];
+
+				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
+				var refNovoQuadra = new Firebase.util.NormalizedCollection(
+					baseRef.child("/filial/"+fazenda.key+"/praemp"),
+					[baseRef.child("/praemp/"+fazenda.key), "$key"]
+					).select(
+					{"key":"praemp.$value","alias":"filial"},
+					{"key":"$key.$value","alias":"praemps"}
+					).ref();
+
+
+					var i=1;
+					refNovoQuadra.on('child_added', function(snap) {
+
+						var objNovo= snap.val();
+						$scope.todasPragas.push(objNovo['praemps']);
+						if(!$scope.$$phase) {
+							$scope.$apply();
+						}
+						$scope.gridOptions.data = $scope.todasPragas;
+
+						if($scope.todasPragas.length==$scope.qtde_praemp)
+						{
+							$('#myPleaseWait').modal('hide');
+						}
+					});
+
+					refNovoQuadra.on('child_changed', function(snap) {
+						$('#myPleaseWait').modal('hide');
+						var objNovo = snap.val();
+						var posicao = null;
+						$scope.todasPragas.forEach(function(obj) {
+							if (obj.key === objNovo['praemps'].key) {
+								posicao = $scope.todasPragas.indexOf(obj);
+							}
+						});
+						if (posicao != null)
+							$scope.todasPragas[posicao] = objNovo['praemps'];
+
+						if (!$scope.$$phase) {
+							$scope.$apply();
+						}
+					});
+
+					refNovoQuadra.on('child_removed', function(snap) {
+						var posicao = null;
+						$scope.todasPragas.forEach(function(obj) {
+							if (obj.key == snap.key()) {
+								posicao = $scope.todasPragas.indexOf(obj);
+							}
+						});
+						if (posicao != null)
+							delete $scope.todasPragas[posicao];
+
+						$scope.gridOptions.data = $scope.todasPragas;
+					});
+				}
+			};
+
+		//---------------------
+		function recuperaClapra(key_fazenda) {
+
+			var baseRef2 = new Firebase(Constant.Url+'/clapraemp/'+key_fazenda);
+
+			baseRef2.on('child_added', function(snapshot3) {
+
+				var objNovo3 = snapshot3.val();
+				$scope.todasClapras.push(objNovo3);		
+
+				if(	$scope.qtde_clapras-1==$scope.todasClapras.length)
+				{
+					$scope.buscaPragas($scope.fazenda);
+					if(!$scope.$$phase) {
+						$scope.$apply();
+					}
+				}			
+
+			}, function(error) {
+				console.error(error);
+			});
+		}
+
+		//############################################################################################################################
+		//############################################################################################################################
+		// Praga
+		//############################################################################################################################
+
+
 		$scope.salvarPraga = function(data){
 			if(validForm(data)) return false;
+			if($scope.fazenda==null) return false;	
 
-			var refNovo = new Firebase(Constant.Url + '/praga/' + data.key );
-			refNovo.set(data);
-			buscaPragas();
-			data.key=parseInt(data.key)+1;
+			delete data.$$hashKey;	
+
+			var refNovo = new Firebase(Constant.Url + '/praemp/' +$scope.fazenda.key+'/');
+			data.key=refNovo.push().key();
+
+			var refPraemp = new Firebase(Constant.Url + '/praemp/' +$scope.fazenda.key+'/'+ data.key );
+			refPraemp.set(data);
+
+			var refFilial = new Firebase(Constant.Url + '/filial/' +$scope.fazenda.key+'/praemp/'+ data.key );
+			refFilial.set(true);
+
 			$scope.clear();
 
 		};
 
-		$scope.clonar = function(){		
-			$scope.todasPragas.forEach(function(obj){
-				var objClonado= obj;
-				delete 	objClonado.$$hashKey;
-				var refNovo = new Firebase(Constant.Url + '/praemp/-KtH3-hl4fZVNnCHZnFn/' + obj.key+'/tamanho/a' );
-				refNovo.remove();
-			});
-			Notify.successBottom('Praga clonada com sucesso!');
-		};
-
 		$scope.editarPraga = function(data){
 			if(validForm(data)) return false;
+			if($scope.fazenda==null) return false;	
 
-			//$scope.tamanhos=castObjToArray(praga.tamanho);
+			delete data.$$hashKey;	
+			if(data.img == null || data.img == '')
+			{
+				delete data.img;	
+			}
 
 			var tamanhos={};
 			$scope.tamanhos.forEach(function(obj){
@@ -267,12 +407,23 @@
 				delete 	tamanhos[obj.key].$$hashKey;
 			});
 
-			delete data.$$hashKey;
 			delete data.tamanho;
 
 			data.tamanho=tamanhos;
 
-			var refNovo = new Firebase(Constant.Url + '/praga/' + data.key );
+
+			var valores={};
+			$scope.valor.forEach(function(obj){
+				valores[obj.key]={};
+				valores[obj.key]=obj;	
+				delete 	valores[obj.key].$$hashKey;
+			});
+
+			delete data.valor;
+
+			data.valor=valores;
+
+			var refNovo = new Firebase(Constant.Url + '/praemp/' +$scope.fazenda.key + '/'+ data.key );
 			refNovo.set(data);
 
 			Notify.successBottom('Praga salva com sucesso!');
@@ -284,74 +435,22 @@
 		$scope.cancelar = function(){
 			$scope.clear();
 			$scope.edit = false;
-		};
+		};	
 
-		$scope.setarConserto = function(){	
-			$scope.todasPragas.forEach(function(obj){
-
-				if(obj.tamanho!=null)
-				{
-					$scope.tamanhos=(castObjToArray(obj.tamanho));
-					if($scope.tamanhos[0].key=="a")
-					{
-						//var refNovo = new Firebase(Constant.Url + '/praga/' + obj.key+'/postam' );
-						//refNovo.set(false);
-						//console.log('possui tamanho A, key: ' + obj.key);
-					}
-					else
-					{
-						var x=1;
-						$scope.tamanhos.forEach(function(obj2){
-							console.log('PRAGA: ' + obj.key + ' TAMANHO' + obj2.key + ' ordem: ' + x );
-							obj2['ordem']=x;
-							obj2['ativo']=true;
-
-							var refNovo = new Firebase(Constant.Url + '/praga/' + obj.key+'/tamanho/'+obj2.key );
-							refNovo.set(obj2);
-							x++;
-						});
-						//
-						//refNovo.set(true);
-						//console.log('possui tamanhos, key: ' + obj.key);
-					}
-				}
-				else
-				{
-					console.log('nao possui nada de tamanho, key: ' + obj.key);
-				}
-
-
-				if(obj.tipo==null)
-				{
-				//	var refNovo = new Firebase(Constant.Url + '/praga/' + obj.key+'/tipo' );
-				//	refNovo.set("PRA");
-				//	console.log('tipo nulo: ' + obj.key);
-			}
-
-				//refNovo.set(false);
-
-				//var refNovo = new Firebase(Constant.Url + '/praga/' + obj.key+'/postam' );
-				//refNovo.set(data);
-
-
-			});
-
-		}
-
-		$scope.chamaEditar = function(praga){	
-			$scope.data = praga;
-			if(praga.tamanho!=null)
+		$scope.chamaEditar = function(praemp){	
+			$scope.data = clone(praemp);
+			if(praemp.tamanho!=null)
 			{
-				$scope.tamanhos=(castObjToArray(praga.tamanho));
+				$scope.tamanhos=(castObjToArray(praemp.tamanho));
 			}
 			else
 			{
 				$scope.data.tamanhos=[];
 				$scope.tamanhos=[];
 			}
-			if(praga.valor!=null)
+			if(praemp.valor!=null)
 			{
-				$scope.valor=(castObjToArray(praga.valor));
+				$scope.valor=(castObjToArray(praemp.valor));
 			}
 			else
 			{
@@ -372,29 +471,71 @@
 			$scope.edit = true;
 		};
 
-		$scope.excluir = function(objeto){
-			var fazendaTmp=$scope.data.fazenda;
-			if(objeto.qtd!=null)
-			{
-				if(objeto.qtd>0)
-				{
-					setMessageError('Já foi associado em quadra. Impossível continuar.');
-					return true;
-				}
+		$scope.excluir = function(){
+			$('#modalDelete').modal('show');
+		};
+
+		$scope.excluirPraga = function(objeto){
+			$('#modalDelete').modal('hide');
+			if(objeto!=null)
+			{					
+				if($scope.fazenda==null) return false;		
+
+				var refEquipeNovo = new Firebase(Constant.Url + '/praga/'+ $scope.fazenda.key + '/'+objeto.key);
+				refEquipeNovo.remove();
+
+				var refFilial = new Firebase(Constant.Url + '/filial/'+ $scope.fazenda.key + '/praemp/'+objeto.key);
+				refFilial.remove();	
+
+				Notify.successBottom('Praga removida com sucesso!');
+				
+				$scope.cancelar();
+
+				var posicao = null;
+				$scope.todasPragas.forEach(function(obj) {
+					if (obj.key === objeto.key) {
+						posicao = 	$scope.todasPragas.indexOf(obj);
+					}
+
+				});
+				if (posicao != null)
+					delete $scope.todasPragas[posicao];
+
+
+
 			}
-
-			var refPragaNovo = new Firebase(Constant.Url + '/praga/'+objeto.key_filial+'/'+objeto.key_cultura+'/'+objeto.key);
-			refPragaNovo.remove();
-
-			Notify.successBottom('Praga removida com sucesso!');
-			$scope.chengeFazenda(fazendaTmp);
 			return true;
 
 		};
 
+		//--
+		$scope.chengePragaPadrao = function(data)
+		{
+			if(data.key_praga==null || data.key_praga!='')
+			{
+				var posicao;
+				$scope.todasPragasPadrao.forEach(function(obj) {
+					if (obj.key!=null && obj.key == data.key_praga) {
+						posicao = $scope.todasPragasPadrao.indexOf(obj);
+					}
+				});
+				if (posicao != null) {
+					var padraPadrao = $scope.todasPragasPadrao[posicao];	
 
+					$scope.data.nome_cientifico=padraPadrao.nome_cientifico;
+					$scope.data.img=padraPadrao.img;
+					$scope.data.texto=padraPadrao.texto;
+				}
+			}
+			else
+			{
+				$scope.data.nome_cientifico='';
+				$scope.data.img='';
+				$scope.data.texto='';
+			}
+		}
 
-//############################################################################################################################
+		//############################################################################################################################
 		//############################################################################################################################
 		//TAMANHO
 		//############################################################################################################################
@@ -412,10 +553,12 @@
 			if($scope.data==null || $scope.data.key==null) return;
 
 			if(validFormTamanho($scope.frmTamanho)) return false;
+			if($scope.fazenda==null) return false;	
+
 
 			var tamObj = clone($scope.frmTamanho);
 			delete tamObj.$$hashKey;
-			var refTamanho = new Firebase(Constant.Url + '/praga/'+$scope.data.key+'/tamanho/'+tamObj.key);
+			var refTamanho = new Firebase(Constant.Url + '/praemp/'+$scope.fazenda.key+ '/'+$scope.data.key+'/tamanho/'+tamObj.key);
 			refTamanho.set(tamObj);
 
 			$scope.data.tamanho[tamObj.key]=tamObj;
@@ -440,26 +583,51 @@
 		$scope.salvarTamanho = function()
 		{
 			if($scope.data==null || $scope.data.key==null) return;
+			if($scope.fazenda==null) return false;	
 
 			if(validFormTamanho($scope.frmTamanho)) return false;
 
 			var tamObj = clone($scope.frmTamanho);
 			delete tamObj.$$hashKey;
-			var refTamanho = new Firebase(Constant.Url + '/praga/'+$scope.data.key+'/tamanho/');
+			var refTamanho = new Firebase(Constant.Url + '/praemp/'+$scope.fazenda.key+'/'+$scope.data.key+'/tamanho/');
 			tamObj.key = refTamanho.push().key();
 
-			var refTamanhoNovo = new Firebase(Constant.Url + '/praga/'+$scope.data.key+'/tamanho/'+tamObj.key);
+			var refTamanhoNovo = new Firebase(Constant.Url + '/praemp/'+$scope.fazenda.key+'/'+$scope.data.key+'/tamanho/'+tamObj.key);
 			refTamanhoNovo.set(tamObj);
 
 
-			var refPraga = new Firebase(Constant.Url + '/praga/'+$scope.data.key+'/postam');
+			var refPraga = new Firebase(Constant.Url + '/praemp/'+$scope.fazenda.key+'/'+$scope.data.key+'/postam');
 			refPraga.set(true);
 			$scope.data.postam=true;
 			
+			if($scope.data.tamanho!=null)
+			{
+				if($scope.data.tamanho[tamObj.key]!=null)
+				{
+					$scope.data.tamanho[tamObj.key]=tamObj;
+				}
+				else
+				{
+					if(Array.isArray($scope.data.tamanho))
+					{
+						$scope.data.tamanho.push(tamObj);
+					}
+					else
+					{
+						$scope.data.tamanho= castObjToArray($scope.data.tamanho);
+						$scope.data.tamanho.push(tamObj);
+					}
+				}
+			}
+			else
+			{
+				$scope.data.tamanho=[];
+				$scope.data.tamanho.push(tamObj);
+			}
 
-			$scope.data.tamanho[tamObj.key]=tamObj;
-			
-			$scope.tamanhos.push(tamObj);			
+
+			$scope.tamanhos.push(tamObj);
+
 			
 			Notify.successBottom('Tamanho inserido com sucesso!');
 
@@ -483,10 +651,11 @@
 		$scope.excluirTamanho = function()
 		{
 			if($scope.data==null || $scope.data.key==null) return;
+			if($scope.fazenda==null) return false;	
 
 			var tamObj = clone($scope.frmTamanho);
 			delete tamObj.$$hashKey;
-			var refTamanho = new Firebase(Constant.Url + '/praga/'+$scope.data.key+'/tamanho/'+tamObj.key);
+			var refTamanho = new Firebase(Constant.Url + '/praemp/'+$scope.fazenda.key+'/'+$scope.data.key+'/tamanho/'+tamObj.key);
 			refTamanho.remove();
 
 			delete $scope.data.tamanho[tamObj.key]
@@ -499,16 +668,18 @@
 				x++;
 			});
 			if (posicao != null) {
-				delete $scope.tamanhos[posicao];		
+				delete $scope.tamanhos[posicao];	
+				$scope.tamanhos.remove(posicao);	
 			}
 
 
-			if($scope.tamanhos.length==0)
+			if($scope.tamanhos.count==0)
 			{
-				var refPraga = new Firebase(Constant.Url + '/praga/'+$scope.data.key+'/postam');
+				var refPraga = new Firebase(Constant.Url + '/praemp/'+$scope.fazenda.key+'/'+$scope.data.key+'/postam');
 				refPraga.set(false);
 				$scope.data.postam=false;
 			}
+
 
 			$('#modalDeleteTamanho').modal('hide');
 
@@ -519,7 +690,7 @@
 
 		}
 
-//############################################################################################################################
+		//############################################################################################################################
 		//############################################################################################################################
 		//TAMANHO
 		//############################################################################################################################
@@ -537,10 +708,11 @@
 			if($scope.data==null || $scope.data.key==null) return;
 
 			if(validFormValor($scope.frmValor)) return false;
+			if($scope.fazenda==null) return false;	
 
 			var tamObj = clone($scope.frmValor);
 			delete tamObj.$$hashKey;
-			var refValor = new Firebase(Constant.Url + '/praga/'+$scope.data.key+'/valor/'+tamObj.key);
+			var refValor = new Firebase(Constant.Url + '/praemp/'+$scope.fazenda.key+'/'+$scope.data.key+'/valor/'+tamObj.key);
 			refValor.set(tamObj);
 
 			$scope.data.valor[tamObj.key]=tamObj;
@@ -567,24 +739,49 @@
 			if($scope.data==null || $scope.data.key==null) return;
 
 			if(validFormValor($scope.frmValor)) return false;
+			if($scope.fazenda==null) return false;	
 
 			var tamObj = clone($scope.frmValor);
 			delete tamObj.$$hashKey;
-			var refValor = new Firebase(Constant.Url + '/praga/'+$scope.data.key+'/valor/');
+			var refValor = new Firebase(Constant.Url + '/praemp/'+$scope.fazenda.key+'/'+$scope.data.key+'/valor/');
 			tamObj.key = refValor.push().key();
 
-			var refValorNovo = new Firebase(Constant.Url + '/praga/'+$scope.data.key+'/valor/'+tamObj.key);
+			var refValorNovo = new Firebase(Constant.Url + '/praemp/'+$scope.fazenda.key+'/'+$scope.data.key+'/valor/'+tamObj.key);
 			refValorNovo.set(tamObj);
 
 
-			var refPraga = new Firebase(Constant.Url + '/praga/'+$scope.data.key+'/valpre');
+			var refPraga = new Firebase(Constant.Url + '/praemp/'+$scope.fazenda.key+'/'+$scope.data.key+'/valpre');
 			refPraga.set(true);
 			$scope.data.valpre=true;
 			
+			if($scope.data.valor!=null)
+			{
+				if($scope.data.valor[tamObj.key]!=null)
+				{
+					$scope.data.valor[tamObj.key]=tamObj;
+				}
+				else
+				{
+					if(Array.isArray($scope.data.valor))
+					{
+						$scope.data.valor.push(tamObj);
+					}
+					else
+					{
+						$scope.data.valor= castObjToArray($scope.data.valor);
+						$scope.data.valor.push(tamObj);
+					}
+					
+					
+				}
+			}
+			else
+			{
+				$scope.data.valor=[];
+				$scope.data.valor.push(tamObj);
+			}		
 
-			$scope.data.valor[tamObj.key]=tamObj;
-			
-			$scope.valor.push(tamObj);			
+			$scope.valor.push(tamObj);
 			
 			Notify.successBottom('Valores inserido com sucesso!');
 
@@ -608,10 +805,11 @@
 		$scope.excluirValor = function()
 		{
 			if($scope.data==null || $scope.data.key==null) return;
+			if($scope.fazenda==null) return false;	
 
 			var tamObj = clone($scope.frmValor);
 			delete tamObj.$$hashKey;
-			var refValor = new Firebase(Constant.Url + '/praga/'+$scope.data.key+'/valor/'+tamObj.key);
+			var refValor = new Firebase(Constant.Url + '/praemp/'+$scope.fazenda.key+'/'+$scope.data.key+'/valor/'+tamObj.key);
 			refValor.remove();
 
 			delete $scope.data.valor[tamObj.key]
@@ -630,7 +828,7 @@
 
 			if($scope.valor.length==0)
 			{
-				var refPraga = new Firebase(Constant.Url + '/praga/'+$scope.data.key+'/valpre');
+				var refPraga = new Firebase(Constant.Url + '/praemp/'+$scope.fazenda.key+'/'+$scope.data.key+'/valpre');
 				refPraga.set(false);
 				$scope.data.valpre=false;
 			}
@@ -655,15 +853,12 @@
 		};
 
 		function validForm(data){
-			if(data.key == null){
-				setMessageError('O campo key é inválido!');
-				return true;
-			}
+			
 			if(data.nome_cientifico == null){
 				setMessageError('O campo nome_cientifico é inválido!');
 				return true;
 			}
-			if(data.descricao === ''){
+			if(data.descricao==null || data.descricao === ''){
 				setMessageError('O campo descrição é inválido!');
 				return true;
 			}
@@ -677,6 +872,10 @@
 			}
 			if(data.key_clapra==null || data.key_clapra==''){
 				setMessageError('O campo Classe é obrigatório!');
+				return true;
+			}
+			if(data.key_praga==null || data.key_praga==''){
+				setMessageError('O campo Pragra Padrão é obrigatório!');
 				return true;
 			}
 			return false;
@@ -767,6 +966,17 @@
 			return true;
 		};
 
+
+
+		function clone(obj) {
+			if (null == obj || "object" != typeof obj) return obj;
+			var copy = obj.constructor();
+			for (var attr in obj) {
+				if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+			}
+			return copy;
+		}
+
 		$scope.clearFormValor= function(){
 			$scope.frmValor==null;
 			$scope.frmValor.nome='';
@@ -784,16 +994,26 @@
 		};
 
 		$scope.clear = function(){
-			//var fazendaTmp=$scope.data.fazenda;
-			angular.extend($scope.data, {			
-				ativo: true,
-				tamanhos:false,
-				nome_cientifico: '',
-				descricao: '',
-				img: ''
-			});
-			//$scope.data.fazenda=fazendaTmp;
-			$scope.desabilitaFazenda=false;
+			
+			$scope.data.key='';
+			$scope.data.descricao='';
+			$scope.data.nome_cientifico='';
+			$scope.data.img='';
+			//$scope.data.key_clapra='';
+			$scope.data.key_praga='40';
+			$scope.data.ativo=true;
+			$scope.data.codigo='';
+			$scope.data.tamanho=[];
+			$scope.data.valor=[];
+			$scope.data.postam=false;
+			$scope.data.valpre=false;
+
+			$scope.tamanhos=[];
+			$scope.gridOptionsTamanhos.data=$scope.tamanhos;
+
+			$scope.valor=[];
+			$scope.gridOptionsValor.data=$scope.valor;
+
 			$scope.edit=false;
 			if(!$scope.$$phase) {
 				$scope.$apply();

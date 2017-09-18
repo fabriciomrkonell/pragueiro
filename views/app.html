@@ -6,25 +6,26 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="shortcut icon" href="/dist/images/favicon.ico">
 	<link rel="mask-icon" href="/dist/images/favicon.ico" color="black">
-	<title>Pragueiro - 1.7</title>
+	<title>Pragueiro - 2.0</title>
 
+	<script src="https://www.gstatic.com/firebasejs/4.1.1/firebase.js"></script>
 	<link rel="stylesheet" type="text/css" href="/app/libraries/bootstrap/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="/app/dist/css/index.css">
 	<link rel="stylesheet" type="text/css" href="/app/libraries/angular-ui-grid/ui-grid.css" /> 
 	<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDDu-8XiPmbb5QbSlh-Dv4xyHF53iGUPOk&language=br&libraries=visualization,geometry"></script>
 	<style type="text/css">
-		[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
-			display: none !important;
-		}
+	[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+		display: none !important;
+	}
 
-		.variedade_css{
-			padding-right: 5px; 
-			padding-left: 0px; 
-		}
+	.variedade_css{
+		padding-right: 5px; 
+		padding-left: 0px; 
+	}
 
-		
 
-	</style>
+
+</style>
 </head>
 <body>
 
@@ -42,6 +43,14 @@
 			<div id="navbar" class="navbar-collapse collapse">
 				<ul class="nav navbar-nav">
 					<li><a href="#/home">Início</a></li>
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Básico <span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="#/configuracoes">Configurações</a></li>
+							<li><a href="#/clapraemp">Classe de Praga</a></li>
+							<li><a href="#/praemp">Praga</a></li>		
+						</ul>
+					</li>
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Cadastro <span class="caret"></span></a>
 						<ul class="dropdown-menu">
@@ -134,6 +143,8 @@
 <script src="/app/libraries/stimulsoft/stimulsoft.reports.js"></script>
 <script src="/app/libraries/stimulsoft/stimulsoft.viewer.js"></script>
 <script src="/app/libraries/stimulsoft/stimulsoft.designer.js"></script>
+
+
 
 </body>
 </html>

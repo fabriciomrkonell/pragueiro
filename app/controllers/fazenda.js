@@ -21,6 +21,7 @@
 		$scope.clear = function(){
 			$scope.data = {};
 			angular.extend($scope.data, {
+				codigo: '',
 				nome: '',
 				razaosocial: '',
 				telefone: '',
