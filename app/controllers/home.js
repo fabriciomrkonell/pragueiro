@@ -104,7 +104,7 @@ function initMap() {
 		$scope.mCountTamanhos = 0;
 		$scope.mCont = 0;
 
-		//gravarAcesso();
+		gravarAcesso();
 		atualizaListaFiliais();
 		atualizaCulturas();
 		atualizaUsuarios();
