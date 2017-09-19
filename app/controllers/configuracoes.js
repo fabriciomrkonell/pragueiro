@@ -20,6 +20,7 @@
 			},
 			frmCultura: {
 				key_cultura:'',
+				abertura : false,
 				altura : false,
 				altura_ocorrencia : '',
 				//altura_intervalo : '',
@@ -638,7 +639,7 @@
 
 		$scope.cancelar = function(){
 			$scope.desabilitaFazenda=false;
-
+			$scope.frmCultura.abertura = false;
 			$scope.clear();
 		};
 
@@ -655,8 +656,13 @@
 					if(objConf.key_cultura==obj.key)
 					{						
 						$scope.frmCultura = objConf;
+						$scope.frmCultura.abertura = true;
 					}
 				});
+			}
+			else
+			{
+				$scope.frmCultura.abertura = true;
 			}
 			
 			$scope.frmCultura.key_cultura=obj.key;
@@ -683,6 +689,7 @@
 			if($scope.fazenda==null) return false;
 			if(validForm($scope.frmCultura)) return false;
 
+			$scope.frmCultura.abertura = true;
 
 			var refConfiguracoes = new Firebase(Constant.Url + '/configuracoes/' + $scope.fazenda.key + '/' + $scope.data.key + '/cultura/'+$scope.frmCultura.key_cultura);
 
@@ -983,6 +990,7 @@
 
 		$scope.clear = function(){
 			$scope.frmCultura= {
+				abertura : false,
 				key_cultura:'',
 				altura : false,
 				altura_ocorrencia : '',

@@ -94,17 +94,23 @@
 								<div ng-show="desabilitaFazenda">
 
 									<div class="col-sm-9">
+
 										<div class="row">
+
 											<button type="button" class="btn btn-success" ng-show="desabilitaFazenda" ng-click="salvarConfcul(frmCultura)">Salvar conf. da Cultura</button>
 											<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar</button>
 										</div>
+										<br>
 										<div class="row">
-											<br>
-											<div class="col-sm-2">
-												<input type="checkbox"  ng-disabled="true" ng-model="data.abertura"
+											<div class="col-sm-9">
+												<input type="checkbox"  ng-disabled="true" ng-model="frmCultura.abertura"
 												ng-true-value="true" ng-false-value="false">	
 												<label>Exibe 'Abertura' no APP</label>		
 											</div>
+										</div>
+										<div class="row">
+											<br>
+											<br>
 											<div class="col-sm-2">
 												<div class="form-group">
 													<input type="checkbox"  ng-model="frmCultura.altura"
