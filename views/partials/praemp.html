@@ -23,7 +23,7 @@
 		<div class="row">
 			<div class="col-sm-6">
 				<div class="form-group">
-					<button type="button" class="btn btn-success"  ng-click="clonar()">Clonar</button>
+					<button type="button" class="btn btn-success"  ng-show="false" ng-click="clonar()">Clonar</button>
 					<button type="button" class="btn btn-success" ng-show="!edit" ng-click="salvarPraga(data)">Salvar</button>
 					<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarPraga(data)">Atualizar</button>
 					<button type="button"  class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar</button>
@@ -177,6 +177,49 @@
 								</div>
 								<div class="form-group">
 									<div ui-grid="gridOptionsTamanhos" ui-grid-selection class="gridTamanho"></div>	
+								</div>
+
+								<div ng-show="false">
+
+									<legend class="permissao">Valores pé-definidos do tamanho</legend>
+									
+									<div class="col-sm-6">
+										<div class="form-group">
+											<label>Nome</label>
+											<input type="text" class="form-control" placeholder="Nome" ng-model="frmValor.nome" />
+										</div>
+									</div>
+									<div class="col-sm-3">
+										<div class="form-group">
+											<label>Ordem</label>
+											<input type="number" class="form-control" placeholder="Ordem" ng-model="frmValor.ordem" />
+										</div>
+									</div>
+									<div class="col-sm-3">
+										<div class="form-group">
+											<label>Valor</label>
+											<input type="number" class="form-control" placeholder="Valor" ng-model="frmValor.valor" />
+										</div>
+									</div>
+									<div class="col-sm-2">
+										<div class="form-group">
+											<br />
+											<input type="checkbox"  ng-model="frmValor.ativo"
+											ng-true-value="true" ng-false-value="false">	
+											<label>Ativo</label>						
+										</div>
+									</div>
+									
+									<div class="form-group">
+										<button type="button" class="btn btn-default btn-xm btn-success"  ng-disabled="!edit" ng-show="!edit_valor" ng-click="salvarValor()"> <i class="glyphicon glyphicon-plus-sign"></i> Inserir	</button>
+										<button type="button" class="btn btn-default btn-xm btn-success" ng-show="edit_valor" ng-click="atualizarValor()">Atualizar</button>
+										<button type="button" class="btn btn-default btn-xm btn-cancel" ng-show="edit_valor" ng-click="cancelarValor()">Cancelar</button>
+										<button type="button" class="btn btn-default btn-xm btn-danger" ng-show="edit_valor" ng-click="questionaExcluirValor()">Excluir</button>
+									</div>
+									<div class="form-group">
+										<div ui-grid="gridOptionsValorTamanho" ui-grid-selection class="gridValores"></div>	
+									</div>
+
 								</div>
 							</div>					
 						</div>

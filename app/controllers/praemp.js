@@ -251,6 +251,38 @@
 			});
 		};
 
+
+		$scope.gridOptionsValorTamanho = { 
+			enableRowSelection: true, 
+			enableRowHeaderSelection: false,
+
+			enableColumnResizing: true,
+
+			multiSelect : false,
+			modifierKeysToMultiSelect : false,
+
+			columnDefs : [
+			{ field: "ordem", displayName: "Ordem", width: 100 , sort:{ direction: 'asc', priority: 0 }},
+			{ field: "nome", displayName: "Nome", sort:{ direction: 'asc', priority: 1 }, width: 240 },	
+			{ field: "valor", displayName: "Valor" },	
+			{ field: "ativo", displayName: "Ativo", width: 150,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" }
+
+			],
+			appScopeProvider: {
+				mapValue: function(row) {
+					return row.entity.ativo ? 'Sim' : 'Não';
+				}
+			}
+
+		};
+
+		$scope.gridOptionsValorTamanho.onRegisterApi = function(gridApi){
+			$scope.gridApi = gridApi;
+			gridApi.selection.on.rowSelectionChanged($scope,function(row){
+				$scope.ChamarEditarValor(row.entity);
+			});
+		};
+
 			//############################################################################################################################
 		//############################################################################################################################
 		// FAZENDA/FILIAL
