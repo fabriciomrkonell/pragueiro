@@ -25,7 +25,6 @@
 			historico: [],
 			culturas: [],
 			key_var:[],
-			variedades: [],
 			variedadesAdd: [],
 			todasQuadras: [],
 			quadrasPlanejamento: [],
@@ -65,9 +64,11 @@
 		refHistoricoQuadrasCulturas = null;
 
 		recuperaCulturaQtde();
-		recuperaCultura();
 
-		atualizaListaFiliais();
+		//atualizaListaFiliais();
+		//recuperaCultura();
+
+		
 		$scope.planejamentoExcluir={};
 
 		$scope.gridOptions = { 
@@ -198,10 +199,11 @@
 							{
 								$scope.qtde_variedades =+ 0;
 							}
-						}
-						recuperaQuadra(obj);
-						recuperaVariedade(obj);
+							recuperaQuadra(obj);
+							recuperaVariedade(obj);
 
+						}
+						
 						if (!$scope.$$phase) {
 							$scope.$apply();
 						}
@@ -449,6 +451,7 @@
 			var baseRef = new Firebase(Constant.Url+'/cultura');
 			baseRef.on('value', function(snapshot) {
 				$scope.qtde_culturas= snapshot.numChildren();
+				recuperaCultura();
 
 			});
 		}
@@ -457,19 +460,15 @@
 
 			var baseRef = new Firebase(Constant.Url+'/cultura');
 
+			var i=0;
 			baseRef.on('child_added', function(snapshot) {
-
+				console.log(i);
 				var objNovo = snapshot.val();
 				$scope.todasCulturas.push(objNovo);
 				
-				if(verificaFinalizacaoCarregamento())
+				if(verificaFinalizacaoCultura())
 				{
-					$scope.chengeFazenda($scope.fazendas[0]);
-					$scope.fazenda=$scope.fazendas[0];
-					$('#myPleaseWait').modal('hide');
-					if (!$scope.$$phase) {
-						$scope.$apply();
-					}
+					atualizaListaFiliais();
 				}
 
 			}, function(error) {
@@ -477,6 +476,20 @@
 			});
 		}
 		
+		function verificaFinalizacaoCultura()
+		{		
+
+			if($scope.todasCulturas.length==$scope.qtde_culturas
+				)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
 		function verificaFinalizacaoCarregamento()
 		{
 			console.log(' --------------------- ');
@@ -590,7 +603,8 @@
 			var mPlanejamento = {};
 			mPlanejamento['key'] = $scope.data.key;
 			mPlanejamento['key_cultura'] = $scope.data.key_cultura;
-			mPlanejamento['area'] = $scope.data.area;
+			if($scope.data.area!=null)
+				mPlanejamento['area'] = $scope.data.area;
 			mPlanejamento['ativo'] = $scope.data.ativo;
 			if( $scope.data.separar_variedade!=null)
 			{
@@ -610,16 +624,16 @@
 				mPlanejamento['data_plantio']=new Date($scope.data.data_plantio).getTime();
 			}
 
-			if($scope.data.variedades!=null)
+			if($scope.todasVariedadesPlanejamento!=null)
 			{
-				if(!Array.isArray($scope.data.variedades))
+				if(!Array.isArray($scope.todasVariedadesPlanejamento))
 				{
-					mPlanejamento['variedades']=$scope.data.variedades;
+					mPlanejamento['variedades']=$scope.todasVariedadesPlanejamento;
 				}
 				else
 				{
 					var list_var=[];
-					$scope.data.variedades.forEach(function(var_pla) 
+					$scope.todasVariedadesPlanejamento.forEach(function(var_pla) 
 					{
 						list_var[var_pla.key]=[];
 						list_var[var_pla.key]['key_variedade']=var_pla.key;
@@ -627,6 +641,46 @@
 						{
 							list_var[var_pla.key]['area']=var_pla.area;
 						}
+
+
+						list_var[var_pla.key]['key_variedade']=var_pla.variedade.key;
+						list_var[var_pla.key]['key_safra']=$scope.safra.key;
+						list_var[var_pla.key]['key_quadra']=$scope.data.key;
+						list_var[var_pla.key]['key']=var_pla.variedade.key;
+
+						if(var_pla.dias!=null)
+						{
+							list_var[var_pla.key]['dias']=var_pla.dias;
+						}
+						if(var_pla.pn!=null)
+						{
+							list_var[var_pla.key]['pn']=var_pla.pn;
+						}
+						if(var_pla.pms!=null)
+						{
+							list_var[var_pla.key]['pms']=var_pla.pms;
+						}
+						if(var_pla.perger!=null)
+						{
+							list_var[var_pla.key]['perger']=var_pla.perger;
+						}
+						if(var_pla.pitm!=null)
+						{
+							list_var[var_pla.key]['pitm']=var_pla.pitm;
+						}
+						if(var_pla.stem!=null)
+						{
+							list_var[var_pla.key]['stem']=var_pla.stem;
+						}
+						if(var_pla.kgha!=null)
+						{
+							list_var[var_pla.key]['kgha']=var_pla.kgha;
+						}
+						if(var_pla.qtdekg!=null)
+						{
+							list_var[var_pla.key]['qtdekg']=var_pla.qtdekg;
+						}
+
 					});
 					mPlanejamento['variedades']=list_var;
 				}		
@@ -827,6 +881,7 @@
 
 			var frmVariedade={};
 			
+			$scope.editCultura=true;
 
 			if (validformPlanejamento($scope.formPlanejamento)) return false;
 
@@ -970,7 +1025,7 @@
 			var x=0;
 			$scope.todasVariedadesPlanejamento.forEach(function(obj2) {
 				if (obj2.key!=null && obj2.key == frmVariedade.key) {
-					posicao = x;
+					posicao = $scope.todasVariedadesPlanejamento.indexOf(obj2);
 				}
 				x++;
 			});
@@ -989,7 +1044,7 @@
 		};
 
 		$scope.ChamarEditarVariedade = function(data){
-			$scope.formPlanejamento=data;
+			$scope.formPlanejamento=clone(data);
 			$scope.edit_variedade=true;
 		}
 
@@ -1028,17 +1083,23 @@
 			refVariedade.remove();
 
 			var i = 0;
-			var posicao_deletar;
+			var posicao;
 			$scope.todasVariedadesPlanejamento.forEach(function(obj2) {
-				if (obj2.key === $scope.formPlanejamento.variedade.key) {
-					posicao_deletar = i;
+				if (obj2.key == $scope.formPlanejamento.variedade.key) {
+					posicao = $scope.todasVariedadesPlanejamento.indexOf(obj2);
 				}
 				i++;
 			});
-			if (posicao_deletar != null) {
+			if (posicao != null) {
 
-				delete $scope.todasVariedadesPlanejamento[posicao_deletar];
+				delete $scope.todasVariedadesPlanejamento[posicao];
 			}			
+			if($scope.todasVariedadesPlanejamento.length==0 || $scope.todasVariedadesPlanejamento.count==0)
+			{
+				var refSepara = new Firebase(Constant.Url + '/filial/' + $scope.fazenda.key + '/safra/' + $scope.safra.key + '/quadra/'+$scope.data.key+'/separar_variedade/');
+				refSepara.set(false);
+				$scope.data.separar_variedade=false;
+			}
 			$scope.clearFormVariedade();
 			return true;
 		};
@@ -1065,13 +1126,13 @@
 		$scope.chengeCultura = function(key_cultura){
 			if(key_cultura === null) return false;
 			$scope.variedadesAdd=[];
-			for (var i = 0; i < $scope.variedades.length; i++)
+			for (var i = 0; i < $scope.todasVariedades.length; i++)
 			{						
-				for(var obj in $scope.variedades[i])
+				for(var obj in $scope.todasVariedades[i])
 				{	
-					if($scope.variedades[i][obj].key_cultura==key_cultura)
+					if($scope.todasVariedades[i][obj].key_cultura==key_cultura)
 					{
-						$scope.variedadesAdd.push($scope.variedades[i][obj]);					
+						$scope.variedadesAdd.push($scope.todasVariedades[i][obj]);					
 					}
 				}
 			}

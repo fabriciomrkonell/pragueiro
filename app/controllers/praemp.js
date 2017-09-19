@@ -32,6 +32,20 @@
 				ordem:1
 			}			
 		});
+
+		$scope.todosFiliaisGeral=[];
+		var baseRef1 = new Firebase(Constant.Url+'/filial');
+
+		baseRef1.on('child_added', function(snapshot1) {
+
+			var objNovo = snapshot1.val();
+			$scope.todosFiliaisGeral.push(objNovo);
+			
+
+
+		});
+
+
 		$scope.tipos = [{nome:'Praga', key:'PRA'},
 		{nome:'Doença', key:'DOE'}];
 		$scope.todasPragas= [];
@@ -45,6 +59,89 @@
 		$scope.tamanhos=[];
 		$scope.valor=[];
 		recuperaQtdePragaPadrao();
+
+
+		$scope.clonar = function(){		
+
+			var i=0;
+			$scope.todosFiliaisGeral.forEach(function(fazenda){
+				i++;
+				if(fazenda.key!=null && fazenda.key!='-KtH3-hl4fZVNnCHZnFn') //&& i>=450 && i<500)
+				{
+					if(fazenda.key=='-KgRvI7Rhsi236Kwu4ZI')
+					{
+						console.log(i);
+					}
+					console.log(fazenda.key + ' ' + i);
+						//console.log(i); -KgleULakT5f6ZrFRvW2
+
+/*
+
+						$scope.todasPragas.forEach(function(obj){
+							if(obj.key!=null)
+							{
+
+								var objClonado= obj;
+								if(fazenda.key=='-KgRvI7Rhsi236Kwu4ZI')
+								{
+									console.log(Constant.Url + '/praemp/'+fazenda.key+'/' + objClonado.key);
+								}
+								delete 	objClonado.$$hashKey;
+								var refNovo = new Firebase(Constant.Url + '/praemp/'+fazenda.key+'/' + objClonado.key);
+								objClonado['key_filial']=fazenda.key;
+								refNovo.set(objClonado);
+
+								var refFilial = new Firebase(Constant.Url + '/filial/' +fazenda.key+'/praemp/'+ objClonado.key );
+								refFilial.set(true);
+							}
+						});
+
+						*/						
+						$scope.todasClapras.forEach(function(obj){
+							if(obj.key!=null)
+							{
+								var objClonado= obj;
+								delete 	objClonado.$$hashKey;
+								var refNovo = new Firebase(Constant.Url + '/clapraemp/'+fazenda.key+'/' + objClonado.key);
+								objClonado['key_filial']=fazenda.key;
+								refNovo.set(objClonado);
+
+								var refFilial = new Firebase(Constant.Url + '/filial/' +fazenda.key+'/clapraemp/'+ objClonado.key );
+								refFilial.set(true);
+							}
+						});
+
+
+
+						var objClonado={};
+						var refNovo = new Firebase(Constant.Url + '/configuracoes/'+fazenda.key+'/1');
+						objClonado['key']='1';
+						objClonado['key_filial']=fazenda.key;
+						objClonado['ponman']= false;
+						if(fazenda.distancia_pontos!=null)
+						{
+							objClonado['distancia_pontos']= fazenda.distancia_pontos;
+						}
+						else
+						{
+							objClonado['distancia_pontos']= 20;
+						}
+						if(fazenda.variacao!=null)
+						{
+							objClonado['variacao']= fazenda.variacao;
+						}
+
+						refNovo.set(objClonado);
+						
+					}
+					else
+					{
+
+					}
+				});
+			console.log(i);
+			Notify.successBottom('Praga clonada com sucesso!');
+		};
 
 		$scope.gridOptions = { 
 			enableRowSelection: true, 
@@ -75,7 +172,7 @@
 					return row.entity.valpre ? 'Sim' : 'Não';
 				}
 			}
-			
+
 		};
 
 		$scope.toggleMultiSelect = function() {
@@ -104,15 +201,15 @@
 			{ field: "ordem", displayName: "Ordem", width: 100 , sort:{ direction: 'asc', priority: 0 }},
 			{ field: "nome", displayName: "Nome", sort:{ direction: 'asc', priority: 1 }, width: 240 },	
 			{ field: "ativo", displayName: "Ativo", width: 150,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" }
-			
-			
+
+
 			],
 			appScopeProvider: {
 				mapValue: function(row) {
 					return row.entity.ativo ? 'Sim' : 'Não';
 				}
 			}
-			
+
 		};
 
 		$scope.gridOptionsTamanhos.onRegisterApi = function(gridApi){
@@ -137,14 +234,14 @@
 			{ field: "nome", displayName: "Nome", sort:{ direction: 'asc', priority: 1 }, width: 240 },	
 			{ field: "valor", displayName: "Valor" },	
 			{ field: "ativo", displayName: "Ativo", width: 150,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" }
-			
+
 			],
 			appScopeProvider: {
 				mapValue: function(row) {
 					return row.entity.ativo ? 'Sim' : 'Não';
 				}
 			}
-			
+
 		};
 
 		$scope.gridOptionsValor.onRegisterApi = function(gridApi){
@@ -255,7 +352,7 @@
 			var baseRef2 = new Firebase(Constant.Url+'/praga');
 
 			baseRef2.on('child_added', function(snapshot3) {
-
+				console.log('add praga');
 				var objNovo3 = snapshot3.val();
 				$scope.todasPragasPadrao.push(objNovo3);		
 
@@ -770,9 +867,7 @@
 					{
 						$scope.data.valor= castObjToArray($scope.data.valor);
 						$scope.data.valor.push(tamObj);
-					}
-					
-					
+					}				
 				}
 			}
 			else

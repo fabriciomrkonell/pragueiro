@@ -31,6 +31,10 @@
 				ordem:1
 			}			
 		});
+
+
+
+
 		$scope.tipos = [{nome:'Praga', key:'PRA'},
 		{nome:'Doença', key:'DOE'}];
 		$scope.todasPragas= [];
@@ -250,7 +254,7 @@
 				var objClonado= obj;
 				delete 	objClonado.$$hashKey;
 				var refNovo = new Firebase(Constant.Url + '/praemp/-KtH3-hl4fZVNnCHZnFn/' + obj.key+'/tamanho/a' );
-				refNovo.remove();
+				//refNovo.remove();
 			});
 			Notify.successBottom('Praga clonada com sucesso!');
 		};

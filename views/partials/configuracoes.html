@@ -91,240 +91,247 @@
 								<div class="col-sm-3">
 									<div ui-grid="gridOptions" ui-grid-selection class="gridCulturaConfiguracoes"></div>	
 								</div>
-								<div class="col-sm-9">
-									<div class="row">
-										<button type="button" class="btn btn-success" ng-show="desabilitaFazenda" ng-click="salvarConfcul(frmCultura)">Salvar conf. da Cultura</button>
-										<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar</button>
-									</div>
-									<div class="row">
-										<br>
-										<div class="col-sm-2">
-											<div class="form-group">
-												<input type="checkbox"  ng-model="frmCultura.altura"
-												ng-true-value="true" ng-false-value="false">	
-												<label>Altura</label>						
-											</div>
-										</div>
-									</div>
-									<div class="row" ng-show="frmCultura.altura">
-										<div class="col-sm-3 form-group">
-											<label>Ocorrência</label>
-											<select class="form-control" ng-model="frmCultura.altura_ocorrencia" ng-options="o.key as o.nome for o in ocorrencia" >							
-												<option></option>
-											</select>
-										</div>
-										<div class="col-sm-3 form-group" ng-show="frmCultura.altura_ocorrencia=='INTFIX'">
-											<label>A cada (intervalo)</label>
-											<input type="number" class="form-control" placeholder="Intervalo" ng-model="frmCultura.altura_intervalo" />
-										</div>
-										<div class="col-sm-2" ng-show="false">
-											<div class="form-group">
-												<br>
-												<input type="checkbox"  ng-model="frmCultura.altura_estagio"
-												ng-true-value="true" ng-false-value="false">	
-												<label>Por estágio</label>						
-											</div>
-										</div>
-									</div>
+								<div ng-show="desabilitaFazenda">
 
-									<hr/>
-
-									<div class="row">
-										<br>
-										<div class="col-sm-4">
-											<div class="form-group">
-												<input type="checkbox"  ng-model="frmCultura.quanos"
+									<div class="col-sm-9">
+										<div class="row">
+											<button type="button" class="btn btn-success" ng-show="desabilitaFazenda" ng-click="salvarConfcul(frmCultura)">Salvar conf. da Cultura</button>
+											<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar</button>
+										</div>
+										<div class="row">
+											<br>
+											<div class="col-sm-2">
+												<input type="checkbox"  ng-disabled="true" ng-model="data.abertura"
 												ng-true-value="true" ng-false-value="false">	
-												<label>Quantidade Nós</label>						
+												<label>Exibe 'Abertura' no APP</label>		
+											</div>
+											<div class="col-sm-2">
+												<div class="form-group">
+													<input type="checkbox"  ng-model="frmCultura.altura"
+													ng-true-value="true" ng-false-value="false">	
+													<label>Altura</label>						
+												</div>
+											</div>
+										</div>
+										<div class="row" ng-show="frmCultura.altura">
+											<div class="col-sm-3 form-group">
+												<label>Ocorrência</label>
+												<select class="form-control" ng-model="frmCultura.altura_ocorrencia" ng-options="o.key as o.nome for o in ocorrencia" >							
+													<option></option>
+												</select>
+											</div>
+											<div class="col-sm-3 form-group" ng-show="frmCultura.altura_ocorrencia=='INTFIX'">
+												<label>A cada (intervalo)</label>
+												<input type="number" class="form-control" placeholder="Intervalo" ng-model="frmCultura.altura_intervalo" />
+											</div>
+											<div class="col-sm-2" ng-show="false">
+												<div class="form-group">
+													<br>
+													<input type="checkbox"  ng-model="frmCultura.altura_estagio"
+													ng-true-value="true" ng-false-value="false">	
+													<label>Por estágio</label>						
+												</div>
+											</div>
+										</div>
+
+										<hr/>
+
+										<div class="row">
+											<br>
+											<div class="col-sm-4">
+												<div class="form-group">
+													<input type="checkbox"  ng-model="frmCultura.quanos"
+													ng-true-value="true" ng-false-value="false">	
+													<label>Quantidade Nós</label>						
+												</div>
+											</div>
+										</div>
+										<div class="row" ng-show="frmCultura.quanos">
+											<div class="col-sm-3 form-group">
+												<label>Ocorrência</label>
+												<select class="form-control" ng-model="frmCultura.quanos_ocorrencia" ng-options="o.key as o.nome for o in ocorrencia" >							
+													<option></option>
+												</select>
+											</div>
+											<div class="col-sm-3 form-group" ng-show="frmCultura.quanos_ocorrencia=='INTFIX'">
+												<label>A cada (intervalo)</label>
+												<input type="number" class="form-control" placeholder="Intervalo" ng-model="frmCultura.quanos_intervalo" />
+											</div>
+											<div class="col-sm-2" ng-show="false">
+												<div class="form-group">
+													<br>
+													<input type="checkbox"  ng-model="frmCultura.quanos_estagio"
+													ng-true-value="true" ng-false-value="false">	
+													<label>Por estágio</label>						
+												</div>
+											</div>
+										</div>
+
+										<hr/>
+
+										<div class="row">
+											<br>
+											<div class="col-sm-4">
+												<div class="form-group">
+													<input type="checkbox"  ng-model="frmCultura.disnos"
+													ng-true-value="true" ng-false-value="false">	
+													<label>Distância Nós</label>						
+												</div>
+											</div>
+										</div>
+										<div class="row" ng-show="frmCultura.disnos">
+											<div class="col-sm-3 form-group">
+												<label>Ocorrência</label>
+												<select class="form-control" ng-model="frmCultura.disnos_ocorrencia" ng-options="o.key as o.nome for o in ocorrencia" >							
+													<option></option>
+												</select>
+											</div>
+											<div class="col-sm-3 form-group" ng-show="frmCultura.disnos_ocorrencia=='INTFIX'">
+												<label>A cada (intervalo)</label>
+												<input type="number" class="form-control" placeholder="Intervalo" ng-model="frmCultura.disnos_intervalo" />
+											</div>
+											<div class="col-sm-2" ng-show="false">
+												<div class="form-group">
+													<br>
+													<input type="checkbox"  ng-model="frmCultura.disnos_estagio"
+													ng-true-value="true" ng-false-value="false">	
+													<label>Por estágio</label>						
+												</div>
+											</div>
+										</div>
+
+										<hr/>
+
+										<div class="row">
+											<br>
+											<div class="col-sm-4">
+												<div class="form-group">
+													<input type="checkbox"  ng-model="frmCultura.quaast"
+													ng-true-value="true" ng-false-value="false">	
+													<label>Quantidade Astes</label>						
+												</div>
+											</div>
+										</div>
+										<div class="row" ng-show="frmCultura.quaast">
+											<div class="col-sm-3 form-group">
+												<label>Ocorrência</label>
+												<select class="form-control" ng-model="frmCultura.quaast_ocorrencia" ng-options="o.key as o.nome for o in ocorrencia" >							
+													<option></option>
+												</select>
+											</div>
+											<div class="col-sm-3 form-group" ng-show="frmCultura.quaast_ocorrencia=='INTFIX'">
+												<label>A cada (intervalo)</label>
+												<input type="number" class="form-control" placeholder="Intervalo" ng-model="frmCultura.quaast_intervalo" />
+											</div>
+											<div class="col-sm-2" ng-show="false">
+												<div class="form-group">
+													<br>
+													<input type="checkbox"  ng-model="frmCultura.quaast_estagio"
+													ng-true-value="true" ng-false-value="false">	
+													<label>Por estágio</label>						
+												</div>
+											</div>
+										</div>
+
+										<hr/>
+
+										<div class="row">
+											<br>
+											<div class="col-sm-4">
+												<div class="form-group">
+													<input type="checkbox"  ng-model="frmCultura.quavag"
+													ng-true-value="true" ng-false-value="false">	
+													<label>Quantidade Vagem</label>						
+												</div>
+											</div>
+										</div>
+										<div class="row" ng-show="frmCultura.quavag">
+											<div class="col-sm-3 form-group">
+												<label>Ocorrência</label>
+												<select class="form-control" ng-model="frmCultura.quavag_ocorrencia" ng-options="o.key as o.nome for o in ocorrencia" >							
+													<option></option>
+												</select>
+											</div>
+											<div class="col-sm-3 form-group" ng-show="frmCultura.quavag_ocorrencia=='INTFIX'">
+												<label>A cada (intervalo)</label>
+												<input type="number" class="form-control" placeholder="Intervalo" ng-model="frmCultura.quavag_intervalo" />
+											</div>
+											<div class="col-sm-2" ng-show="false">
+												<div class="form-group">
+													<br>
+													<input type="checkbox"  ng-model="frmCultura.quavag_estagio"
+													ng-true-value="true" ng-false-value="false">	
+													<label>Por estágio</label>						
+												</div>
+											</div>
+										</div>
+
+										<hr/>
+
+										<div class="row">
+											<br>
+											<div class="col-sm-6">
+												<div class="form-group">
+													<input type="checkbox"  ng-model="frmCultura.altprivag"
+													ng-true-value="true" ng-false-value="false">	
+													<label>Quantidade Altura primeira vagem</label>						
+												</div>
+											</div>
+										</div>
+										<div class="row" ng-show="frmCultura.altprivag">
+											<div class="col-sm-3 form-group">
+												<label>Ocorrência</label>
+												<select class="form-control" ng-model="frmCultura.altprivag_ocorrencia" ng-options="o.key as o.nome for o in ocorrencia" >							
+													<option></option>
+												</select>
+											</div>
+											<div class="col-sm-3 form-group" ng-show="frmCultura.altprivag_ocorrencia=='INTFIX'">
+												<label>A cada (intervalo)</label>
+												<input type="number" class="form-control" placeholder="Intervalo" ng-model="frmCultura.altprivag_intervalo" />
+											</div>
+											<div class="col-sm-2" ng-show="false">
+												<div class="form-group">
+													<br>
+													<input type="checkbox"  ng-model="frmCultura.altprivag_estagio"
+													ng-true-value="true" ng-false-value="false">	
+													<label>Por estágio</label>						
+												</div>
+											</div>
+										</div>
+
+										<hr/>
+
+										<div class="row">
+											<br>
+											<div class="col-sm-6">
+												<div class="form-group">
+													<input type="checkbox"  ng-model="frmCultura.quagravag"
+													ng-true-value="true" ng-false-value="false">	
+													<label>Quantidade Grão por Vagem</label>						
+												</div>
+											</div>
+										</div>
+										<div class="row" ng-show="frmCultura.quagravag">
+											<div class="col-sm-3 form-group">
+												<label>Ocorrência</label>
+												<select class="form-control" ng-model="frmCultura.quagravag_ocorrencia" ng-options="o.key as o.nome for o in ocorrencia" >							
+													<option></option>
+												</select>
+											</div>
+											<div class="col-sm-3 form-group" ng-show="frmCultura.quagravag_ocorrencia=='INTFIX'">
+												<label>A cada (intervalo)</label>
+												<input type="number" class="form-control" placeholder="Intervalo" ng-model="frmCultura.quagravag_intervalo" />
+											</div>
+											<div class="col-sm-2" ng-show="false">
+												<div class="form-group">
+													<br>
+													<input type="checkbox"  ng-model="frmCultura.quagravag_estagio"
+													ng-true-value="true" ng-false-value="false">	
+													<label>Por estágio</label>						
+												</div>
 											</div>
 										</div>
 									</div>
-									<div class="row" ng-show="frmCultura.quanos">
-										<div class="col-sm-3 form-group">
-											<label>Ocorrência</label>
-											<select class="form-control" ng-model="frmCultura.quanos_ocorrencia" ng-options="o.key as o.nome for o in ocorrencia" >							
-												<option></option>
-											</select>
-										</div>
-										<div class="col-sm-3 form-group" ng-show="frmCultura.quanos_ocorrencia=='INTFIX'">
-											<label>A cada (intervalo)</label>
-											<input type="number" class="form-control" placeholder="Intervalo" ng-model="frmCultura.quanos_intervalo" />
-										</div>
-										<div class="col-sm-2" ng-show="false">
-											<div class="form-group">
-												<br>
-												<input type="checkbox"  ng-model="frmCultura.quanos_estagio"
-												ng-true-value="true" ng-false-value="false">	
-												<label>Por estágio</label>						
-											</div>
-										</div>
-									</div>
-
-									<hr/>
-
-									<div class="row">
-										<br>
-										<div class="col-sm-4">
-											<div class="form-group">
-												<input type="checkbox"  ng-model="frmCultura.disnos"
-												ng-true-value="true" ng-false-value="false">	
-												<label>Distância Nós</label>						
-											</div>
-										</div>
-									</div>
-									<div class="row" ng-show="frmCultura.disnos">
-										<div class="col-sm-3 form-group">
-											<label>Ocorrência</label>
-											<select class="form-control" ng-model="frmCultura.disnos_ocorrencia" ng-options="o.key as o.nome for o in ocorrencia" >							
-												<option></option>
-											</select>
-										</div>
-										<div class="col-sm-3 form-group" ng-show="frmCultura.disnos_ocorrencia=='INTFIX'">
-											<label>A cada (intervalo)</label>
-											<input type="number" class="form-control" placeholder="Intervalo" ng-model="frmCultura.disnos_intervalo" />
-										</div>
-										<div class="col-sm-2" ng-show="false">
-											<div class="form-group">
-												<br>
-												<input type="checkbox"  ng-model="frmCultura.disnos_estagio"
-												ng-true-value="true" ng-false-value="false">	
-												<label>Por estágio</label>						
-											</div>
-										</div>
-									</div>
-
-									<hr/>
-
-									<div class="row">
-										<br>
-										<div class="col-sm-4">
-											<div class="form-group">
-												<input type="checkbox"  ng-model="frmCultura.quaast"
-												ng-true-value="true" ng-false-value="false">	
-												<label>Quantidade Astes</label>						
-											</div>
-										</div>
-									</div>
-									<div class="row" ng-show="frmCultura.quaast">
-										<div class="col-sm-3 form-group">
-											<label>Ocorrência</label>
-											<select class="form-control" ng-model="frmCultura.quaast_ocorrencia" ng-options="o.key as o.nome for o in ocorrencia" >							
-												<option></option>
-											</select>
-										</div>
-										<div class="col-sm-3 form-group" ng-show="frmCultura.quaast_ocorrencia=='INTFIX'">
-											<label>A cada (intervalo)</label>
-											<input type="number" class="form-control" placeholder="Intervalo" ng-model="frmCultura.quaast_intervalo" />
-										</div>
-										<div class="col-sm-2" ng-show="false">
-											<div class="form-group">
-												<br>
-												<input type="checkbox"  ng-model="frmCultura.quaast_estagio"
-												ng-true-value="true" ng-false-value="false">	
-												<label>Por estágio</label>						
-											</div>
-										</div>
-									</div>
-
-									<hr/>
-
-									<div class="row">
-										<br>
-										<div class="col-sm-4">
-											<div class="form-group">
-												<input type="checkbox"  ng-model="frmCultura.quavag"
-												ng-true-value="true" ng-false-value="false">	
-												<label>Quantidade Vagem</label>						
-											</div>
-										</div>
-									</div>
-									<div class="row" ng-show="frmCultura.quavag">
-										<div class="col-sm-3 form-group">
-											<label>Ocorrência</label>
-											<select class="form-control" ng-model="frmCultura.quavag_ocorrencia" ng-options="o.key as o.nome for o in ocorrencia" >							
-												<option></option>
-											</select>
-										</div>
-										<div class="col-sm-3 form-group" ng-show="frmCultura.quavag_ocorrencia=='INTFIX'">
-											<label>A cada (intervalo)</label>
-											<input type="number" class="form-control" placeholder="Intervalo" ng-model="frmCultura.quavag_intervalo" />
-										</div>
-										<div class="col-sm-2" ng-show="false">
-											<div class="form-group">
-												<br>
-												<input type="checkbox"  ng-model="frmCultura.quavag_estagio"
-												ng-true-value="true" ng-false-value="false">	
-												<label>Por estágio</label>						
-											</div>
-										</div>
-									</div>
-
-									<hr/>
-
-									<div class="row">
-										<br>
-										<div class="col-sm-6">
-											<div class="form-group">
-												<input type="checkbox"  ng-model="frmCultura.altprivag"
-												ng-true-value="true" ng-false-value="false">	
-												<label>Quantidade Altura primeira vagem</label>						
-											</div>
-										</div>
-									</div>
-									<div class="row" ng-show="frmCultura.altprivag">
-										<div class="col-sm-3 form-group">
-											<label>Ocorrência</label>
-											<select class="form-control" ng-model="frmCultura.altprivag_ocorrencia" ng-options="o.key as o.nome for o in ocorrencia" >							
-												<option></option>
-											</select>
-										</div>
-										<div class="col-sm-3 form-group" ng-show="frmCultura.altprivag_ocorrencia=='INTFIX'">
-											<label>A cada (intervalo)</label>
-											<input type="number" class="form-control" placeholder="Intervalo" ng-model="frmCultura.altprivag_intervalo" />
-										</div>
-										<div class="col-sm-2" ng-show="false">
-											<div class="form-group">
-												<br>
-												<input type="checkbox"  ng-model="frmCultura.altprivag_estagio"
-												ng-true-value="true" ng-false-value="false">	
-												<label>Por estágio</label>						
-											</div>
-										</div>
-									</div>
-
-									<hr/>
-
-									<div class="row">
-										<br>
-										<div class="col-sm-6">
-											<div class="form-group">
-												<input type="checkbox"  ng-model="frmCultura.quagravag"
-												ng-true-value="true" ng-false-value="false">	
-												<label>Quantidade Grão por Vagem</label>						
-											</div>
-										</div>
-									</div>
-									<div class="row" ng-show="frmCultura.quagravag">
-										<div class="col-sm-3 form-group">
-											<label>Ocorrência</label>
-											<select class="form-control" ng-model="frmCultura.quagravag_ocorrencia" ng-options="o.key as o.nome for o in ocorrencia" >							
-												<option></option>
-											</select>
-										</div>
-										<div class="col-sm-3 form-group" ng-show="frmCultura.quagravag_ocorrencia=='INTFIX'">
-											<label>A cada (intervalo)</label>
-											<input type="number" class="form-control" placeholder="Intervalo" ng-model="frmCultura.quagravag_intervalo" />
-										</div>
-										<div class="col-sm-2" ng-show="false">
-											<div class="form-group">
-												<br>
-												<input type="checkbox"  ng-model="frmCultura.quagravag_estagio"
-												ng-true-value="true" ng-false-value="false">	
-												<label>Por estágio</label>						
-											</div>
-										</div>
-									</div>
-
 								</div>
 							</div>
 						</div>

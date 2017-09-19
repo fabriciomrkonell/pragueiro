@@ -54,7 +54,7 @@
 					<div class="form-group">
 						<label>Cultura</label>
 
-						<select class="form-control" ng-disabled="todasVariedadesPlanejamento.length>0"  ng-change="chengeCultura()" ng-model="data.key_cultura"  ng-options="cultura.key as (cultura.nome) for cultura in todasCulturas"> 							
+						<select class="form-control" ng-disabled="todasVariedadesPlanejamento.length>0"  ng-change="chengeCultura(data.key_cultura)" ng-model="data.key_cultura"  ng-options="cultura.key as (cultura.nome) for cultura in todasCulturas"> 							
 							<option></option>
 						</select>						
 					</div>
@@ -83,7 +83,7 @@
 						<div class="col-sm-8">
 
 							<div class="form-group">
-								<input type="checkbox" ng-disabled=editCultura ng-model="data.separar_variedade"
+								<input type="checkbox" ng-disabled="todasVariedadesPlanejamento.length==0" ng-model="data.separar_variedade"
 								ng-true-value="true" ng-false-value="false">	
 								<label>Separar por variedade</label>
 							</div>
