@@ -30,6 +30,12 @@
 				nome:'',
 				ativo:true,
 				ordem:1
+			},	
+			frmValorTamanho: {
+				key:'',
+				nome:'',
+				ativo:true,
+				ordem:1
 			}			
 		});
 
@@ -64,224 +70,342 @@
 		$scope.clonar = function(){		
 
 			var i=0;
+
 			$scope.todosFiliaisGeral.forEach(function(fazenda){
 				i++;
-				if(fazenda.key!=null && fazenda.key!='-KtH3-hl4fZVNnCHZnFn') //&& i>=450 && i<500)
+
+				if(fazenda.key!=null && fazenda.key!='-KNhveilZ009PI7QHdTxxxx')
 				{
-					if(fazenda.key=='-KgRvI7Rhsi236Kwu4ZI')
-					{
-						console.log(i);
-					}
-					console.log(fazenda.key + ' ' + i);
-						//console.log(i); -KgleULakT5f6ZrFRvW2
 
-/*
+					
+					var baseRef1 = new Firebase(Constant.Url+'/praemp/'+fazenda.key);
 
-						$scope.todasPragas.forEach(function(obj){
-							if(obj.key!=null)
+					baseRef1.on('child_added', function(snapshot1) {
+
+
+
+						var obj = snapshot1.val();
+						if(obj.key!=null)
+						{
+							
+
+							console.log(obj.key);
+
+							if(obj.key!=null && obj.key_clapra!=null && obj.key_clapra=="1")
 							{
-
+								//iPraga++
 								var objClonado= obj;
 								if(fazenda.key=='-KgRvI7Rhsi236Kwu4ZI')
 								{
 									console.log(Constant.Url + '/praemp/'+fazenda.key+'/' + objClonado.key);
 								}
 								delete 	objClonado.$$hashKey;
-								var refNovo = new Firebase(Constant.Url + '/praemp/'+fazenda.key+'/' + objClonado.key);
-								objClonado['key_filial']=fazenda.key;
-								refNovo.set(objClonado);
 
-								var refFilial = new Firebase(Constant.Url + '/filial/' +fazenda.key+'/praemp/'+ objClonado.key );
-								refFilial.set(true);
+
+								var refNovo = new Firebase(Constant.Url + '/praemp/'+fazenda.key+'/' + objClonado.key+'/tamanho/');
+								var key= refNovo.push().key();
+
+								var tamanho={};
+								tamanho['key']=key;
+								tamanho['ativo']=true;
+								tamanho['nome']="Mariposa";
+								tamanho['ordem']=4;
+								tamanho['valpre']=true;
+
+								var valor={};
+								valor['key']='1a';
+								valor['ativo']=true;
+								valor['nome']="Ausência";
+								valor['ordem']=1;
+								valor['valor']=0;
+
+								var valor2={};
+								valor2['key']='2a';
+								valor2['ativo']=true;
+								valor2['nome']="Presença";
+								valor2['ordem']=2;
+								valor2['valor']=100;
+
+								tamanho['valor']={};
+
+								tamanho['valor']['1a']=valor;
+								tamanho['valor']['2a']=valor2;
+
+								var refNovo2 = new Firebase(Constant.Url + '/praemp/'+fazenda.key+'/' + objClonado.key+'/tamanho/'+key);
+								refNovo2.set(tamanho)
 							}
-						});
 
-						*/						
-						$scope.todasClapras.forEach(function(obj){
-							if(obj.key!=null)
+							/*
+							if(objNovo.tamanho!=null)
 							{
-								var objClonado= obj;
-								delete 	objClonado.$$hashKey;
-								var refNovo = new Firebase(Constant.Url + '/clapraemp/'+fazenda.key+'/' + objClonado.key);
-								objClonado['key_filial']=fazenda.key;
-								refNovo.set(objClonado);
+								var tamanhos=castObjToArray(objNovo.tamanho);
+								tamanhos.forEach(function(objTam)
+								{
+									if(objTam.valpre!=null &&  objTam.valpre==true)
+									{
+										console.log(Constant.Url + '/praemp/'+fazenda.key+'/' + objNovo.key+'/tamanho/'+ objTam.key);
 
-								var refFilial = new Firebase(Constant.Url + '/filial/' +fazenda.key+'/clapraemp/'+ objClonado.key );
-								refFilial.set(true);
+										var refNovo = new Firebase(Constant.Url + '/praemp/'+fazenda.key+'/' + objNovo.key+'/tamanho/'+ objTam.key);
+										refNovo.remove();
+
+									}
+								});
 							}
-						});
-
-
-
-						var objClonado={};
-						var refNovo = new Firebase(Constant.Url + '/configuracoes/'+fazenda.key+'/1');
-						objClonado['key']='1';
-						objClonado['key_filial']=fazenda.key;
-						objClonado['ponman']= false;
-						if(fazenda.distancia_pontos!=null)
-						{
-							objClonado['distancia_pontos']= fazenda.distancia_pontos;
+							*/
 						}
-						else
+					});
+
+
+				/*
+			if(fazenda.key!=null && fazenda.key!='-KNhveilZ009PI7QHdTx') //&& i>=450 && i<500)
+			{
+
+				if(fazenda.key=='-KNhveilZ009PI7QHdTx')
+				{
+
+
+
+
+						if(fazenda.key!='-KNhveilZ009PI7QHdTx')
 						{
-							objClonado['distancia_pontos']= 20;
-						}
-						if(fazenda.variacao!=null)
-						{
-							objClonado['variacao']= fazenda.variacao;
+							console.log(i);
+
+							console.log(fazenda.key + ' ' + i);
+
+							var iPraga=0;
+							$scope.todasPragas.forEach(function(obj){
+								if(obj.key!=null && obj.key_clapra!=null && obj.key_clapra=="1")
+								{
+									iPraga++
+									var objClonado= obj;
+									if(fazenda.key=='-KgRvI7Rhsi236Kwu4ZI')
+									{
+										console.log(Constant.Url + '/praemp/'+fazenda.key+'/' + objClonado.key);
+									}
+									delete 	objClonado.$$hashKey;
+
+
+									var refNovo = new Firebase(Constant.Url + '/praemp/'+fazenda.key+'/' + objClonado.key+'/tamanho/');
+									var key= refNovo.push().key();
+
+									var tamanho={};
+									tamanho['key']=key;
+									tamanho['ativo']=true;
+									tamanho['nome']="Mariposa";
+									tamanho['ordem']=4;
+									tamanho['valpre']=true;
+
+									var valor={};
+									valor['key']='1a';
+									valor['ativo']=true;
+									valor['nome']="Ausência";
+									valor['ordem']=1;
+									valor['valor']=0;
+
+									var valor2={};
+									valor2['key']='2a';
+									valor2['ativo']=true;
+									valor2['nome']="Presença";
+									valor2['ordem']=2;
+									valor2['valor']=100;
+
+									tamanho['valor']={};
+
+									tamanho['valor']['1a']=valor;
+									tamanho['valor']['2a']=valor2;
+
+									var refNovo2 = new Firebase(Constant.Url + '/praemp/'+fazenda.key+'/' + objClonado.key+'/tamanho/'+key);
+									refNovo2.set(tamanho)
+								}
+							});
+							console.log(fazenda.key + ' ' + iPraga);
 						}
 
-						refNovo.set(objClonado);
-						
+					$scope.todasClapras.forEach(function(obj){
+						if(obj.key!=null)
+						{
+							var objClonado= obj;
+							delete 	objClonado.$$hashKey;
+							var refNovo = new Firebase(Constant.Url + '/clapraemp/'+fazenda.key+'/' + objClonado.key);
+							objClonado['key_filial']=fazenda.key;
+							refNovo.set(objClonado);
+
+							var refFilial = new Firebase(Constant.Url + '/filial/' +fazenda.key+'/clapraemp/'+ objClonado.key );
+							refFilial.set(true);
+						}
+					});
+
+
+
+					var objClonado={};
+					var refNovo = new Firebase(Constant.Url + '/configuracoes/'+fazenda.key+'/1');
+					objClonado['key']='1';
+					objClonado['key_filial']=fazenda.key;
+					objClonado['ponman']= false;
+					if(fazenda.distancia_pontos!=null)
+					{
+						objClonado['distancia_pontos']= fazenda.distancia_pontos;
 					}
 					else
 					{
-
+						objClonado['distancia_pontos']= 20;
 					}
-				});
-			console.log(i);
-			Notify.successBottom('Praga clonada com sucesso!');
-		};
+					if(fazenda.variacao!=null)
+					{
+						objClonado['variacao']= fazenda.variacao;
+					}
 
-		$scope.gridOptions = { 
-			enableRowSelection: true, 
-			enableRowHeaderSelection: false,
-
-			enableColumnResizing: true,
-
-			multiSelect : false,
-			modifierKeysToMultiSelect : false,
-
-			columnDefs : [
-			{ field: "codigo", displayName: "Código", width: 80 },
-			{ field: "descricao", displayName: "Descrição", width: 240 },
-			{ field: "ativo", displayName: "Ativo", width: 70,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" },
-			{ field: "postam", displayName: "Tamanhos", width: 100,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValueTamanhos(row)}}</div>" },
-			{ field: "valpre", displayName: "Valores", width: 100,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValueValores(row)}}</div>" }
-
-
-			],
-			appScopeProvider: {
-				mapValue: function(row) {
-					return row.entity.ativo ? 'Sim' : 'Não';
-				},
-				mapValueTamanhos: function(row) {
-					return row.entity.postam ? 'Sim' : 'Não';
-				},
-				mapValueValor: function(row) {
-					return row.entity.valpre ? 'Sim' : 'Não';
+					refNovo.set(objClonado);
+					*/
 				}
-			}
+				else
+				{
 
-		};
-
-		$scope.toggleMultiSelect = function() {
-			$scope.gridApi.selection.setMultiSelect(!$scope.gridApi.grid.options.multiSelect);
-		};
-
-
-		$scope.gridOptions.onRegisterApi = function(gridApi){
-			$scope.gridApi = gridApi;
-			gridApi.selection.on.rowSelectionChanged($scope,function(row){
-				$scope.chamaEditar(row.entity);
-			});
-		};
-
-
-		$scope.gridOptionsTamanhos = { 
-			enableRowSelection: true, 
-			enableRowHeaderSelection: false,
-
-			enableColumnResizing: true,
-
-			multiSelect : false,
-			modifierKeysToMultiSelect : false,
-
-			columnDefs : [
-			{ field: "ordem", displayName: "Ordem", width: 100 , sort:{ direction: 'asc', priority: 0 }},
-			{ field: "nome", displayName: "Nome", sort:{ direction: 'asc', priority: 1 }, width: 240 },	
-			{ field: "ativo", displayName: "Ativo", width: 150,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" }
-
-
-			],
-			appScopeProvider: {
-				mapValue: function(row) {
-					return row.entity.ativo ? 'Sim' : 'Não';
 				}
-			}
-
-		};
-
-		$scope.gridOptionsTamanhos.onRegisterApi = function(gridApi){
-			$scope.gridApi = gridApi;
-			gridApi.selection.on.rowSelectionChanged($scope,function(row){
-				$scope.ChamarEditarTamanho(row.entity);
 			});
-		};
+console.log(i);
+Notify.successBottom('Praga clonada com sucesso!');
+};
+
+$scope.gridOptions = { 
+	enableRowSelection: true, 
+	enableRowHeaderSelection: false,
+
+	enableColumnResizing: true,
+
+	multiSelect : false,
+	modifierKeysToMultiSelect : false,
+
+	columnDefs : [
+	{ field: "codigo", displayName: "Código", width: 80 },
+	{ field: "descricao", displayName: "Descrição", width: 240 },
+	{ field: "ativo", displayName: "Ativo", width: 70,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" },
+	{ field: "postam", displayName: "Tamanhos", width: 100,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValueTamanhos(row)}}</div>" },
+	{ field: "valpre", displayName: "Valores", width: 100,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValueValores(row)}}</div>" }
 
 
-		$scope.gridOptionsValor = { 
-			enableRowSelection: true, 
-			enableRowHeaderSelection: false,
+	],
+	appScopeProvider: {
+		mapValue: function(row) {
+			return row.entity.ativo ? 'Sim' : 'Não';
+		},
+		mapValueTamanhos: function(row) {
+			return row.entity.postam ? 'Sim' : 'Não';
+		},
+		mapValueValor: function(row) {
+			return row.entity.valpre ? 'Sim' : 'Não';
+		}
+	}
 
-			enableColumnResizing: true,
+};
 
-			multiSelect : false,
-			modifierKeysToMultiSelect : false,
-
-			columnDefs : [
-			{ field: "ordem", displayName: "Ordem", width: 100 , sort:{ direction: 'asc', priority: 0 }},
-			{ field: "nome", displayName: "Nome", sort:{ direction: 'asc', priority: 1 }, width: 240 },	
-			{ field: "valor", displayName: "Valor" },	
-			{ field: "ativo", displayName: "Ativo", width: 150,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" }
-
-			],
-			appScopeProvider: {
-				mapValue: function(row) {
-					return row.entity.ativo ? 'Sim' : 'Não';
-				}
-			}
-
-		};
-
-		$scope.gridOptionsValor.onRegisterApi = function(gridApi){
-			$scope.gridApi = gridApi;
-			gridApi.selection.on.rowSelectionChanged($scope,function(row){
-				$scope.ChamarEditarValor(row.entity);
-			});
-		};
+$scope.toggleMultiSelect = function() {
+	$scope.gridApi.selection.setMultiSelect(!$scope.gridApi.grid.options.multiSelect);
+};
 
 
-		$scope.gridOptionsValorTamanho = { 
-			enableRowSelection: true, 
-			enableRowHeaderSelection: false,
+$scope.gridOptions.onRegisterApi = function(gridApi){
+	$scope.gridApi = gridApi;
+	gridApi.selection.on.rowSelectionChanged($scope,function(row){
+		$scope.chamaEditar(row.entity);
+	});
+};
 
-			enableColumnResizing: true,
 
-			multiSelect : false,
-			modifierKeysToMultiSelect : false,
+$scope.gridOptionsTamanhos = { 
+	enableRowSelection: true, 
+	enableRowHeaderSelection: false,
 
-			columnDefs : [
-			{ field: "ordem", displayName: "Ordem", width: 100 , sort:{ direction: 'asc', priority: 0 }},
-			{ field: "nome", displayName: "Nome", sort:{ direction: 'asc', priority: 1 }, width: 240 },	
-			{ field: "valor", displayName: "Valor" },	
-			{ field: "ativo", displayName: "Ativo", width: 150,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" }
+	enableColumnResizing: true,
 
-			],
-			appScopeProvider: {
-				mapValue: function(row) {
-					return row.entity.ativo ? 'Sim' : 'Não';
-				}
-			}
+	multiSelect : false,
+	modifierKeysToMultiSelect : false,
 
-		};
+	columnDefs : [
+	{ field: "ordem", displayName: "Ordem", width: 100 , sort:{ direction: 'asc', priority: 0 }},
+	{ field: "nome", displayName: "Nome", sort:{ direction: 'asc', priority: 1 }, width: 240 },	
+	{ field: "ativo", displayName: "Ativo", width: 150,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" }
 
-		$scope.gridOptionsValorTamanho.onRegisterApi = function(gridApi){
-			$scope.gridApi = gridApi;
-			gridApi.selection.on.rowSelectionChanged($scope,function(row){
-				$scope.ChamarEditarValor(row.entity);
-			});
-		};
+
+	],
+	appScopeProvider: {
+		mapValue: function(row) {
+			return row.entity.ativo ? 'Sim' : 'Não';
+		}
+	}
+
+};
+
+$scope.gridOptionsTamanhos.onRegisterApi = function(gridApi){
+	$scope.gridApi = gridApi;
+	gridApi.selection.on.rowSelectionChanged($scope,function(row){
+		$scope.ChamarEditarTamanho(row.entity);
+	});
+};
+
+
+$scope.gridOptionsValor = { 
+	enableRowSelection: true, 
+	enableRowHeaderSelection: false,
+
+	enableColumnResizing: true,
+
+	multiSelect : false,
+	modifierKeysToMultiSelect : false,
+
+	columnDefs : [
+	{ field: "ordem", displayName: "Ordem", width: 100 , sort:{ direction: 'asc', priority: 0 }},
+	{ field: "nome", displayName: "Nome", sort:{ direction: 'asc', priority: 1 }, width: 240 },	
+	{ field: "valor", displayName: "Valor" , width: 100 },	
+	{ field: "ativo", displayName: "Ativo", width: 150,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" }
+
+	],
+	appScopeProvider: {
+		mapValue: function(row) {
+			return row.entity.ativo ? 'Sim' : 'Não';
+		}
+	}
+
+};
+
+$scope.gridOptionsValor.onRegisterApi = function(gridApi){
+	$scope.gridApi = gridApi;
+	gridApi.selection.on.rowSelectionChanged($scope,function(row){
+		$scope.ChamarEditarValor(row.entity);
+	});
+};
+
+
+$scope.gridOptionsTamanhoValor = { 
+	enableRowSelection: true, 
+	enableRowHeaderSelection: false,
+
+	enableColumnResizing: true,
+
+	multiSelect : false,
+	modifierKeysToMultiSelect : false,
+
+	columnDefs : [
+	{ field: "ordem", displayName: "Ordem", width: 100 , sort:{ direction: 'asc', priority: 0 }},
+	{ field: "nome", displayName: "Nome", sort:{ direction: 'asc', priority: 1 }, width: 240 },	
+	{ field: "valor", displayName: "Valor",  width: 100 },	
+	{ field: "ativo", displayName: "Ativo", width: 150,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" }
+
+	],
+	appScopeProvider: {
+		mapValue: function(row) {
+			return row.entity.ativo ? 'Sim' : 'Não';
+		}
+	}
+
+};
+
+$scope.gridOptionsTamanhoValor.onRegisterApi = function(gridApi){
+	$scope.gridApi = gridApi;
+	gridApi.selection.on.rowSelectionChanged($scope,function(row){
+		$scope.ChamarEditarValorTamanho(row.entity);
+	});
+};
 
 			//############################################################################################################################
 		//############################################################################################################################
@@ -531,9 +655,28 @@
 
 			var tamanhos={};
 			$scope.tamanhos.forEach(function(obj){
+				delete obj.$$hashKey;
 				tamanhos[obj.key]={};
-				tamanhos[obj.key]=obj;	
+
 				delete 	tamanhos[obj.key].$$hashKey;
+
+				if(obj.valor!=null)
+				{
+					var valorObj={};
+					castObjToArray(obj.valor).forEach(function(objVal){
+						valorObj[objVal.key]={};
+						valorObj[objVal.key]=objVal;	
+						delete 	valorObj[objVal.key].$$hashKey;
+					});
+
+					delete obj.valor;
+
+					obj.valor=valorObj;
+					
+				}
+				delete 	tamanhos[obj.key].$$hashKey;
+				tamanhos[obj.key]=obj;	
+
 			});
 
 			delete data.tamanho;
@@ -672,8 +815,15 @@
 
 		$scope.ChamarEditarTamanho = function(tamanho)
 		{
+			$scope.valorTamanho=[];
 			$scope.frmTamanho = clone(tamanho);
 			$scope.edit_tamanho=true;
+
+			//$scope.gridOptionsValorTamanho.data=$scope.frmTamanho.valor;
+
+			$scope.valorTamanho=castObjToArray($scope.frmTamanho.valor)
+
+			$scope.gridOptionsTamanhoValor.data=$scope.valorTamanho;
 
 		}
 
@@ -688,6 +838,25 @@
 			var tamObj = clone($scope.frmTamanho);
 			delete tamObj.$$hashKey;
 			var refTamanho = new Firebase(Constant.Url + '/praemp/'+$scope.fazenda.key+ '/'+$scope.data.key+'/tamanho/'+tamObj.key);
+			
+			if($scope.valorTamanho.length>0 || $scope.valorTamanho.count>0)
+			{
+				var valor={};
+				$scope.valorTamanho.forEach(function(obj){
+					valor[obj.key]={};
+					valor[obj.key]=obj;	
+					delete 	valor[obj.key].$$hashKey;
+				});
+
+				delete tamObj.valor;
+
+				tamObj.valor=valor;
+			}
+			else
+			{
+				delete tamObj.valor;
+			}
+
 			refTamanho.set(tamObj);
 
 			$scope.data.tamanho[tamObj.key]=tamObj;
@@ -702,6 +871,11 @@
 			if (posicao != null) {
 				$scope.tamanhos[posicao] = tamObj;				
 			}
+
+
+			
+
+
 
 			Notify.successBottom('Tamanho atualizado com sucesso!');
 
@@ -971,6 +1145,160 @@
 
 		//############################################################################################################################
 		//############################################################################################################################
+		//VALOR DO TAMANHO
+		//############################################################################################################################
+
+
+		$scope.ChamarEditarValorTamanho = function(valor)
+		{
+			$scope.frmValorTamanho = clone(valor);
+			$scope.edit_valor_tamanho=true;
+
+		}
+
+		$scope.atualizarValorTamanho = function()
+		{
+			if($scope.data==null || $scope.data.key==null) return;
+			if($scope.frmTamanho.key==null) return;
+			if($scope.frmValorTamanho.key==null) return;
+
+			if(validFormValorTamanho($scope.frmValorTamanho)) return false;
+			if($scope.fazenda==null) return false;	
+
+			var tamObj = clone($scope.frmValorTamanho);
+			delete tamObj.$$hashKey;
+			var refValor = new Firebase(Constant.Url + '/praemp/'+$scope.fazenda.key+'/'+$scope.data.key+'/tamanho/'+$scope.frmTamanho.key+'/valor/'+tamObj.key);
+			refValor.set(tamObj);
+
+			$scope.frmTamanho.valor[tamObj.key]=tamObj;
+			var posicao;
+			var x=0;
+			$scope.valorTamanho.forEach(function(obj) {
+				if (obj.key!=null && obj.key == tamObj.key) {
+					posicao = $scope.valorTamanho.indexOf(obj);
+				}
+				x++;
+			});
+			if (posicao != null) {
+				$scope.valorTamanho[posicao] = tamObj;				
+			}
+
+			Notify.successBottom('Valores atualizado com sucesso!');
+
+			$scope.clearFormValorTamanho();
+			$scope.edit_valor_tamanho = false;
+		}
+
+		$scope.salvarValorTamanho = function()
+		{
+			if($scope.data==null || $scope.data.key==null) return;
+			if($scope.frmTamanho.key==null) return;
+
+			if(validFormValorTamanho($scope.frmValorTamanho)) return false;
+			if($scope.fazenda==null) return false;	
+
+			var tamObj = clone($scope.frmValorTamanho);
+			delete tamObj.$$hashKey;
+			var refValor = new Firebase(Constant.Url + '/praemp/'+$scope.fazenda.key+'/'+$scope.data.key+'/tamanho/'+$scope.frmTamanho.key+'/valor');
+			tamObj.key = refValor.push().key();
+
+			var refValorNovo = new Firebase(Constant.Url + '/praemp/'+$scope.fazenda.key+'/'+$scope.data.key+'/tamanho/'+$scope.frmTamanho.key+'/valor/'+tamObj.key);
+			refValorNovo.set(tamObj);
+
+
+			var refPraga = new Firebase(Constant.Url + '/praemp/'+$scope.fazenda.key+'/'+$scope.data.key+'/tamanho/'+$scope.frmTamanho.key+'/valpre');
+			refPraga.set(true);
+			$scope.frmTamanho.valpre=true;
+			
+			if($scope.frmTamanho.valor!=null)
+			{
+				if($scope.frmTamanho.valor[tamObj.key]!=null)
+				{
+					$scope.frmTamanho.valor[tamObj.key]=tamObj;
+				}
+				else
+				{
+					if(Array.isArray($scope.frmTamanho.valor))
+					{
+						$scope.frmTamanho.valor.push(tamObj);
+					}
+					else
+					{
+						$scope.frmTamanho.valor= castObjToArray($scope.frmTamanho.valor);
+						$scope.frmTamanho.valor.push(tamObj);
+					}				
+				}
+			}
+			else
+			{
+				$scope.frmTamanho.valor=[];
+				$scope.frmTamanho.valor.push(tamObj);
+			}		
+
+			$scope.valorTamanho.push(tamObj);
+			
+			Notify.successBottom('Valor inserido com sucesso!');
+
+			$scope.clearFormValorTamanho();
+			$scope.edit_valor_tamanho = false;
+		}
+
+		$scope.cancelarValorTamanho = function()
+		{		
+			$scope.clearFormValorTamanho();
+			$scope.edit_valor_tamanho = false;
+		}
+
+		$scope.questionaExcluirValorTamanho = function()
+		{
+			if ($scope.frmValor.key != null) {
+				$('#modalDeleteValorTamanho').modal('show');
+			} 
+		}
+
+		$scope.excluirValorTamanho = function()
+		{
+			if($scope.data==null || $scope.data.key==null) return;
+			if($scope.fazenda==null) return false;	
+			if($scope.frmTamanho.key==null) return;
+			if($scope.frmValorTamanho.key==null) return;
+
+			var tamObj = clone($scope.frmValorTamanho);
+			delete tamObj.$$hashKey;
+			var refValor = new Firebase(Constant.Url + '/praemp/'+$scope.fazenda.key+'/'+$scope.data.key+'/tamanho/'+$scope.frmTamanho.key + '/valor/' + $scope.frmValorTamanho.key);
+			refValor.remove();
+
+			delete $scope.frmTamanho.valor[tamObj.key]
+			var posicao;
+			var x=0;
+			$scope.valorTamanho.forEach(function(obj) {
+				if (obj.key!=null && obj.key == tamObj.key) {
+					posicao = $scope.valorTamanho.indexOf(obj);
+				}
+				x++;
+			});
+			if (posicao != null) {
+				delete $scope.valorTamanho[posicao];		
+			}
+
+
+			if($scope.valorTamanho.length==0 || $scope.valorTamanho.count==0)
+			{
+				var refPraga = new Firebase(Constant.Url + '/praemp/'+$scope.fazenda.key+'/'+$scope.data.key+'/tamanho/'+$scope.frmTamanho.key +'/valpre');
+				refPraga.set(false);
+				$scope.frmTamanho.valpre=false;
+			}
+
+			$('#modalDeleteValorTamanho').modal('hide');
+
+			Notify.successBottom('Valor removido com sucesso!');
+
+			$scope.clearFormValorTamanho();
+			$scope.edit_valor = false;
+
+		}
+		//############################################################################################################################
+		//############################################################################################################################
 		//UTEIS
 		//############################################################################################################################
 
@@ -1014,7 +1342,7 @@
 				setMessageError('O campo nome é obrigatório!');
 				return true;
 			}
-			if(data.ordem == null || (data.ordem=='' && data.ordem!=0)){
+			if(isNaN(data.ordem ) || data.ordem == null || (data.ordem=='' && data.ordem!=0)){
 				setMessageError('O campo ordem é obrigatório!');
 				return true;
 			}
@@ -1028,16 +1356,33 @@
 				setMessageError('O campo nome é obrigatório!');
 				return true;
 			}
-			if(data.ordem == null || (data.ordem=='' && data.ordem!=0)){
+			if(isNaN(data.ordem ) || data.ordem == null || (data.ordem=='' && data.ordem!=0)){
 				setMessageError('O campo ordem é obrigatório!');
 				return true;
 			}
-			if(data.valor == null || (data.valor=='' && data.valor!=0)){
+			if(isNaN(data.valor ) ||  data.valor == null || (data.valor=='' && data.valor!=0)){
 				setMessageError('O campo valor é obrigatório!');
 				return true;
 			}
 			return false;
 		};
+
+		function validFormValorTamanho(data){
+			if(data.nome == null || data.nome==''){
+				setMessageError('O campo nome é obrigatório!');
+				return true;
+			}
+			if(isNaN(data.ordem ) || data.ordem == null || (data.ordem=='' && data.ordem!=0)){
+				setMessageError('O campo ordem é obrigatório!');
+				return true;
+			}
+			if(isNaN(data.valor ) ||  data.valor == null || (data.valor=='' && data.valor!=0)){
+				setMessageError('O campo valor é obrigatório!');
+				return true;
+			}
+			return false;
+		};
+
 		//-------------------------------------------------------------------
 		function clone(obj) {
 			if (obj === null || typeof(obj) !== 'object' || 'isActiveClone' in obj)
@@ -1120,6 +1465,21 @@
 			return true;
 		};
 
+		$scope.clearFormValorTamanho= function(){
+			$scope.frmValorTamanho==null;
+			$scope.frmValorTamanho.nome='';
+			$scope.frmValorTamanho.key='';
+			$scope.frmValorTamanho.ativo=true;
+			if($scope.frmTamanho.valor!=null)
+			{
+				$scope.frmValorTamanho.ordem = $scope.frmTamanho.valor.length +1 ;
+			}
+			else
+			{
+				$scope.frmValorTamanho.ordem = 1 ;
+			}
+			return true;
+		};
 		$scope.clear = function(){
 			
 			$scope.data.key='';
