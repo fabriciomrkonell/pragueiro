@@ -13,6 +13,7 @@
 			save: true,
 
 			editarcodigo: true,
+			editAgendamento: false,
 			temquadras: false,
 			temprodutos: false,
 			temequipamentos: false,
@@ -49,6 +50,7 @@
 		$scope.qtde_produtos = 0;
 		$scope.qtde_funcionarios  = 0;
 		$scope.qtde_variedades = 0;
+		$scope.qtde_usuarios = 0;
 
 		$scope.todasTipatis = [];
 		$scope.todasEquipes  = [];
@@ -57,6 +59,7 @@
 		$scope.todosEquipamentos  = [];
 		$scope.todosFuncionarios  = [];
 		$scope.todasVariedades = [];
+		$scope.todosUsuarios=[];
 
 		$scope.variedadesTmp = [];
 
@@ -144,7 +147,6 @@ $scope.gridOptions = {
 $scope.toggleMultiSelect = function() {
 	$scope.gridApi.selection.setMultiSelect(!$scope.gridApi.grid.options.multiSelect);
 };
-
 
 $scope.gridOptions.onRegisterApi = function(gridApi) {
 	$scope.gridApi = gridApi;
@@ -348,6 +350,53 @@ $scope.gridOptionsExecucoes = {
 };
 
 //############################################################################################################################
+// GRID AGENDAMETNO
+//############################################################################################################################
+$scope.todosAgendamentosOrdser = [];
+
+$scope.gridOptionsAgendamento = {
+	enableRowSelection: true,
+	enableRowHeaderSelection: false,
+
+	enableColumnResizing: true,
+
+	multiSelect: false,
+	modifierKeysToMultiSelect: false,
+
+	columnDefs: [
+	{
+		field: "data",
+		displayName: "Data",
+		type: 'date',
+		cellFilter: 'date:"dd/MM/yyyy"',
+		width: 130
+	}, 
+	{
+		field: "quadra.nome",
+		displayName: "Quadra",
+		width: 300
+	}, 	
+	{
+		field: "usuario.nome",
+		displayName: "Monitor",
+		width: 300
+	}, 
+	
+	{
+		name: 'Retirar',
+		enableColumnMenu: false,
+		width: 70,
+		cellTemplate: '<div class="cell_personalizada_excluir"><button class="btn btn-danger btn-xs" ng-click="grid.appScope.questionaExcluirAgendamento(row)"><i class="glyphicon glyphicon-remove"></i>	</button></div>'
+	}]
+};
+
+$scope.gridOptionsAgendamento.onRegisterApi = function(gridApi) {
+	$scope.gridApi = gridApi;
+	gridApi.selection.on.rowSelectionChanged($scope, function(row) {
+		$scope.chamaEditarAgendamento(row.entity);
+	});
+};
+//############################################################################################################################
 //############################################################################################################################
 // FAZENDA/FILIAL
 //############################################################################################################################
@@ -429,6 +478,7 @@ function atualizaListaFiliais() {
 					{
 						$scope.qtde_funcionarios  =+ 0;
 					}
+
 					if(obj.filial.variedade!=null)
 					{
 						$scope.qtde_variedades  =+ Object.keys(obj.filial.variedade).length;
@@ -438,6 +488,15 @@ function atualizaListaFiliais() {
 						$scope.qtde_variedades  =+ 0;
 					}
 
+					if(obj.filial.usuario!=null)
+					{
+						$scope.qtde_usuarios  =+ Object.keys(obj.filial.usuario).length;
+					}
+					else
+					{
+						$scope.qtde_usuarios  =+ 0;
+					}
+
 					recuperaTipati(obj);
 					recuperaEquipe(obj);
 					recuperaQuadra(obj);
@@ -445,7 +504,7 @@ function atualizaListaFiliais() {
 					recuperaFuncionario(obj);
 					recuperaProduto(obj);
 					recuperaVariedade(obj);
-
+					recuperaUsuarios(obj);
 					
 
 					if (!$scope.$$phase) {
@@ -962,7 +1021,7 @@ function recuperaVariedade(fazenda) {
 
 		refUsuarios.ref().on('child_added', function(snap) {
 			var variedades_brutas=snap.val();
-			$scope.todasVariedades.push(variedades_brutas);
+			//$scope.todasVariedades.push(variedades_brutas);
 
 			for(var obj in variedades_brutas ){
 				var objVar=variedades_brutas[obj];
@@ -980,6 +1039,48 @@ function recuperaVariedade(fazenda) {
 	}
 }
 //-------------------------------------------------------------------
+function recuperaUsuarios(fazenda)
+{
+	if(fazenda === null || fazenda==null) 
+	{
+		$scope.todosUsuarios =[];
+	}
+	else
+	{			
+
+		$scope.todosUsuarios=[];
+
+		var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
+		var refNovoQuadra = new Firebase.util.NormalizedCollection(
+			baseRef.child("/filial/"+fazenda.key+"/usuario"),
+			[baseRef.child("/usuario"), "$key"]
+			).select(
+			{"key":"usuario.$value","alias":"filial"},
+			{"key":"$key.$value","alias":"usuarios"}
+			).ref();
+
+
+
+			refNovoQuadra.on('child_added', function(snap) {
+				$('#myPleaseWait').modal('hide');
+				var objNovo= snap.val();
+				
+				$scope.todosUsuarios.push(objNovo['usuarios']);
+
+				if (!$scope.$$phase) {
+					$scope.$apply();
+				}
+				if(verificaFinalizacaoCarregamento())
+				{
+					$scope.chengeFazenda($scope.fazendas[0]);
+					$scope.data.fazenda=$scope.fazendas[0];
+					$('#myPleaseWait').modal('hide');
+				}
+
+			});
+		}
+	};
+//-------------------------------------------------------------------
 function verificaFinalizacaoCarregamento()
 {
 	
@@ -991,6 +1092,7 @@ function verificaFinalizacaoCarregamento()
 	console.log('todosEquipamentos: ' + $scope.todosEquipamentos.length + ' - qde: ' + $scope.qtde_equipamentos);
 	console.log('todosFuncionarios: ' + $scope.todosFuncionarios.length + ' - qde: ' + $scope.qtde_funcionarios);
 	console.log('todasVariedades: ' + $scope.todasVariedades.length + ' - qde: ' + $scope.qtde_variedades);
+	console.log('todosUsuarios: ' + $scope.todosUsuarios.length + ' - qde: ' + $scope.qtde_usuarios);
 
 	console.log(' --------------------- ');
 	
@@ -1002,6 +1104,7 @@ function verificaFinalizacaoCarregamento()
 		&& $scope.todosEquipamentos.length==$scope.qtde_equipamentos
 		&& $scope.todosFuncionarios.length==$scope.qtde_funcionarios
 		&& $scope.todasVariedades.length==$scope.qtde_variedades
+		&& $scope.todosUsuarios.length==$scope.qtde_usuarios
 		)
 	{
 		return true;
@@ -1298,17 +1401,62 @@ $scope.chengeTipOrdser = function() {
 				{
 					$scope.data.colheita=false;
 				}
+
+				if(obj2.ageant!=null)
+				{
+					$scope.data.ageant=obj2.ageant;
+					if($scope.data.agedep)
+					{
+						$scope.data.diadep = obj2.diadep;
+					}
+					else
+					{
+						delete $scope.data.diadep;
+					}
+				}
+				else
+				{
+					$scope.data.ageant=false;
+				}
+
+				if(obj2.agedep!=null)
+				{
+					$scope.data.agedep=obj2.agedep;
+					if($scope.data.agedep)
+					{
+						$scope.data.diaant = obj2.diaant;
+					}
+					else
+					{
+						delete $scope.data.diaant;
+					}
+				}
+				else
+				{
+					$scope.data.agedep=false;
+				}
+				if($scope.data.agedep || $scope.data.ageant)
+				{
+					$scope.data.separar_variedade=true;
+				}
+				else
+				{
+					$scope.data.separar_variedade=false;
+				}
 			}
 		});
 	}
 	else
 	{
 		$scope.data.aplagr=false;
+		$scope.data.ageant=false;
+		$scope.data.agedep=false;
 	}
 
 
 	return true;
 };
+
 //############################################################################################################################
 //############################################################################################################################
 // ORDEM SERVICO
@@ -1399,6 +1547,7 @@ $scope.chamaEditarOrdser = function(obj) {
 
 	$scope.chengeSafra($scope.data.key_safra);
 	$scope.todasQuadrasOrdser=[];
+	$scope.todasQuadrasOrdserAge=[];
 	for (var propertyName in $scope.data.quadras) {
 		for(var obj3 of $scope.todasQuadras) {
 			if ($scope.data.quadras[propertyName].key_quadra === obj3.key) {
@@ -1417,6 +1566,8 @@ $scope.chamaEditarOrdser = function(obj) {
 						}
 					});
 				}
+				var objClonado1 = clone(obj3);
+				$scope.todasQuadrasOrdserAge.push(objClonado1);
 				$scope.todasQuadrasOrdser.push(obj2);
 
 			}
@@ -1524,6 +1675,43 @@ $scope.chamaEditarOrdser = function(obj) {
 	}
 	$scope.gridOptionsExecucoes.data = $scope.todosExecucoesOrdser;
 	//-------------------------------------------------------------
+	$scope.todosAgendamentosOrdser = [];
+	for (var propertyName in $scope.data.agendamento) {
+		var objExe=$scope.data.agendamento[propertyName];
+		
+		$scope.todasQuadras.forEach(function(obj2) {
+			if (objExe.key_quadra === obj2.key) {
+				objExe['quadra'] = obj2;
+			}
+		});
+
+		if(objExe.key_variedade!=null)
+		{
+			$scope.todasVariedadesPlanejamento.forEach(function(obj2) {
+				if (objExe.key_variedade === obj2.key) {
+					objExe['variedade'] = obj2;
+				}
+			});
+		}
+
+		if(objExe.key_usuario!=null)
+		{
+			$scope.todosUsuarios.forEach(function(obj2) {
+				if (objExe.key_usuario === obj2.key) {
+					objExe['usuario'] = obj2;
+				}
+			});
+		}
+
+		$scope.todosAgendamentosOrdser.push(objExe);
+	}
+	if ($scope.todosAgendamentosOrdser.length == 0) {
+		$scope.temagendamento = false;
+	} else {
+		$scope.temagendamento = true;
+	}
+	$scope.gridOptionsAgendamento.data = $scope.todosAgendamentosOrdser;
+	//-------------------------------------------------------------
 };
 
 //-------------------------------------------------------------------
@@ -1567,6 +1755,7 @@ $scope.excluirOrdser = function() {
 	return true;
 
 };
+
 //############################################################################################################################
 //############################################################################################################################
 //QUADRA
@@ -1668,8 +1857,78 @@ $scope.adicionarQuadra = function(data, data_quadra) {
 		refOrdserGravar.set(quadraTmp);
 
 		quadraIncluir['variedade'] = $scope.data_variedade;
+		var objClonado1 = clone(quadraIncluir);
+		$scope.todasQuadrasOrdserAge.push(objClonado1);
 		$scope.todasQuadrasOrdser.push(quadraIncluir);
 
+		if(data.ageant || data.agedep)
+		{
+			if(data.ageant &&  $scope.variedadesTmp.length==0)
+			{
+				var d = new Date();
+				d.setDate(data.datpre.getDate() - data.diaant);
+
+				var data_crua= new Date(d).toDateString();
+				if (new Date(data_crua) < new Date(new Date().toDateString())){
+					
+				}
+				else
+				{
+					var objAgendamento={};
+					var refAgendamento = new Firebase(Constant.Url + '/agendamento/' + data.fazenda.key +'/' + data.key_safra);
+					objAgendamento['key']=refAgendamento.push().key();
+					objAgendamento['key_safra']=data.key_safra;
+					objAgendamento['key_filial']=data.fazenda.key;
+					objAgendamento['key_quadra']=data_quadra.quadra.key;
+					objAgendamento['key_ordser']=data.key;
+					objAgendamento['status']='Agendado';
+					var d = new Date();
+					d.setDate(data.datpre.getDate() - data.diaant);
+
+					objAgendamento['data']=d.getTime();
+					objAgendamento['data_string']=d.getDate()+'/'+d.getMonth()+'/'+d.getFullYear();
+
+					var refAgendamentoNovo = new Firebase(Constant.Url + '/agendamento/' + data.fazenda.key +'/' + data.key_safra +"/"+objAgendamento['key']);
+
+					refAgendamentoNovo.set(objAgendamento);
+
+					var refOrdser = new Firebase(Constant.Url + '/ordser/' + data.fazenda.key +'/' + data.key + '/agendamento/'+objAgendamento['key']);
+					refOrdser.set(objAgendamento);
+
+					objAgendamento['quadra']=objClonado1;
+					$scope.todosAgendamentosOrdser.push(objAgendamento);
+				}
+			}
+			if(data.agedep &&  $scope.variedadesTmp.length==0)
+			{
+				var objAgendamento={};
+				var refAgendamento = new Firebase(Constant.Url + '/agendamento/' + data.fazenda.key +'/' + data.key_safra);
+				objAgendamento['key']=refAgendamento.push().key();
+				objAgendamento['key_safra']=data.key_safra;
+				objAgendamento['key_filial']=data.fazenda.key;
+				objAgendamento['key_quadra']=data_quadra.quadra.key;
+				objAgendamento['key_ordser']=data.key;
+				objAgendamento['status']='Agendado';
+				var d = new Date();
+				d.setDate(data.datpre.getDate() + data.diaant);
+
+				objAgendamento['data']=d.getTime();
+				objAgendamento['data_string']=d.getDate()+'/'+d.getMonth()+'/'+d.getFullYear();
+
+				var refAgendamentoNovo = new Firebase(Constant.Url + '/agendamento/' + data.fazenda.key +'/' + data.key_safra +"/"+objAgendamento['key']);
+
+				refAgendamentoNovo.set(objAgendamento);
+
+				var refOrdser = new Firebase(Constant.Url + '/ordser/' + data.fazenda.key +'/' + data.key + '/agendamento/'+objAgendamento['key']);
+				refOrdser.set(objAgendamento);
+
+				objAgendamento['quadra']=objClonado1;
+				$scope.todosAgendamentosOrdser.push(objAgendamento);
+			}
+
+
+		}
+		
 		$scope.temquadras = true;
 
 		$scope.gridOptionsQuadras.data = $scope.todasQuadrasOrdser;
@@ -1721,22 +1980,48 @@ $scope.excluirQuadra = function() {
 				posicao_deletar = $scope.todasQuadrasOrdser.indexOf(obj2);
 			}
 		});
+
+		var key_quadra_verdadeiro;
 		if (posicao_deletar != null) {
+			key_quadra_verdadeiro = $scope.todasQuadrasOrdser[posicao_deletar].key_quadra;
 			if ($scope.todasQuadrasOrdser[posicao_deletar].area != null) {
 				$scope.area_total -= $scope.todasQuadrasOrdser[posicao_deletar].area;
 			}
 			delete $scope.todasQuadrasOrdser[posicao_deletar];
+			delete $scope.todasQuadrasOrdserAge[posicao_deletar];
 		}
 
 		if ($scope.todasQuadrasOrdser.length == 0) {
 			$scope.temquadras = false;
 		}
 
+
+		var listaAgendamentos = [];
+		$scope.todosAgendamentosOrdser.forEach(function(obj2) {
+			if (key_quadra_verdadeiro === obj2.key_quadra) {
+				listaAgendamentos.push($scope.todosAgendamentosOrdser.indexOf(obj2));
+			}
+		});
+
+		if(listaAgendamentos.length>0)
+		{
+			for(var x in listaAgendamentos)
+			{
+				var key=$scope.todosAgendamentosOrdser[x].key;
+				var refOrdserNovo = new Firebase(Constant.Url + '/ordser/' + $scope.data.fazenda.key + '/' + $scope.data.key + '/agendamento/' + key);
+				refOrdserNovo.remove();
+				
+				var refAgendamento = new Firebase(Constant.Url + '/agendamento/' + $scope.data.fazenda.key + '/' + $scope.data.key_safra + '/' + key);
+				refAgendamento.remove();
+
+				delete $scope.todosAgendamentosOrdser[x];
+			}
+		}
+
 		$scope.key_quadra = null;
 	}
 	$scope.data.fazenda = fazendaTmp;
 	return true;
-
 };
 
 $scope.chengeQuadra = function(qus) {
@@ -1783,8 +2068,202 @@ $scope.chengeVariedade = function(variedade) {
 	}
 }
 
+//############################################################################################################################
+//############################################################################################################################
+//AGENDAMENTO
+//############################################################################################################################
+//-------------------------------------------------------------------
+$scope.adicionarAgendamento = function(data, data_agendamento) {
+	if ($scope.finalizado) {
+		$scope.mensagem_aviso = "Ordem de serviço/atividade está finalizada. Impossível continuar.";
+		$('#modalMensagem').modal('show');
+		return;
+	}
+	
+	if(validFormAgendamento(data_agendamento)) return false;
+
+	var quadra = data_agendamento.quadra;
+	var usuario = data_agendamento.usuario;
+
+	var fazendaTmp = $scope.data.fazenda;
+
+	var objAgendamento={};
+
+	var refAgendamento = new Firebase(Constant.Url + '/agendamento/' + data.fazenda.key +'/' + data.key_safra);
+	objAgendamento['key']=refAgendamento.push().key();
+
+	objAgendamento['key_safra']=data.key_safra;
+	objAgendamento['key_filial']=data.fazenda.key;
+	objAgendamento['key_quadra']=quadra.key;
+	if(usuario!=null)
+	{
+		objAgendamento['key_usuario']=usuario.key;
+	}
+	objAgendamento['key_ordser']=data.key;
+	objAgendamento['status']='Agendado';
+	objAgendamento.data= new Date(data_agendamento.data).getTime(); 
+	objAgendamento.data_string=new Date(data_agendamento.data).getDate()+'/'+new Date(data_agendamento.data).getMonth()+'/'+new Date(data_agendamento.data).getFullYear();
+
+	var refAgendamentoNovo = new Firebase(Constant.Url + '/agendamento/' + data.fazenda.key +'/' + data.key_safra +"/"+objAgendamento['key']);
+
+	refAgendamentoNovo.set(objAgendamento);
+
+	var refOrdser = new Firebase(Constant.Url + '/ordser/' + data.fazenda.key +'/' + data.key + '/agendamento/'+objAgendamento['key']);
+	refOrdser.set(objAgendamento);
+
+	objAgendamento['quadra']=quadra;
+	objAgendamento['usuario']=usuario;
+	$scope.todosAgendamentosOrdser.push(objAgendamento);
+	$scope.clearAgendamento();
+};
+//-------------------------------------------------------------------
+$scope.atualizarAgendamento = function(data, data_agendamento) {
+	if ($scope.finalizado) {
+		$scope.mensagem_aviso = "Ordem de serviço/atividade está finalizada. Impossível continuar.";
+		$('#modalMensagem').modal('show');
+		return;
+	}
+
+	if(validFormAgendamento(data_agendamento)) return false;
+
+	var fazendaTmp = $scope.data.fazenda;
+	if (data_agendamento == null) return false;
 
 
+	var objAgendamento= clone(data_agendamento);
+
+	var quadra=objAgendamento.quadra;
+
+	var usuario=objAgendamento.usuario;
+
+
+	delete objAgendamento.quadra;
+	delete objAgendamento.$$hashKey;
+	delete objAgendamento.usuario;
+	delete objAgendamento.key_usuario;
+
+	objAgendamento.data= new Date(data_agendamento.data).getTime(); 
+	objAgendamento.data_string=new Date(data_agendamento.data).getDate()+'/'+new Date(data_agendamento.data).getMonth()+'/'+new Date(data_agendamento.data).getFullYear();
+	objAgendamento['key_quadra']=quadra.key;
+	if(usuario !=null)
+	{
+		objAgendamento['key_usuario']=usuario.key;
+	}
+
+	var refAgendamentoNovo = new Firebase(Constant.Url + '/agendamento/' + data.fazenda.key +'/' + data.key_safra +"/"+objAgendamento.key);
+
+	refAgendamentoNovo.set(objAgendamento);
+
+	var refOrdser = new Firebase(Constant.Url + '/ordser/' + data.fazenda.key +'/' + data.key + '/agendamento/'+objAgendamento.key);
+	refOrdser.set(objAgendamento);
+
+	objAgendamento['quadra']=quadra;
+	if(usuario !=null)
+	{
+		objAgendamento['usuario']=usuario;
+	}
+
+	var posicao;
+	$scope.todosAgendamentosOrdser.forEach(function(obj) {
+		if (obj.key === data_agendamento.key) {
+			posicao = $scope.todosAgendamentosOrdser.indexOf(obj);
+		}
+	});
+	if(posicao!=null)
+	{
+		$scope.todosAgendamentosOrdser[posicao]=objAgendamento;
+	}
+
+	Notify.successBottom('Agendamento atualizado com sucesso!');
+
+	$scope.clearAgendamento();
+
+	$scope.data.fazenda = fazendaTmp;
+
+};
+//-------------------------------------------------------------------
+$scope.questionaExcluirAgendamento = function(row) {
+	if ($scope.finalizado) {
+		$scope.mensagem_aviso = "Ordem de serviço/atividade está finalizada. Impossível continuar.";
+		$('#modalMensagem').modal('show');
+		return;
+	}
+	$scope.key_agendamento = row.entity.key;
+	$('#modalDeleteAgendamento').modal('show');
+};
+//-------------------------------------------------------------------
+$scope.excluirAgendamento = function() {
+	$('#modalDeleteAgendamento').modal('hide');
+	if ($scope.finalizado) {
+		$scope.mensagem_aviso = "Ordem de serviço/atividade está finalizada. Impossível continuar.";
+		$('#modalMensagem').modal('show');
+		return;
+	}
+	var fazendaTmp = $scope.data.fazenda;
+	if ($scope.data != null && $scope.data.fazenda != null && $scope.key_agendamento != null) {
+		var refOrdserNovo = new Firebase(Constant.Url + '/ordser/' + $scope.data.fazenda.key + '/' + $scope.data.key + '/agendamento/' + $scope.key_agendamento);
+		refOrdserNovo.remove();
+
+		var refAgendamento = new Firebase(Constant.Url + '/agendamento/' + $scope.data.fazenda.key + '/' + $scope.data.key_safra + '/' + $scope.key_agendamento);
+		refAgendamento.remove();
+
+		Notify.successBottom('Agendamento removido com sucesso!');
+
+		var posicao_deletar;
+		$scope.todosAgendamentosOrdser.forEach(function(obj2) {
+			if ($scope.key_agendamento === obj2.key) {
+				posicao_deletar = $scope.todosAgendamentosOrdser.indexOf(obj2);
+			}
+		});
+		if($scope.todosAgendamentosOrdser.length==1)
+		{
+			if (posicao_deletar != null) {
+				delete $scope.todosAgendamentosOrdser[posicao_deletar];
+
+				$scope.todosAgendamentosOrdser=[];
+			}
+		}
+		else
+		{
+			delete $scope.todosAgendamentosOrdser[posicao_deletar];
+		}
+
+		if ($scope.todosAgendamentosOrdser.length == 0) {
+			$scope.temagendamento = false;
+		}
+
+
+		$scope.key_agendamento = null;
+	}
+	$scope.clearAgendamento();
+
+	$scope.data.fazenda = fazendaTmp;
+	return true;
+};
+//-------------------------------------------------------------------
+$scope.chamaEditarAgendamento = function(obj) {
+	$scope.data_agendamento = clone(obj);
+	$scope.data_agendamento.data = new Date(obj.data);
+	var posicao;
+	$scope.todasQuadrasOrdserAge.forEach(function(objQ) {
+		if (objQ.key === obj.key_quadra) {
+			posicao = $scope.todasQuadrasOrdserAge.indexOf(objQ);
+		}
+	});
+	if(posicao!=null)
+	{
+		$scope.data_agendamento.quadra = $scope.todasQuadrasOrdserAge[posicao];
+	}
+	$scope.editAgendamento = true;
+
+	if (!$scope.$$phase) {
+		$scope.$apply();
+	}
+}
+
+$scope.cancelarAgendamento= function() {
+	$scope.clearAgendamento();
+}
 //############################################################################################################################
 //############################################################################################################################
 //PRODUTO
@@ -1888,7 +2367,6 @@ $scope.excluirProduto = function() {
 	}
 	$scope.data.fazenda = fazendaTmp;
 	return true;
-
 };
 $scope.chengeProduto = function() {
 	$scope.data_produto.dose= $scope.data_produto.dospad;
@@ -2313,50 +2791,84 @@ function validFormExecucao(data) {
 	return false;
 };
 //-------------------------------------------------------------------
+function validFormAgendamento(data) {
+
+	if (data == null) {
+		setMessageError('É preciso preencher os campos da guia Execução!');
+		return true;
+	}
+	if (data.data == null) {
+		setMessageError('O campo Data é obrigatório!');
+		return true;
+	}
+	if (data.data === '') {
+		setMessageError('O campo Data é obrigatório!');
+		return true;
+	}
+	var data_crua= new Date(data.data).toDateString();
+	if (new Date(data_crua) < new Date(new Date().toDateString())){
+		setMessageError('O campo Data não pode ser menor que a data atual!');
+		return true;
+	}
+	if (data.quadra == null) {
+		setMessageError('O campo Quadra é obrigatório!');
+		return true;
+	}
+
+	return false;
+};
+//-------------------------------------------------------------------
+$scope.clearAgendamento = function() {
+
+	$scope.editAgendamento = false;
+	
+	$scope.data_agendamento.key = null;
+	$scope.data_agendamento.key_usuario = null;
+	$scope.data_agendamento.usuario = null;
+	$scope.data_agendamento.key_quadra = null;
+	$scope.data_agendamento.quadra = null;	
+};
+//-------------------------------------------------------------------
 $scope.helpSituacao = function() {
 	$('#modalHelp').modal('show');
 }
 //-------------------------------------------------------------------
 $scope.clear = function() {
-			//var fazendaTmp=$scope.data.fazenda;
-			angular.extend($scope.data, {
-				datpre: '',
-				obs: '',
-				codigo: '',
-				key_tipati: '',
-				key_safra: '',
-				key_equipe: '',
-				situacao: 'Aberto',
-				key: ''
-			});
-			//$scope.data.fazenda=fazendaTmp;
-			$scope.desabilitaFazenda = false;
-			$scope.edit = false;
-			$scope.save = true;
+	angular.extend($scope.data, {
+		datpre: '',
+		obs: '',
+		codigo: '',
+		key_tipati: '',
+		key_safra: '',
+		key_equipe: '',
+		situacao: 'Aberto',
+		key: ''
+	});
+	$scope.desabilitaFazenda = false;
+	$scope.edit = false;
+	$scope.save = true;
 
-			$scope.todasQuadrasOrdser = [];
-			$scope.gridOptionsQuadras.data = $scope.todasQuadrasOrdser;
-			$scope.temquadras = false;
-			$scope.todosProdutosOrdser = [];
-			$scope.gridOptionsProdutos.data = $scope.todosProdutosOrdser;
-			$scope.temprodutos = false;
-			$scope.todosEquipamentosOrdser = [];
-			$scope.gridOptionsEquipamentos.data = $scope.todosEquipamentosOrdser;
-			$scope.temequipamentos = false;
-			$scope.todosExecucoesOrdser = [];
-			$scope.gridOptionsExecucoes.data = $scope.todosExecucoesOrdser;
-			$scope.temequipamentos = false;
-			$scope.area_total = 0;
-			$scope.horas_total =0;
+	$scope.todasQuadrasOrdser = [];
+	$scope.gridOptionsQuadras.data = $scope.todasQuadrasOrdser;
+	$scope.temquadras = false;
+	$scope.todosProdutosOrdser = [];
+	$scope.gridOptionsProdutos.data = $scope.todosProdutosOrdser;
+	$scope.temprodutos = false;
+	$scope.todosEquipamentosOrdser = [];
+	$scope.gridOptionsEquipamentos.data = $scope.todosEquipamentosOrdser;
+	$scope.temequipamentos = false;
+	$scope.todosExecucoesOrdser = [];
+	$scope.gridOptionsExecucoes.data = $scope.todosExecucoesOrdser;
+	$scope.temequipamentos = false;
+	$scope.area_total = 0;
+	$scope.horas_total =0;
 
-			if (!$scope.$$phase) {
-				$scope.$apply();
-			}
+	if (!$scope.$$phase) {
+		$scope.$apply();
+	}
 
-			$scope.data.codigo = zeroFill($scope.numeracao_codigo, 5);
-			//$scope.chengeFazenda($scope.fazenda);
-			//$scope.data.fazenda=fazendaTmp;
-		};
+	$scope.data.codigo = zeroFill($scope.numeracao_codigo, 5);
+};
 //-------------------------------------------------------------------
 function clone(obj) {
 	if (obj === null || typeof(obj) !== 'object' || 'isActiveClone' in obj)
@@ -2397,7 +2909,6 @@ function formatDate(date) {
 
 	return [day, month, year].join('/');
 }
-
 
 }
 

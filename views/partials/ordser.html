@@ -2,7 +2,7 @@
 
 	<div class="container container-view">
 		<div class="row">
-			<div class="col-sm-6 col-sm-no-bottom">
+			<div class="col-sm-5 col-sm-no-bottom">
 				<p>Você está em <a href="#home">Início</a> / <a href="#lancamento">Lançamentos</a>  / <a href="#ordser">Ordem de Serviço/Atividade</a></p>
 
 				<br />
@@ -10,7 +10,7 @@
 		</div>
 
 		<div class="row">
-			<div class="col-sm-6 col-sm-no-bottom">
+			<div class="col-sm-5 col-sm-no-bottom">
 
 				<label>Fazenda</label>
 				<select class="form-control" ng-disabled=desabilitaFazenda ng-options="fazenda.nome for fazenda in fazendas" ng-model="data.fazenda" ng-change="chengeFazenda(data.fazenda)">
@@ -124,7 +124,6 @@
 								<label>Horas Trabalhadas</label>
 								<br />
 								<label>{{horas_total.toFixed(2)}}</label>
-
 							</div>	
 						</div>
 
@@ -138,8 +137,33 @@
 							</div>	
 						</div>
 					</div>
-					
-
+					<div class="row">
+						<div class="col-sm-8 col-sm-no-bottom">
+							<div class="form-group ">
+								<input type="checkbox" ng-show="true" ng-disabled="true" ng-model="data.ageant"
+								ng-true-value="true" ng-false-value="false">	
+								<label>Agendar levantamento antes</label>						
+							</div>	
+						</div>	
+					</div>
+					<div class="row">
+						<div class="col-sm-8 col-sm-no-bottom">
+							<div class="form-group ">
+								<input type="checkbox" ng-show="true" ng-disabled="true" ng-model="data.agedep"
+								ng-true-value="true" ng-false-value="false">	
+								<label>Agendar levantamento depois</label>						
+							</div>	
+						</div>	
+					</div>
+					<div class="row">
+						<div class="col-sm-8 col-sm-no-bottom">
+							<div class="form-group ">
+								<input type="checkbox" ng-show="true" ng-disabled="true" ng-model="data.separar_variedade"
+								ng-true-value="true" ng-false-value="false">	
+								<label>Separa Variedade</label>						
+							</div>	
+						</div>	
+					</div>
 
 				</form>
 
@@ -158,6 +182,7 @@
 				<li class="active"><a  href="#1a" data-toggle="tab">Quadras/Regiões</a></li>
 				<li><a href="#2a" data-toggle="tab">Produtos</a></li>
 				<li><a href="#3a" data-toggle="tab">Equipamentos</a></li>
+				<li><a href="#5a" data-toggle="tab">Agendamento</a></li>
 				<li><a href="#4a" data-toggle="tab">Execução</a></li>
 			</ul>
 
@@ -170,21 +195,16 @@
 							<b><p class="alinhado_direito">Quadra/Região*</p></b>
 						</div>
 						<div class="form-group col-sm-4">
-
 							<select class="form-control" ng-model="data_quadra" ng-change="chengeQuadra(data_quadra)" ng-disabled="desabilitaQuadras" ng-options="pl as (pl.quadra.nome) for pl in todosPlanejamento">
 								<option></option>
 							</select>
-
-
 						</div>
 
-						<div class="" ng-show= "data_quadra.variedades.length>0 && (data.plantio || data.colheita)" >
-
+						<div class="" ng-show= "data_quadra.variedades.length>0 && (data.plantio || data.colheita || data.separar_variedade)" >
 							<div class="form-group col-sm-1">
 								<b><p class="alinhado_direito">Variedade</p></b>
 							</div>
 							<div class="form-group col-sm-3">
-
 								<select class="form-control" ng-model="data_variedade" ng-change="chengeVariedade(data_variedade)" ng-disabled="desabilitaQuadras" ng-options="pl as (pl.nome) for pl in variedadesTmp">
 									<option></option>
 								</select>
@@ -211,6 +231,7 @@
 						<div ui-grid="gridOptionsQuadras" ui-grid-selection class="gridOrdserQuadras"></div>	
 					</div>
 				</div>
+
 				<div class="tab-pane" id="2a">
 					<div class="row">
 
@@ -264,7 +285,6 @@
 					</div>
 				</div>
 
-
 				<div class="tab-pane" id="4a">
 					<div class="row">
 						<div class="col-sm-2 col-sm-no-bottom">
@@ -310,8 +330,6 @@
 					</div>
 					<br >
 					<div class="row">
-
-
 						<div class="form-group col-sm-2">
 							<b><p class="alinhado_direito">Quadra/região</p></b>
 						</div>
@@ -374,6 +392,65 @@
 					</div>
 				</div>
 
+				<div class="tab-pane" id="5a">
+					<div class="row">
+						<div class="col-sm-2 col-sm-no-bottom">
+							<b><p class="alinhado_direito">Data*</p></b>
+						</div>
+						<div class="form-group col-sm-2 col-sm-no-bottom">
+							<input type="date" class="form-control" ng-model="data_agendamento.data">
+						</div>	
+						<div class="form-group col-sm-2">
+							<b><p class="alinhado_direito">Monitor</p></b>
+						</div>
+						<div class="form-group col-sm-2 col-sm-no-bottom">
+							<select class="form-control" ng-model="data_agendamento.usuario"  ng-disabled="desabilitaQuadras" ng-options="usuario as (usuario.nome) for usuario in todosUsuarios">
+								<option></option>
+							</select>
+						</div>	
+					</div>
+					<div class="row">
+						<div class="form-group col-sm-2">
+							<b><p class="alinhado_direito">Quadra/região</p></b>
+						</div>
+						<div class="form-group col-sm-2 col-sm-no-bottom">
+
+
+							<select class="form-control" ng-model="data_agendamento.quadra" ng-disabled="desabilitaQuadras"  ng-options="quadra as (quadra.nome) for quadra in todasQuadrasOrdserAge">
+								<option></option>
+							</select>
+						</div>
+						<div class="" ng-show= "variedadesTmpExecucao.length>0 && (data.plantio || data.colheita)" >
+							<div class="form-group col-sm-2 col-sm-no-bottom">
+								<b><p class="alinhado_direito">Variedade</p></b>
+							</div>
+							<div class="form-group col-sm-3">
+								<select class="form-control" ng-model="data_execucao.variedade" ng-change="chengeVariedadeExecucao(data_execucao.variedade)" ng-disabled="desabilitaQuadras" ng-options="pl as (pl.nome) for pl in variedadesTmpExecucao">
+									<option></option>
+								</select>
+							</div>
+
+						</div>
+						<button type="button" class="btn btn-default btn-xm"  ng-show="!editAgendamento"  ng-disabled="desabilitaQuadras" ng-click="adicionarAgendamento(data, data_agendamento)">
+							<i class="glyphicon glyphicon-plus-sign"></i>												
+						</button>	
+
+						<button type="button" class="btn btn-success" ng-disabled="finalizado" ng-show="editAgendamento" ng-click="atualizarAgendamento
+						(data, data_agendamento)">Atualizar</button>
+
+						<button type="button" class="btn btn-default btn-cancel" ng-show="editAgendamento" ng-click="cancelarAgendamento()">Cancelar/Novo</button>
+
+					</div>
+
+
+
+
+					
+
+					<div class="row">
+						<div ui-grid="gridOptionsAgendamento" ui-grid-selection class="gridOrdserExecucao"></div>	
+					</div>
+				</div>
 
 
 			</div>
@@ -492,6 +569,28 @@
 				</div>
 
 
+			</div>
+		</div>
+	</div>
+	<!-- Modal DELETE-->
+	<div class="modal fade" id="modalDeleteAgendamento" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Confirmação Exclusão</h4>
+				</div>
+
+				<div class="modal-body">
+					<p>Têm certeza que deseja excluir o Agendamento desta Ordem de Serviço/Atividade?</p>
+					<p class="debug-url"></p>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+					<button type="button" class="btn btn-default btn-danger" ng-click="excluirAgendamento()">Excluir</button>
+				</div>
 			</div>
 		</div>
 	</div>

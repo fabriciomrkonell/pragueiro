@@ -741,6 +741,7 @@ $scope.gridOptionsTamanhoValor.onRegisterApi = function(gridApi){
 			}
 
 			$scope.edit = true;
+			$scope.edit_tamanho = false;
 		};
 
 		$scope.excluir = function(){

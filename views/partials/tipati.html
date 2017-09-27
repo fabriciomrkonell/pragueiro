@@ -57,6 +57,7 @@
 					</div>	
 
 					<div class="row">
+						<hr>
 						<div class="col-sm-5">
 							<div class="form-group">
 								<input type="checkbox"  ng-disabled="data.colheita || data.plantio"  ng-model="data.aplagr"
@@ -72,6 +73,7 @@
 						</div>
 					</div>
 					<div class="row">
+						<hr>
 						<div class="col-sm-5">
 							<div class="form-group">
 								<input type="checkbox"  ng-disabled="data.aplagr || data.colheita" ng-model="data.plantio"
@@ -86,6 +88,34 @@
 								<label>Colheita (exige variedade)</label>						
 							</div>		
 						</div>
+					</div>
+					<div class="row">
+						<hr>
+						<div class="col-sm-7">
+							<div class="form-group">
+								<input type="checkbox"   ng-model="data.ageant"
+								ng-true-value="true" ng-false-value="false">	
+								<label>Agendar levantamento antes</label>						
+							</div>		
+						</div>
+						<div class="col-sm-3" ng-show="data.ageant">
+							<label>Qtde Dias</label>
+							<input type="number" class="form-control" placeholder="Dias antes"  ng-model="data.diaant" />
+						</div>	
+					</div>
+					<div class="row">
+						<hr>
+						<div class="col-sm-7">
+							<div class="form-group">
+								<input type="checkbox"   ng-model="data.agedep"
+								ng-true-value="true" ng-false-value="false">	
+								<label>Agendar levantamento depois</label>						
+							</div>		
+						</div>
+						<div class="col-sm-3" ng-show="data.agedep">
+							<label>Qtde Dias</label>
+							<input type="number" class="form-control" placeholder="Dias depois"    ng-model="data.diadep" />
+						</div>	
 					</div>
 
 				</form>

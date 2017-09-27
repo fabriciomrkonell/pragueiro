@@ -375,6 +375,16 @@
 				setMessageError('O campo coordenada é inválido!');
 				return true;
 			}
+
+			if(data.ageant != null && data.ageant==true && (data.diaant==null || data.diaant=='')){
+				setMessageError('O campo Qtde dias (agendar antes) é obrigatório!');
+				return true;
+			}
+			if(data.agedep != null && data.agedep==true && (data.diadep==null || data.diadep=='')){
+				setMessageError('O campo Qtde dias (agendar depois) é obrigatório!');
+				return true;
+			}
+
 			return false;
 		};
 		
