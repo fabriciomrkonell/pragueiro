@@ -16,6 +16,7 @@
 				tamanhos:false,
 				texto: ' ',
 				key_praga:'40',
+				nome_cientifico: ' ',
 				valor:[],
 				tamanho:[]
 			},
@@ -51,12 +52,16 @@
 
 		});
 
+		$scope.tipos = [
+		{nome:'Praga', key:'PRA'},
+		{nome:'Doença', key:'DOE'},
+		{nome:'Erva daninha', key:'ERV'}
+		];
 
-		$scope.tipos = [{nome:'Praga', key:'PRA'},
-		{nome:'Doença', key:'DOE'}];
 		$scope.todasPragas= [];
 		$scope.todasPragasPadrao= [];
 		$scope.todasClapras= [];
+		$scope.todasClaprasTipo = [];
 
 		$scope.qtde_clapras=0;
 		$scope.qtde_qtde_praemp=0;
@@ -66,7 +71,7 @@
 		$scope.valor=[];
 		recuperaQtdePragaPadrao();
 
-
+		//--
 		$scope.clonar = function(){		
 
 			var i=0;
@@ -156,7 +161,7 @@
 					});
 
 
-				/*
+					/*
 			if(fazenda.key!=null && fazenda.key!='-KNhveilZ009PI7QHdTx') //&& i>=450 && i<500)
 			{
 
@@ -263,151 +268,151 @@
 
 				}
 			});
-console.log(i);
 Notify.successBottom('Praga clonada com sucesso!');
 };
+		//--
+		$scope.gridOptions = { 
+			enableRowSelection: true, 
+			enableRowHeaderSelection: false,
 
-$scope.gridOptions = { 
-	enableRowSelection: true, 
-	enableRowHeaderSelection: false,
+			enableColumnResizing: true,
 
-	enableColumnResizing: true,
+			multiSelect : false,
+			modifierKeysToMultiSelect : false,
 
-	multiSelect : false,
-	modifierKeysToMultiSelect : false,
-
-	columnDefs : [
-	{ field: "codigo", displayName: "Código", width: 80 },
-	{ field: "descricao", displayName: "Descrição", width: 240 },
-	{ field: "ativo", displayName: "Ativo", width: 70,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" },
-	{ field: "postam", displayName: "Tamanhos", width: 100,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValueTamanhos(row)}}</div>" },
-	{ field: "valpre", displayName: "Valores", width: 100,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValueValores(row)}}</div>" }
-
-
-	],
-	appScopeProvider: {
-		mapValue: function(row) {
-			return row.entity.ativo ? 'Sim' : 'Não';
-		},
-		mapValueTamanhos: function(row) {
-			return row.entity.postam ? 'Sim' : 'Não';
-		},
-		mapValueValor: function(row) {
-			return row.entity.valpre ? 'Sim' : 'Não';
-		}
-	}
-
-};
-
-$scope.toggleMultiSelect = function() {
-	$scope.gridApi.selection.setMultiSelect(!$scope.gridApi.grid.options.multiSelect);
-};
+			columnDefs : [
+			{ field: "codigo", displayName: "Código", width: 80 },
+			{ field: "descricao", displayName: "Descrição", width: 240 },
+			{ field: "ativo", displayName: "Ativo", width: 70,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" },
+			{ field: "postam", displayName: "Tamanhos", width: 100,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValueTamanhos(row)}}</div>" },
+			{ field: "valpre", displayName: "Valores", width: 100,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValueValores(row)}}</div>" }
 
 
-$scope.gridOptions.onRegisterApi = function(gridApi){
-	$scope.gridApi = gridApi;
-	gridApi.selection.on.rowSelectionChanged($scope,function(row){
-		$scope.chamaEditar(row.entity);
-	});
-};
+			],
+
+			appScopeProvider: {
+				mapValue: function(row) {
+					return row.entity.ativo ? 'Sim' : 'Não';
+				},
+				mapValueTamanhos: function(row) {
+					return row.entity.postam ? 'Sim' : 'Não';
+				},
+				mapValueValor: function(row) {
+					return row.entity.valpre ? 'Sim' : 'Não';
+				}
+			}
+
+		};
+		//--
+		$scope.toggleMultiSelect = function() {
+			$scope.gridApi.selection.setMultiSelect(!$scope.gridApi.grid.options.multiSelect);
+		};
+
+		//--
+		$scope.gridOptions.onRegisterApi = function(gridApi){
+			$scope.gridApi = gridApi;
+			gridApi.selection.on.rowSelectionChanged($scope,function(row){
+				$scope.chamaEditar(row.entity);
+			});
+		};
+
+		//--
+		$scope.gridOptionsTamanhos = { 
+			enableRowSelection: true, 
+			enableRowHeaderSelection: false,
+
+			enableColumnResizing: true,
+
+			multiSelect : false,
+			modifierKeysToMultiSelect : false,
+
+			columnDefs : [
+			{ field: "ordem", displayName: "Ordem", width: 100 , sort:{ direction: 'asc', priority: 0 }},
+			{ field: "nome", displayName: "Nome", sort:{ direction: 'asc', priority: 1 }, width: 240 },	
+			{ field: "ativo", displayName: "Ativo", width: 150,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" }
 
 
-$scope.gridOptionsTamanhos = { 
-	enableRowSelection: true, 
-	enableRowHeaderSelection: false,
+			],
+			appScopeProvider: {
+				mapValue: function(row) {
+					return row.entity.ativo ? 'Sim' : 'Não';
+				}
+			}
 
-	enableColumnResizing: true,
+		};
+		//--	
+		$scope.gridOptionsTamanhos.onRegisterApi = function(gridApi){
+			$scope.gridApi = gridApi;
+			gridApi.selection.on.rowSelectionChanged($scope,function(row){
+				$scope.ChamarEditarTamanho(row.entity);
+			});
+		};
 
-	multiSelect : false,
-	modifierKeysToMultiSelect : false,
+		//--
+		$scope.gridOptionsValor = { 
+			enableRowSelection: true, 
+			enableRowHeaderSelection: false,
 
-	columnDefs : [
-	{ field: "ordem", displayName: "Ordem", width: 100 , sort:{ direction: 'asc', priority: 0 }},
-	{ field: "nome", displayName: "Nome", sort:{ direction: 'asc', priority: 1 }, width: 240 },	
-	{ field: "ativo", displayName: "Ativo", width: 150,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" }
+			enableColumnResizing: true,
 
+			multiSelect : false,
+			modifierKeysToMultiSelect : false,
 
-	],
-	appScopeProvider: {
-		mapValue: function(row) {
-			return row.entity.ativo ? 'Sim' : 'Não';
-		}
-	}
+			columnDefs : [
+			{ field: "ordem", displayName: "Ordem", width: 100 , sort:{ direction: 'asc', priority: 0 }},
+			{ field: "nome", displayName: "Nome", sort:{ direction: 'asc', priority: 1 }, width: 240 },	
+			{ field: "valor", displayName: "Valor" , width: 100 },	
+			{ field: "ativo", displayName: "Ativo", width: 150,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" }
 
-};
+			],
+			appScopeProvider: {
+				mapValue: function(row) {
+					return row.entity.ativo ? 'Sim' : 'Não';
+				}
+			}
 
-$scope.gridOptionsTamanhos.onRegisterApi = function(gridApi){
-	$scope.gridApi = gridApi;
-	gridApi.selection.on.rowSelectionChanged($scope,function(row){
-		$scope.ChamarEditarTamanho(row.entity);
-	});
-};
+		};
+		//--
+		$scope.gridOptionsValor.onRegisterApi = function(gridApi){
+			$scope.gridApi = gridApi;
+			gridApi.selection.on.rowSelectionChanged($scope,function(row){
+				$scope.ChamarEditarValor(row.entity);
+			});
+		};
 
+		//--	
+		$scope.gridOptionsTamanhoValor = { 
+			enableRowSelection: true, 
+			enableRowHeaderSelection: false,
 
-$scope.gridOptionsValor = { 
-	enableRowSelection: true, 
-	enableRowHeaderSelection: false,
+			enableColumnResizing: true,
 
-	enableColumnResizing: true,
+			multiSelect : false,
+			modifierKeysToMultiSelect : false,
 
-	multiSelect : false,
-	modifierKeysToMultiSelect : false,
+			columnDefs : [
+			{ field: "ordem", displayName: "Ordem", width: 100 , sort:{ direction: 'asc', priority: 0 }},
+			{ field: "nome", displayName: "Nome", sort:{ direction: 'asc', priority: 1 }, width: 240 },	
+			{ field: "valor", displayName: "Valor",  width: 100 },	
+			{ field: "ativo", displayName: "Ativo", width: 150,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" }
 
-	columnDefs : [
-	{ field: "ordem", displayName: "Ordem", width: 100 , sort:{ direction: 'asc', priority: 0 }},
-	{ field: "nome", displayName: "Nome", sort:{ direction: 'asc', priority: 1 }, width: 240 },	
-	{ field: "valor", displayName: "Valor" , width: 100 },	
-	{ field: "ativo", displayName: "Ativo", width: 150,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" }
+			],
+			appScopeProvider: {
+				mapValue: function(row) {
+					return row.entity.ativo ? 'Sim' : 'Não';
+				}
+			}
 
-	],
-	appScopeProvider: {
-		mapValue: function(row) {
-			return row.entity.ativo ? 'Sim' : 'Não';
-		}
-	}
+		};
+		//--
+		$scope.gridOptionsTamanhoValor.onRegisterApi = function(gridApi){
+			$scope.gridApi = gridApi;
+			gridApi.selection.on.rowSelectionChanged($scope,function(row){
+				$scope.ChamarEditarValorTamanho(row.entity);
+			});
+		};
 
-};
-
-$scope.gridOptionsValor.onRegisterApi = function(gridApi){
-	$scope.gridApi = gridApi;
-	gridApi.selection.on.rowSelectionChanged($scope,function(row){
-		$scope.ChamarEditarValor(row.entity);
-	});
-};
-
-
-$scope.gridOptionsTamanhoValor = { 
-	enableRowSelection: true, 
-	enableRowHeaderSelection: false,
-
-	enableColumnResizing: true,
-
-	multiSelect : false,
-	modifierKeysToMultiSelect : false,
-
-	columnDefs : [
-	{ field: "ordem", displayName: "Ordem", width: 100 , sort:{ direction: 'asc', priority: 0 }},
-	{ field: "nome", displayName: "Nome", sort:{ direction: 'asc', priority: 1 }, width: 240 },	
-	{ field: "valor", displayName: "Valor",  width: 100 },	
-	{ field: "ativo", displayName: "Ativo", width: 150,   cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>" }
-
-	],
-	appScopeProvider: {
-		mapValue: function(row) {
-			return row.entity.ativo ? 'Sim' : 'Não';
-		}
-	}
-
-};
-
-$scope.gridOptionsTamanhoValor.onRegisterApi = function(gridApi){
-	$scope.gridApi = gridApi;
-	gridApi.selection.on.rowSelectionChanged($scope,function(row){
-		$scope.ChamarEditarValorTamanho(row.entity);
-	});
-};
-
-			//############################################################################################################################
+		//############################################################################################################################
 		//############################################################################################################################
 		// FAZENDA/FILIAL
 		//############################################################################################################################
@@ -421,7 +426,7 @@ $scope.gridOptionsTamanhoValor.onRegisterApi = function(gridApi){
 			var key_usuario;
 			obj.$loaded().then(function() {
 				key_usuario= obj.$value;
-				
+
 				$scope.fazendas=[];
 				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
 				var refNovo = new Firebase.util.NormalizedCollection(
@@ -450,7 +455,7 @@ $scope.gridOptionsTamanhoValor.onRegisterApi = function(gridApi){
 							$scope.$apply();
 						}
 					});
-					
+
 					if($scope.fazendas.length==0)
 					{
 						$('#myPleaseWait').modal('hide');
@@ -468,7 +473,7 @@ $scope.gridOptionsTamanhoValor.onRegisterApi = function(gridApi){
 			else
 			{		
 
-				
+
 				if(fazenda.clapraemp!=null)
 				{
 					$scope.qtde_clapras = castObjToArray(fazenda.clapraemp).length;
@@ -618,6 +623,8 @@ $scope.gridOptionsTamanhoValor.onRegisterApi = function(gridApi){
 			});
 		}
 
+
+		
 		//############################################################################################################################
 		//############################################################################################################################
 		// Praga
@@ -672,7 +679,7 @@ $scope.gridOptionsTamanhoValor.onRegisterApi = function(gridApi){
 					delete obj.valor;
 
 					obj.valor=valorObj;
-					
+
 				}
 				delete 	tamanhos[obj.key].$$hashKey;
 				tamanhos[obj.key]=obj;	
@@ -700,7 +707,7 @@ $scope.gridOptionsTamanhoValor.onRegisterApi = function(gridApi){
 
 			Notify.successBottom('Praga salva com sucesso!');
 
-			
+
 			$scope.clear();
 		};
 
@@ -740,6 +747,19 @@ $scope.gridOptionsTamanhoValor.onRegisterApi = function(gridApi){
 				$scope.$apply();
 			}
 
+			$scope.todasClaprasTipo= [];
+			$scope.todasClapras.forEach(function(obj) {
+				if ($scope.data.tipo == 'PRA' && obj.tipo=='Praga') {
+					$scope.todasClaprasTipo.push(obj);
+				}
+				if ($scope.data.tipo == 'DOE' && obj.tipo=='Doença') {
+					$scope.todasClaprasTipo.push(obj);
+				}
+				if ($scope.data.tipo == 'ERV' && obj.tipo=='Erva Daninha') {
+					$scope.todasClaprasTipo.push(obj);
+				}
+			});
+
 			$scope.edit = true;
 			$scope.edit_tamanho = false;
 		};
@@ -761,7 +781,7 @@ $scope.gridOptionsTamanhoValor.onRegisterApi = function(gridApi){
 				refFilial.remove();	
 
 				Notify.successBottom('Praga removida com sucesso!');
-				
+
 				$scope.cancelar();
 
 				var posicao = null;
@@ -802,12 +822,27 @@ $scope.gridOptionsTamanhoValor.onRegisterApi = function(gridApi){
 			}
 			else
 			{
-				$scope.data.nome_cientifico='';
+				$scope.data.nome_cientifico=' ';
 				$scope.data.img='';
 				$scope.data.texto='';
 			}
 		}
 
+		$scope.changeTipo = function()
+		{
+			$scope.todasClaprasTipo= [];
+			$scope.todasClapras.forEach(function(obj) {
+				if ($scope.data.tipo == 'PRA' && obj.tipo=='Praga') {
+					$scope.todasClaprasTipo.push(obj);
+				}
+				if ($scope.data.tipo == 'DOE' && obj.tipo=='Doença') {
+					$scope.todasClaprasTipo.push(obj);
+				}
+				if ($scope.data.tipo == 'ERV' && obj.tipo=='Erva Daninha') {
+					$scope.todasClaprasTipo.push(obj);
+				}
+			});
+		}
 		//############################################################################################################################
 		//############################################################################################################################
 		//TAMANHO
@@ -1485,7 +1520,7 @@ $scope.gridOptionsTamanhoValor.onRegisterApi = function(gridApi){
 			
 			$scope.data.key='';
 			$scope.data.descricao='';
-			$scope.data.nome_cientifico='';
+			$scope.data.nome_cientifico=' ';
 			$scope.data.img='';
 			//$scope.data.key_clapra='';
 			$scope.data.key_praga='40';

@@ -12,6 +12,7 @@
 	<link rel="stylesheet" type="text/css" href="/app/libraries/bootstrap/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="/app/dist/css/index.css">
 	<link rel="stylesheet" type="text/css" href="/app/libraries/angular-ui-grid/ui-grid.css" /> 
+	<link rel="stylesheet" href="/app/libraries/fullcalendar/fullcalendar.css">
 	<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDDu-8XiPmbb5QbSlh-Dv4xyHF53iGUPOk&language=br&libraries=visualization,geometry"></script>
 	<style type="text/css">
 	[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
@@ -61,7 +62,8 @@
 
 							<li>---------------</li>	
 							<li><a href="#/planejamento">Planejamento de Safra</a></li>	
-							<li>---------------</li>	
+							<li>---------------</li>
+							<li><a href="#/agendamento">Agendamento</a></li>	
 
 						</ul>
 					</li>
@@ -108,8 +110,9 @@
 
 	277.672,37
 	<ng-view></ng-view>
-	<script src="/app/libraries/angularjs/js/angular.min.js"></script>
 	<script src="/app/libraries/jquery/js/jquery.min.js"></script>
+	<script src="/app/libraries/angularjs/js/angular.min.js"></script>
+	
 	<script src="https://cdn.firebase.com/js/client/2.2.4/firebase.js"></script>
 	<script src="https://cdn.firebase.com/libs/angularfire/1.1.3/angularfire.min.js"></script>
 	<script src="https://cdn.firebase.com/libs/firebase-util/0.2.5/firebase-util.min.js"></script>
@@ -131,6 +134,13 @@
 <script src="/app/libraries/ngmap/ng-map.min.js"></script>
 <script src="/app/libraries/mask/js/jquery-mask.min.js"></script>
 <script src="/app/libraries/kmlmapparser/KmlMapParser.js"></script>
+
+<script src='/app/libraries/moment/moment.js'></script>
+<script src='/app/libraries/fullcalendar/fullcalendar.js'></script>
+<script src='/app/libraries/fullcalendar/gcal.js'></script>
+
+<script src='/app/libraries/angular-ui-calendar/calendar.js'></script>
+
 <script src="/app/app.js"></script>
 <script src="/app/others/script.js"></script>
 <script src="/app/others/config.js"></script>

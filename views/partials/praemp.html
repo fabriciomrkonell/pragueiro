@@ -24,10 +24,10 @@
 			<div class="col-sm-6">
 				<div class="form-group">
 					<button type="button" class="btn btn-success"  ng-show="false" ng-click="clonar()">Clonar</button>
-					<button type="button" class="btn btn-success" ng-show="!edit" ng-click="salvarPraga(data)">Salvar</button>
-					<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarPraga(data)">Atualizar</button>
+					<button type="button" class="btn btn-success" ng-show="!edit" ng-click="salvarPraga(data)">Salvar Praga</button>
+					<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarPraga(data)">Atualizar Praga</button>
 					<button type="button"  class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar</button>
-					<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="excluir()">Excluir</button>
+					<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="excluir()">Excluir Praga</button>
 				</div>
 				<form class="form-signin" role="form">
 					<div class="row">
@@ -62,16 +62,12 @@
 						<label>Tipo</label><br />
 
 						<div class="row">
-
-
 							<div ng-repeat="(key,val) in tipos">
 								<div class="col-sm-3">
-									<input type="radio"  ng-model="data.tipo" ng-value='val.key'  >
+									<input type="radio"  ng-change="changeTipo()" ng-model="data.tipo" ng-value='val.key'  >
 									{{val.nome}}
 								</div>
 							</div>
-
-
 						</div>
 					</div>
 
@@ -80,7 +76,7 @@
 					<div class="form-group">
 						<label>Classe de Praga</label>
 
-						<select class="form-control"  ng-model="data.key_clapra" ng-options="cl.key as (cl.nome) for cl in todasClapras" >
+						<select class="form-control"  ng-model="data.key_clapra" ng-options="cl.key as (cl.nome) for cl in todasClaprasTipo" >
 							<option></option>
 						</select>
 					</div>
@@ -118,7 +114,7 @@
 						<input type="text" class="form-control" placeholder="Nome" ng-model="data.nome_cientifico" />
 					</div>	
 
-					<div class="form-group" ng-show="true">
+					<div class="form-group" ng-show="false">
 						<label>img</label>
 						<input type="text" ng-disabled="true" class="form-control" placeholder="Nome" ng-model="data.img" />
 					</div>	
@@ -180,10 +176,10 @@
 								</div>
 
 								<div class="form-group">
-									<button type="button" class="btn btn-default btn-xm btn-success"  ng-disabled="!edit" ng-show="!edit_tamanho" ng-click="salvarTamanho()"> <i class="glyphicon glyphicon-plus-sign"></i> Inserir	</button>
-									<button type="button" class="btn btn-default btn-xm btn-success" ng-show="edit_tamanho" ng-click="atualizarTamanho()">Atualizar</button>
+									<button type="button" class="btn btn-default btn-xm btn-success"  ng-disabled="!edit" ng-show="!edit_tamanho" ng-click="salvarTamanho()"> <i class="glyphicon glyphicon-plus-sign"></i> Inserir Tamanho	</button>
+									<button type="button" class="btn btn-default btn-xm btn-success" ng-show="edit_tamanho" ng-click="atualizarTamanho()">Atualizar Tamanho</button>
 									<button type="button" class="btn btn-default btn-xm btn-cancel" ng-show="edit_tamanho" ng-click="cancelarTamanho()">Cancelar</button>
-									<button type="button" class="btn btn-default btn-xm btn-danger" ng-show="edit_tamanho && !frmTamanho.valpre" ng-click="questionaExcluirTamanho()">Excluir</button>
+									<button type="button" class="btn btn-default btn-xm btn-danger" ng-show="edit_tamanho && !frmTamanho.valpre" ng-click="questionaExcluirTamanho()">Excluir Tamanho</button>
 								</div>
 								<div class="form-group">
 
@@ -232,10 +228,10 @@
 													<br />
 												</div>
 												<div class="form-group">
-													<button type="button" class="btn btn-default btn-xm btn-success"  ng-disabled="!edit" ng-show="!edit_valor_tamanho" ng-click="salvarValorTamanho()"> <i class="glyphicon glyphicon-plus-sign"></i> Inserir	</button>
-													<button type="button" class="btn btn-default btn-xm btn-success" ng-show="edit_valor_tamanho" ng-click="atualizarValorTamanho()">Atualizar</button>
+													<button type="button" class="btn btn-default btn-xm btn-success"  ng-disabled="!edit" ng-show="!edit_valor_tamanho" ng-click="salvarValorTamanho()"> <i class="glyphicon glyphicon-plus-sign"></i> Inserir Valor	</button>
+													<button type="button" class="btn btn-default btn-xm btn-success" ng-show="edit_valor_tamanho" ng-click="atualizarValorTamanho()">Atualizar Valor</button>
 													<button type="button" class="btn btn-default btn-xm btn-cancel" ng-show="edit_valor_tamanho" ng-click="cancelarValorTamanho()">Cancelar</button>
-													<button type="button" class="btn btn-default btn-xm btn-danger" ng-show="edit_valor_tamanho" ng-click="questionaExcluirValorTamanho()">Excluir</button>
+													<button type="button" class="btn btn-default btn-xm btn-danger" ng-show="edit_valor_tamanho" ng-click="questionaExcluirValorTamanho()">Excluir Valor</button>
 												</div>
 												<div class="form-group">
 													<div ui-grid="gridOptionsTamanhoValor" ui-grid-selection class="gridTamanho"></div>	
@@ -281,10 +277,10 @@
 									</div>
 								</div>
 								<div class="form-group">
-									<button type="button" class="btn btn-default btn-xm btn-success"  ng-disabled="!edit" ng-show="!edit_valor" ng-click="salvarValor()"> <i class="glyphicon glyphicon-plus-sign"></i> Inserir	</button>
-									<button type="button" class="btn btn-default btn-xm btn-success" ng-show="edit_valor" ng-click="atualizarValor()">Atualizar</button>
+									<button type="button" class="btn btn-default btn-xm btn-success"  ng-disabled="!edit" ng-show="!edit_valor" ng-click="salvarValor()"> <i class="glyphicon glyphicon-plus-sign"></i> Inserir Valor	</button>
+									<button type="button" class="btn btn-default btn-xm btn-success" ng-show="edit_valor" ng-click="atualizarValor()">Atualizar Valor</button>
 									<button type="button" class="btn btn-default btn-xm btn-cancel" ng-show="edit_valor" ng-click="cancelarValor()">Cancelar</button>
-									<button type="button" class="btn btn-default btn-xm btn-danger" ng-show="edit_valor" ng-click="questionaExcluirValor()">Excluir</button>
+									<button type="button" class="btn btn-default btn-xm btn-danger" ng-show="edit_valor" ng-click="questionaExcluirValor()">Excluir Valor</button>
 								</div>
 								<div class="form-group">
 									<div ui-grid="gridOptionsValor" ui-grid-selection class="gridValores"></div>	

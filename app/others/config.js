@@ -52,6 +52,11 @@
         resolve: {
           deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/safra.js'])
         }
+      }).when('/agendamento', {
+        templateUrl: '/views/partials/agendamento.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/agendamento.js'])
+        }
       }).when('/planejamento', {
         templateUrl: '/views/partials/planejamento.html',
         resolve: {

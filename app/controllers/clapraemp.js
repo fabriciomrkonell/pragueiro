@@ -18,7 +18,7 @@
 			}
 		});
 
-		$scope.tipo = ['Praga', 'Doença'];
+		$scope.tipo = ['Praga', 'Doença', 'Erva Daninha'];
 		$scope.numeracao_codigo = 1;
 		$scope.todasClapras=[];
 		
