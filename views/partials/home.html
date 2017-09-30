@@ -1,363 +1,369 @@
  <style type="text/css">
- 	.active-table{
- 		background-color: #eee;
- 	}
- 	.nopadding {
- 		padding: 0 !important;
- 		margin: 0 !important;
- 	}
- 	.title_resumo {
- 		margin-left: 35px;
- 	}
+ .active-table{
+ 	background-color: #eee;
+ }
+ .nopadding {
+ 	padding: 0 !important;
+ 	margin: 0 !important;
+ }
+ .title_resumo {
+ 	margin-left: 35px;
+ }
 
 
- 	.modalMapa{
- 	}
- 	#map{
- 		height: 400px;
- 		width: 570px;  
- 	}
+ .modalMapa{
+ }
+ #map{
+ 	height: 400px;
+ 	width: 570px;  
+ }
 
- 	.tab-content>.active {
- 		display: block;
- 	}
+ .tab-content>.active {
+ 	display: block;
+ }
 
- 	.clickable{
- 		cursor: pointer;   
- 	}
+ .clickable{
+ 	cursor: pointer;   
+ }
 
- 	.panel-heading span {
- 		margin-top: -20px;
- 		font-size: 15px;
- 	}
- 	.panel_tabela{
- 		padding:1px;
- 	}
+ .panel-heading span {
+ 	margin-top: -20px;
+ 	font-size: 15px;
+ }
+ .panel_tabela{
+ 	padding:1px;
+ }
 
- 	.count{
- 		font-size: 40px;
- 		font-weight: 600;
- 	}
+ .count{
+ 	font-size: 40px;
+ 	font-weight: 600;
+ }
 
- 	.count_top
- 	{
- 		font-size: 13px;
- 	}
-
-
- </style>
- <div ng-controller="homeCtrl" class="ng-scope ng_scope">
+ .count_top
+ {
+ 	font-size: 13px;
+ }
 
 
- 	<div class="container container-view" >
- 		<div class="row">
- 			<div class="col-sm-3 nopadding col-sm-no-bottom ">
- 				<form class="form-signin" role="form">
- 					<div class="form-group">
- 						<label>Escolha uma Fazenda</label>
- 						<select class="form-control" ng-options="fazenda.nome for fazenda in fazendas" ng-change="chengeFazenda(fazenda)" ng-model="fazenda" >
- 						</select>
- 					</div>
- 				</form>
- 			</div>
- 			<div class="col-sm-2 col-sm-no-bottom ">
- 				<form class="form-signin" role="form" >
- 					<div class="form-group">
- 						<label>Safra</label>
- 						<select class="form-control" ng-options="safra.descricao for safra in fazenda.safra" ng-model="safra" ng-change="chengeSafra()">
- 						</select>
- 					</div>
- 				</form>
- 			</div>
- 			<div class="col-sm-4 col-sm-no-bottom ">
- 				<div class="form-group">
- 					<label>&nbsp;</label>
- 					<br>
- 					<input type="checkbox"  ng-model="exibirSomenteEn" ng-change= "setaExibirSomenteEncontradas()"
- 					ng-true-value="true" ng-false-value="false">	
- 					<label>Exibir somente pragas encontradas</label>						
- 				</div>	
- 			</div>
- 		</div>
-
- 		<div class="row" ng-show=false>
- 			<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count" style="padding-right:20px; border-right: 1px solid #ccc;">
- 				<span class="count_top"><i class="glyphicon glyphicon-bookmark"></i> Usuários no período</span>
- 				<div class="count">1</div>
- 			</div>
-
- 			<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count" style="padding-right:20px; border-right: 1px solid #ccc;">
- 				<span class="count_top"><i class="glyphicon glyphicon-bookmark"></i> Média de pontos</span>
- 				<div class="count">12</div>
- 			</div>
-
- 			<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count" style="padding-right:20px; border-right: 1px solid #ccc;">
- 				<span class="count_top"><i class="glyphicon glyphicon-bookmark"></i>Distância entre pontos</span>
- 				<div class="count">20m</div>
- 				<span class="count_bottom"><i class="green">Média**</i> </span>
- 			</div>
-
- 			<div class="col-md-4 col-sm-8 col-xs-12 tile_stats_count" style="padding-right:20px; border-right: 1px solid #ccc;">
- 				<div google-chart chart="chart" style="{{cssStyle}}"></div>
- 			</div>
- 		</div>
-
- 		<div id="exTab1" class="container_tab">	
- 			<ul  class="nav nav-tabs">
- 				<li class="active"><a  href="#1a" data-toggle="tab">Resumo</a></li>
- 				<li id="2aa"><a href="#2a"  data-toggle="tab">Mapa Infestação</a></li>
- 				<li><a href="#3a" data-toggle="tab">Gráfico evolução</a></li>
- 			</ul>
-
- 			<div class="tab-content clearfix">
-
- 				<div class="tab-pane active " id="1a">
- 					<div class="row tabela_pronta" > 		
-
- 						<div  ng-show="table_pronta">
- 							<div class="table-responsive ">
- 								<table class="table table-condensed table-bordered table-hover" >
- 									<tbody>	
- 										<tr> 							
- 											<th class="text-right"  colspan="2" style="vertical-align:middle;" >Quadra</th>
- 											<th class="text-center active-table" ng-repeat="v in vistorias" >{{v.quadra.nome}}</th>
- 										</tr>
- 										<tr>
- 											<th class="text-right" colspan="2">Cultura</th>
- 											<th class="text-center" ng-repeat="v in vistorias" >{{v.cultura.nome}}</th>
- 										</tr>
- 										<tr>
- 											<th  colspan="2" class="text-right">DAE Atual</th>
- 											<th class="text-center" ng-repeat="v in vistorias" >{{diferencaData(v.quadraxcultura.data_plantio, v.dataMilis)}}</th>
- 										</tr>
- 										<tr>
- 											<th colspan="2" class="text-right">Data do Levantamento</th>
- 											<th class="text-center active-table" ng-repeat="v in vistorias">
- 												<a> {{v.dataExtenso}} </a>
- 											</th>
- 										</tr>
- 										<tr>
- 											<th colspan="2" class="text-right" style="vertical-align:middle;" >Estágio</th>
- 											<th class="text-center"  ng-repeat="v in vistorias">{{v.estagio.codigo}} - {{v.estagio.nome}}</th>
- 										</tr>
- 										<tr>
- 											<th colspan="2" class="text-right" style="vertical-align:middle;" >Monitor</th>
- 											<th class="text-center" ng-repeat="v in vistorias" >{{v.usuario.nome}}</th>
- 										</tr>
- 										<tr>
- 											<th colspan="2" class="text-right">Método (tipo)</th>
- 											<th class="text-center" ng-repeat="v in vistorias">{{v.metodo}}</th>
- 										</tr>
-
- 										<tr>
- 											<th colspan="2" class="text-right">Qtde Pontos</th>
- 											<th class="text-center" ng-repeat="v in vistorias">{{v.qtde_ponto}}</th>
- 										</tr>
-
- 										<tr>
- 											<th colspan="2" class="text-right">Onde foram os pontos?</th>
- 											<th class="text-center" ng-repeat="v in vistorias">
- 												<button type="button" class="btn btn-success btn-xs" ng-click="abrirMapa(v)">
- 													&nbsp;&nbsp;<i class="glyphicon glyphicon-map-marker"></i>&nbsp;&nbsp;
- 												</button>
- 											</th>
- 										</tr>
-
- 										<tr>
- 											<th  colspan="2"  class="text-right">Tecnologia</th>
- 											<th class="text-center" ng-repeat="v in vistorias"> {{v.variedade.nome_tecnologia}}</th>
- 										</tr>
- 										<tr>
- 											<th colspan="2" class="text-right">Variedade</th>
- 											<th class="text-center" ng-repeat="v in vistorias"> {{v.variedade.nome}}</th>
- 										</tr>
- 										<tr>
- 											<th colspan="2" class="text-right">Data da última aplicação</th>
- 											<th class="text-center" ng-repeat="v in vistorias"> {{v.datOrdserExtenso}}</th>
- 										</tr>
- 										<tr>
- 											<th colspan="2" class="text-right">Intervalo da aplicação</th>
- 											<th class="text-center" ng-repeat="v in vistorias">{{v.datOrdserIntervalo}}</th> 							
- 										</tr>		
- 										<tr>
- 											<th colspan="2" class="text-right">&nbsp;</th>
- 											<th class="text-center"  ng-repeat="v in vistorias" >{{v.metodo=='Planta' ? 'Total plantas: ' + v.qtde_planta * v.qtde_ponto : '%'}}</th>
- 										</tr>	
- 										<tbody ng-repeat="praga in pragasExibir">
- 											<tr>
- 												<th rowspan="{{praga.tamanhos.length+1}}"  colspan="{{praga.colspan}}" style="vertical-align:middle;" class="text-center active-table">{{praga.descricao}}</th>
-
- 												<tr ng-repeat="tam in praga.tamanhos track by $index" >
- 													<th height="32" class="text-right active-table" ng-show="praga.tamanhos.length>1">{{tam.nome}}</th>
- 													<th class="text-center" ng-repeat="v in vistorias">
- 														{{vistorias[$index].pragas_com_valor[tam.id].valor !=0 ? vistorias[$index].pragas_com_valor[tam.id].valor  : '&nbsp;'}}
+</style>
+<div ng-controller="homeCtrl" class="ng-scope ng_scope">
 
 
- 													</th>
- 												</tr>
+	<div class="container container-view" >
+		<div class="row">
+			<div class="col-sm-3 nopadding col-sm-no-bottom ">
+				<form class="form-signin" role="form">
+					<div class="form-group">
+						<label>Escolha uma Fazenda</label>
+						<select class="form-control" ng-options="fazenda.nome for fazenda in fazendas" ng-change="chengeFazenda(fazenda)" ng-model="fazenda" >
+						</select>
+					</div>
+				</form>
+			</div>
+			<div class="col-sm-2 col-sm-no-bottom ">
+				<form class="form-signin" role="form" >
+					<div class="form-group">
+						<label>Safra</label>
+						<select class="form-control" ng-options="safra.descricao for safra in fazenda.safra" ng-model="safra" ng-change="chengeSafra()">
+						</select>
+					</div>
+				</form>
+			</div>
+			<div class="col-sm-4 col-sm-no-bottom ">
+				<div class="form-group">
+					<label>&nbsp;</label>
+					<br>
+					<input type="checkbox"  ng-model="exibirSomenteEn" ng-change= "setaExibirSomenteEncontradas()"
+					ng-true-value="true" ng-false-value="false">	
+					<label>Exibir somente pragas encontradas</label>						
+				</div>	
+			</div>
+		</div>
 
- 											</tr>
+		<div class="row" ng-show=false>
+			<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count" style="padding-right:20px; border-right: 1px solid #ccc;">
+				<span class="count_top"><i class="glyphicon glyphicon-bookmark"></i> Usuários no período</span>
+				<div class="count">1</div>
+			</div>
 
- 										</tbody>
+			<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count" style="padding-right:20px; border-right: 1px solid #ccc;">
+				<span class="count_top"><i class="glyphicon glyphicon-bookmark"></i> Média de pontos</span>
+				<div class="count">12</div>
+			</div>
 
- 									</tbody>
- 								</table>
- 							</div>
- 						</div>
- 					</div>
- 				</div>
+			<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count" style="padding-right:20px; border-right: 1px solid #ccc;">
+				<span class="count_top"><i class="glyphicon glyphicon-bookmark"></i>Distância entre pontos</span>
+				<div class="count">20m</div>
+				<span class="count_bottom"><i class="green">Média**</i> </span>
+			</div>
 
- 				<div class="tab-pane" id="2a">
- 					<div class="row" > 						
- 						<form class="form-signin" role="form"> 							
- 							<div  class="panel_mapa"> 
- 								<label>Quadras/Regiões</label>
- 								<div class="panel panel-default sem_marge_botton">
- 									<div class="panel-body">
+			<div class="col-md-4 col-sm-8 col-xs-12 tile_stats_count" style="padding-right:20px; border-right: 1px solid #ccc;">
+				<div google-chart chart="chart" style="{{cssStyle}}"></div>
+			</div>
+		</div>
 
- 										<div class="form-group">
+		<div id="exTab1" class="container_tab">	
+			<ul  class="nav nav-tabs">
+				<li class="active"><a  href="#1a" data-toggle="tab">Resumo</a></li>
+				<li id="2aa"><a href="#2a"  data-toggle="tab">Mapa Infestação</a></li>
+				<li><a href="#3a" data-toggle="tab">Gráfico evolução</a></li>
+			</ul>
 
- 											<button type="button" class="btn btn-default btn-xs" ng-click="efetuaSelecionarTodasQuadras()" >
- 												&nbsp;&nbsp;<i class="glyphicon glyphicon-ok-circle"></i>&nbsp;&nbsp;
- 											</button>
- 											<button type="button" class="btn btn-default btn-xs" ng-click="DesEfetuaSelecionarTodasQuadras()">
- 												&nbsp;&nbsp;<i class="glyphicon glyphicon-ban-circle"></i>&nbsp;&nbsp;
- 											</button>
+			<div class="tab-content clearfix">
 
- 											
+				<div class="tab-pane active " id="1a">
+					<div class="row tabela_pronta" > 		
 
- 										</div>
- 										<hr/>
+						<div  ng-show="table_pronta">
+							<div class="table-responsive ">
+								<table class="table table-condensed table-bordered table-hover" >
+									<tbody>	
+										<tr> 							
+											<th class="text-right"  colspan="2" style="vertical-align:middle;" >Quadra</th>
+											<th class="text-center active-table" ng-repeat="v in vistorias" >{{v.quadra.nome}}</th>
+										</tr>
+										<tr>
+											<th class="text-right" colspan="2">Cultura</th>
+											<th class="text-center" ng-repeat="v in vistorias" >{{v.cultura.nome}}</th>
+										</tr>
+										<tr>
+											<th  colspan="2" class="text-right">DAE Atual</th>
+											<th class="text-center" ng-repeat="v in vistorias" >{{diferencaData(v.quadraxcultura.data_plantio, v.dataMilis)}}</th>
+										</tr>
+										<tr>
+											<th colspan="2" class="text-right">Data do Levantamento</th>
+											<th class="text-center active-table" ng-repeat="v in vistorias">
+												<a> {{v.dataExtenso}} </a>
+											</th>
+										</tr>
+										<tr>
+											<th colspan="2" class="text-right" style="vertical-align:middle;" >Estágio</th>
+											<th class="text-center"  ng-repeat="v in vistorias">{{v.estagio.codigo}} - {{v.estagio.nome}}</th>
+										</tr>
+										<tr>
+											<th colspan="2" class="text-right" style="vertical-align:middle;" >Monitor</th>
+											<th class="text-center" ng-repeat="v in vistorias" >{{v.usuario.nome}}</th>
+										</tr>
+										<tr>
+											<th colspan="2" class="text-right">Método (tipo)</th>
+											<th class="text-center" ng-repeat="v in vistorias">{{v.metodo}}</th>
+										</tr>
 
- 										<label ng-repeat="quadra in quadras">
- 											<input type="checkbox"  
- 											checklist-model="formMapa.quadras" checklist-value="quadra.quadra" ng-change="clickQuadras()">
- 											{{quadra.quadra.nome}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+										<tr>
+											<th colspan="2" class="text-right">Qtde Pontos</th>
+											<th class="text-center" ng-repeat="v in vistorias">{{v.qtde_ponto}}</th>
+										</tr>
 
- 										</label>
+										<tr>
+											<th colspan="2" class="text-right">Onde foram os pontos?</th>
+											<th class="text-center" ng-repeat="v in vistorias">
+												<button type="button" class="btn btn-success btn-xs" ng-click="abrirMapa(v)">
+													&nbsp;&nbsp;<i class="glyphicon glyphicon-map-marker"></i>&nbsp;&nbsp;
+												</button>
+											</th>
+										</tr>
 
- 									</div>
- 								</div>
- 								<br />
+										<tr>
+											<th  colspan="2"  class="text-right">Tecnologia</th>
+											<th class="text-center" ng-repeat="v in vistorias"> {{v.variedade.nome_tecnologia}}</th>
+										</tr>
+										<tr>
+											<th colspan="2" class="text-right">Variedade</th>
+											<th class="text-center" ng-repeat="v in vistorias"> {{v.variedade.nome}}</th>
+										</tr>
+										<tr>
+											<th colspan="2" class="text-right">Data da última aplicação</th>
+											<th class="text-center" ng-repeat="v in vistorias"> {{v.datOrdserExtenso}}</th>
+										</tr>
+										<tr>
+											<th colspan="2" class="text-right">Intervalo da aplicação</th>
+											<th class="text-center" ng-repeat="v in vistorias">{{v.datOrdserIntervalo}}</th> 							
+										</tr>		
+										<tr>
+											<th colspan="2" class="text-right">&nbsp;</th>
+											<th class="text-center"  ng-repeat="v in vistorias" >{{v.metodo=='Planta' ? 'Total plantas: ' + v.qtde_planta * v.qtde_ponto : '%'}}</th>
+										</tr>	
+										<tbody ng-repeat="praga in pragasExibir">
+											<tr>
+												<th rowspan="{{praga.tamanhos.length+1}}"  colspan="{{praga.colspan}}" style="vertical-align:middle;" class="text-center active-table">{{praga.descricao}}</th>
 
- 								<div class="form-group">
- 									<label>Praga</label>
- 									<select class="form-control" ng-options="praga.key as (praga.descricao) for praga in pragasExibir" ng-model="formMapa.praga" >
- 									</select>
- 								</div>
- 								<div class="row">
- 									<div class="col-sm-2 col-sm-no-bottom">
- 										<button type="button" class="btn btn-success btn-sm" ng-click="pragaAnterior()">
- 											&nbsp;&nbsp;<i class="glyphicon glyphicon-backward"></i>&nbsp;&nbsp;
- 										</button>
- 										<button type="button" class="btn btn-success btn-sm" ng-click="pragaProxima()">
- 											&nbsp;&nbsp;<i class="glyphicon glyphicon-forward"></i>&nbsp;&nbsp;
- 										</button>
- 									</div>
- 									<div class="col-sm-3 form-group alinhado_direito">
- 										<button type="button" class="btn btn-success btn-sm"  ng-click="gerarMapa()">
- 											<i class="glyphicon glyphicon-map-marker"></i>&nbsp;&nbsp;&nbsp;&nbsp;Gerar Mapa&nbsp;&nbsp;&nbsp;&nbsp;</button>
- 										</div>
- 										<div class="col-sm-5 form-group">
- 											<div class="">
+												<tr ng-repeat="tam in praga.tamanhos track by $index" >
+													<th height="32" class="text-right active-table" >{{tam.nome}}</th>
+													<th class="text-center" ng-repeat="v in vistorias" ng-show="praga.tamanhos[0].key==null">
+														<div class="white-space-pre-line" >
+															{{vistorias[$index].pragas_com_valor[praga.index].valor !='' ? vistorias[$index].pragas_com_valor[praga.index].valor  : '&nbsp;'}}
+														</div>
+													</th>
 
- 												<input type="checkbox"   ng-model="exibirConfiguracoes">
- 												<label>Configurações do mapa</label>
- 											</div>
-
- 										</div>
-
-
- 									</div>
- 									<div class="row" ng-show="exibirConfiguracoes">
-
- 										<div class="form-group col-sm-5 ">
- 											<label>Intensidade</label>
- 											<input type="number" class="form-control" placeholder="" ng-model="formMapa.intesidade"  min="10" max="50"/>
- 										</div>
-
- 										<div class="form-group col-sm-5 ">
- 											<br />
- 											<input type="checkbox"   ng-model="exibirNomeQuadra"  ng-change= "setaExibirNomeQuadras()" >
- 											<label>Exibir nome quadras</label>
- 										</div>
- 									</div>
-
- 								</div>
- 								<form class="form-signin" role="form">
- 									<div class="form-group">
- 										<div id="map_infestacao" style="width:100%; height:500px;"></div>
- 									</div>
- 								</form>
-
- 							</div>
- 						</div>
- 					</div>
- 				</div> <!-- container container-view -->
- 				<div id="viewer"></div>
- 				<!-- Modal Mensagem-->
- 				<div class="modal fade" id="modalMensagem" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
- 					<div class="modal-dialog">
- 						<div class="modal-content">
-
- 							<div class="modal-header">
- 								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
- 								<h4 class="modal-title" id="myModalLabel">Aviso!</h4>
- 							</div>
-
- 							<div class="modal-body">
- 								<p>{{mensagem_aviso}}</p>
- 								<p class="debug-url"></p>
- 							</div>
+													<th class="text-center" ng-repeat="v in vistorias"  ng-show="praga.tamanhos[0].key!=null">
+														{{vistorias[$index].pragas_com_valor[tam.id].valor !=0 ? vistorias[$index].pragas_com_valor[tam.id].valor  : '&nbsp;'}}
 
 
- 						</div>
- 					</div>
- 				</div>
- 			</div> <!-- final homeCtrl-->
+													</th>
+												</tr>
+
+											</tr>
+
+										</tbody>
+
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="tab-pane" id="2a">
+					<div class="row" > 						
+						<form class="form-signin" role="form"> 							
+							<div  class="panel_mapa"> 
+								<label>Quadras/Regiões</label>
+								<div class="panel panel-default sem_marge_botton">
+									<div class="panel-body">
+
+										<div class="form-group">
+
+											<button type="button" class="btn btn-default btn-xs" ng-click="efetuaSelecionarTodasQuadras()" >
+												&nbsp;&nbsp;<i class="glyphicon glyphicon-ok-circle"></i>&nbsp;&nbsp;
+											</button>
+											<button type="button" class="btn btn-default btn-xs" ng-click="DesEfetuaSelecionarTodasQuadras()">
+												&nbsp;&nbsp;<i class="glyphicon glyphicon-ban-circle"></i>&nbsp;&nbsp;
+											</button>
 
 
 
- 			<!-- Modal Help-->
- 			<div class="modal fade modalMapa" id="modalMapa" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
- 				<div class="modal-dialog">
- 					<div class="modal-content">
+										</div>
+										<hr/>
 
- 						<div class="modal-header">
- 							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
- 							<h4 class="modal-title" id="myModalLabel">Onde foram feito os pontos?</h4>
- 						</div>
+										<label ng-repeat="quadra in quadras">
+											<input type="checkbox"  
+											checklist-model="formMapa.quadras" checklist-value="quadra.quadra" ng-change="clickQuadras()">
+											{{quadra.quadra.nome}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
- 						<div class="modal-body">
- 							<div id="map"></div>
+										</label>
 
- 						</div>
+									</div>
+								</div>
+								<br />
+
+								<div class="form-group">
+									<label>Praga</label>
+									<select class="form-control" ng-options="praga.key as (praga.descricao) for praga in pragasExibir" ng-model="formMapa.praga" >
+									</select>
+								</div>
+								<div class="row">
+									<div class="col-sm-2 col-sm-no-bottom">
+										<button type="button" class="btn btn-success btn-sm" ng-click="pragaAnterior()">
+											&nbsp;&nbsp;<i class="glyphicon glyphicon-backward"></i>&nbsp;&nbsp;
+										</button>
+										<button type="button" class="btn btn-success btn-sm" ng-click="pragaProxima()">
+											&nbsp;&nbsp;<i class="glyphicon glyphicon-forward"></i>&nbsp;&nbsp;
+										</button>
+									</div>
+									<div class="col-sm-3 form-group alinhado_direito">
+										<button type="button" class="btn btn-success btn-sm"  ng-click="gerarMapa()">
+											<i class="glyphicon glyphicon-map-marker"></i>&nbsp;&nbsp;&nbsp;&nbsp;Gerar Mapa&nbsp;&nbsp;&nbsp;&nbsp;</button>
+										</div>
+										<div class="col-sm-5 form-group">
+											<div class="">
+
+												<input type="checkbox"   ng-model="exibirConfiguracoes">
+												<label>Configurações do mapa</label>
+											</div>
+
+										</div>
 
 
- 					</div>
- 				</div>
- 			</div>
- 			<!-- Modal Start here-->
- 			<div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"
- 			role="dialog" aria-hidden="true" data-backdrop="static">
- 			<div class="modal-dialog modal-sm">
- 				<div class="modal-content">
- 					<div class="modal-header">
- 						<h4 class="modal-title">
- 							<span class="glyphicon glyphicon-time">
- 							</span>&nbsp;&nbsp;Aguarde, carregando...
- 						</h4>
- 					</div>
- 					<div class="modal-body">
- 						<div class="progress">
- 							<div class="progress-bar progress-bar-info
- 							progress-bar-striped active"
- 							style="width: 100%">
- 						</div>
- 					</div>
- 				</div>
- 			</div>
- 		</div>
- 	</div>
- 	<!-- Modal ends Here -->
- </div>
+									</div>
+									<div class="row" ng-show="exibirConfiguracoes">
+
+										<div class="form-group col-sm-5 ">
+											<label>Intensidade</label>
+											<input type="number" class="form-control" placeholder="" ng-model="formMapa.intesidade"  min="10" max="50"/>
+										</div>
+
+										<div class="form-group col-sm-5 ">
+											<br />
+											<input type="checkbox"   ng-model="exibirNomeQuadra"  ng-change= "setaExibirNomeQuadras()" >
+											<label>Exibir nome quadras</label>
+										</div>
+									</div>
+
+								</div>
+								<form class="form-signin" role="form">
+									<div class="form-group">
+										<div id="map_infestacao" style="width:100%; height:500px;"></div>
+									</div>
+								</form>
+
+							</div>
+						</div>
+					</div>
+				</div> <!-- container container-view -->
+				<div id="viewer"></div>
+				<!-- Modal Mensagem-->
+				<div class="modal fade" id="modalMensagem" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+								<h4 class="modal-title" id="myModalLabel">Aviso!</h4>
+							</div>
+
+							<div class="modal-body">
+								<p>{{mensagem_aviso}}</p>
+								<p class="debug-url"></p>
+							</div>
+
+
+						</div>
+					</div>
+				</div>
+			</div> <!-- final homeCtrl-->
+
+
+
+			<!-- Modal Help-->
+			<div class="modal fade modalMapa" id="modalMapa" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="myModalLabel">Onde foram feito os pontos?</h4>
+						</div>
+
+						<div class="modal-body">
+							<div id="map"></div>
+
+						</div>
+
+
+					</div>
+				</div>
+			</div>
+			<!-- Modal Start here-->
+			<div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"
+			role="dialog" aria-hidden="true" data-backdrop="static">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">
+							<span class="glyphicon glyphicon-time">
+							</span>&nbsp;&nbsp;Aguarde, carregando...
+						</h4>
+					</div>
+					<div class="modal-body">
+						<div class="progress">
+							<div class="progress-bar progress-bar-info
+							progress-bar-striped active"
+							style="width: 100%">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Modal ends Here -->
+</div>
