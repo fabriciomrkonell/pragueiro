@@ -188,23 +188,20 @@
 												<th rowspan="{{praga.tamanhos.length+1}}"  colspan="{{praga.colspan}}" style="vertical-align:middle;" class="text-center active-table">{{praga.descricao}}</th>
 
 												<tr ng-repeat="tam in praga.tamanhos track by $index" >
-													<th height="32" class="text-right active-table" >{{tam.nome}}</th>
-													<th class="text-center" ng-repeat="v in vistorias" ng-show="praga.tamanhos[0].key==null">
-														<div class="white-space-pre-line" >
-															{{vistorias[$index].pragas_com_valor[praga.index].valor !='' ? vistorias[$index].pragas_com_valor[praga.index].valor  : '&nbsp;'}}
+													<th height="32" class="text-right active-table" ng-show="praga.tamanhos[0].key != null" >{{tam.nome}} </th>
+													<th class="text-center" ng-repeat="v in vistorias">
+														<div class="white-space-pre-line" ng-show="vistorias[$index].pragas_com_valor[tam.id].valpre==true" >
+															{{vistorias[$index].pragas_com_valor[tam.id].valor !='' ? vistorias[$index].pragas_com_valor[tam.id].valor  : '&nbsp;'}}															
 														</div>
-													</th>
-
-													<th class="text-center" ng-repeat="v in vistorias"  ng-show="praga.tamanhos[0].key!=null">
-														{{vistorias[$index].pragas_com_valor[tam.id].valor !=0 ? vistorias[$index].pragas_com_valor[tam.id].valor  : '&nbsp;'}}
-
-
-													</th>
+														<div ng-show="vistorias[$index].pragas_com_valor[tam.id].valpre== null || !vistorias[$index].pragas_com_valor[tam.id].valpre" >
+															{{vistorias[$index].pragas_com_valor[tam.id].valor !='' ? vistorias[$index].pragas_com_valor[tam.id].valor  : '&nbsp;'}}															
+														</div>
+													</th>													
 												</tr>
-
 											</tr>
 
 										</tbody>
+
 
 									</tbody>
 								</table>

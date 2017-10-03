@@ -91,7 +91,7 @@
 			key_cultura:''
 		};
 
-		$scope.gridOptions = { 
+		$scope.gridOptionsCulturas = { 
 			enableRowSelection: true, 
 			enableRowHeaderSelection: false,
 
@@ -116,7 +116,7 @@
 		};
 
 
-		$scope.gridOptions.onRegisterApi = function(gridApi){
+		$scope.gridOptionsCulturas.onRegisterApi = function(gridApi){
 			$scope.gridApi = gridApi;
 			gridApi.selection.on.rowSelectionChanged($scope,function(row){
 				$scope.chamaEditarConxcul(row.entity);
@@ -440,7 +440,7 @@
 				$scope.data=obj;
 
 				$('#myPleaseWait').modal('hide');
-				$scope.gridOptions.data=$scope.todasCulturas;
+				$scope.gridOptionsCulturas.data=$scope.todasCulturas;
 				if (!$scope.$$phase) {
 					$scope.$apply();
 				}
@@ -496,7 +496,7 @@
 				$scope.todasCulturas.push(objNovo);
 
 				
-				$scope.gridOptions.data=$scope.todasCulturas;
+				$scope.gridOptionsCulturas.data=$scope.todasCulturas;
 				if (!$scope.$$phase) {
 					$scope.$apply();
 				}	
@@ -643,7 +643,6 @@
 			$scope.clear();
 		};
 
-
 		$scope.chamaEditarConxcul = function(obj){
 			$scope.desabilitaFazenda=true;
 
@@ -714,8 +713,6 @@
 			
 			Notify.successBottom('Usuário adicionado com sucesso!');
 			usuario = null;
-			//_salvarQuadra = true;
-			//$scope.clearQuadrasCulturas(fazenda.$id, safra);
 		};
 
 		$scope.chamaNovoUsuario = function(){		
@@ -761,239 +758,203 @@
 				}
 			});
 
-/*
-    	ref.auth.createUserWithEmailAndPassword(data.email, data.senha).then(function(user) {
-    		console.log(user);
+		}
 
+		$scope.gravarAceemp= function(aceemp)
+		{
+			if($scope.fazenda==null) return false;
+			if($scope.usuario.key==null) return false;
 
-    		var refNovoAuth = new Firebase(url + '/usuarioxauth/' + user.uid);
-    		foo =  {};  
-    		foo [ user.uid ]  =  user.uid ; 
-    		refNovoAuth.set( user.uid);
+			delete aceemp.$$hashKey;	
 
-    		var refNovo = new Firebase(url + '/usuario/' + user.uid);
-    		refNovo.set(data);
+			aceemp['key_filial'] = $scope.fazenda.key ;
+			aceemp['key_usuario'] = $scope.usuario.key ;
 
-    		var refNovo = new Firebase(Constant.Url + '/filial/' + $scope.fazenda.key + '/usuario/'+usuario.key);
-    		refNovo.set(true);
+			var refConfiguracoes = new Firebase(Constant.Url + '/aceemp/' + $scope.fazenda.key + '/' + $scope.usuario.key+'/'+ aceemp.key);
 
-    		var refNovoUserXFil = new Firebase(Constant.Url + '/usuario/'+usuario.key+'/filial/'+ $scope.fazenda.key);
-    		refNovoUserXFil.set(true);
+			refConfiguracoes.set(aceemp);
+		}
 
-    		Notify.successBottom('Usuário criado e associado a fazenda com sucesso!');
-
-    		$('#modalNovoUsuario').modal('hide');	
-    		
-    	})
-    	.catch(function(error) {
-    		console.log(error);
-    	});
-
-    	*/
-
-
-
-    }
-    $scope.gravarAceemp= function(aceemp)
-    {
-    	if($scope.fazenda==null) return false;
-    	if($scope.usuario.key==null) return false;
-
-    	delete aceemp.$$hashKey;	
-
-    	aceemp['key_filial'] = $scope.fazenda.key ;
-    	aceemp['key_usuario'] = $scope.usuario.key ;
-
-    	var refConfiguracoes = new Firebase(Constant.Url + '/aceemp/' + $scope.fazenda.key + '/' + $scope.usuario.key+'/'+ aceemp.key);
-
-    	refConfiguracoes.set(aceemp);
-    	//Notify.successBottom('Configurações atualizadas com sucesso!');
-    }
-
-    $scope.chamaExcluirAcesso = function(){
-    	if($scope.exibePermissoes)
-    	{
-    		$('#modalDeleteAcesso').modal('show');
-    	}
-    };
-
-    $scope.excluirAcesso = function(){
-    	$('#modalDeleteAcesso').modal('hide');
-
-    	if( $scope.usuario==null) return false;
-    	if($scope.fazenda==null) return false;
-
-    	var refNovo = new Firebase(Constant.Url + '/filial/' + $scope.fazenda.key + '/usuario/'+ $scope.usuario.key);
-    	refNovo.remove();
-
-    	var refNovoUserXFil = new Firebase(Constant.Url + '/usuario/'+ $scope.usuario.key+'/filial/'+ $scope.fazenda.key);
-    	refNovoUserXFil.remove();
-
-    	var refConfiguracoes = new Firebase(Constant.Url + '/aceemp/' + $scope.fazenda.key + '/' + $scope.usuario.key);
-    	refConfiguracoes.remove();
-
-    	Notify.successBottom('Usuário removido com sucesso!');
-
-    	$scope.exibePermissoes= false;
-    	return true;
-    };
-
-    $scope.cancelarUsuario = function(){
-    	$scope.exibePermissoes=false;
-    }
-		//############################################################################################################################
-		//############################################################################################################################
-		//UTEIS
-		//############################################################################################################################
-
-		$scope.setaFazenda = function(fazenda){
-			if(fazenda === null) return false;
-
-			$scope.fazendas.forEach(function(item){
-				if(item.key === fazenda.key) 	
-				{
-					$scope.fazenda = item;		
-				}
-			});
-			
+		$scope.chamaExcluirAcesso = function(){
+			if($scope.exibePermissoes)
+			{
+				$('#modalDeleteAcesso').modal('show');
+			}
 		};
 
-		function setMessageError(message){
-			Notify.errorBottom(message);
+		$scope.excluirAcesso = function(){
+			$('#modalDeleteAcesso').modal('hide');
+
+			if( $scope.usuario==null) return false;
+			if($scope.fazenda==null) return false;
+
+			var refNovo = new Firebase(Constant.Url + '/filial/' + $scope.fazenda.key + '/usuario/'+ $scope.usuario.key);
+			refNovo.remove();
+
+			var refNovoUserXFil = new Firebase(Constant.Url + '/usuario/'+ $scope.usuario.key+'/filial/'+ $scope.fazenda.key);
+			refNovoUserXFil.remove();
+
+			var refConfiguracoes = new Firebase(Constant.Url + '/aceemp/' + $scope.fazenda.key + '/' + $scope.usuario.key);
+			refConfiguracoes.remove();
+
+			Notify.successBottom('Usuário removido com sucesso!');
+
+			$scope.exibePermissoes= false;
+			return true;
 		};
 
-		function validForm(data){			
-			if(data.altura){
-				if(data.altura_ocorrencia==null || data.altura_ocorrencia==''){
-					setMessageError('O ocorrência de "Altura" é inválido!');
-					return true;
-				}
-				if(data.altura_ocorrencia=='INTFIX' && (data.altura_intervalo==null || data.altura_intervalo=='')){
-					setMessageError('É preciso definir o intervalo da ocorrência de "Altura"!');
-					return true;
-				}
+		$scope.cancelarUsuario = function(){
+			$scope.exibePermissoes=false;
+		}
+
+	//############################################################################################################################
+	//############################################################################################################################
+	//UTEIS
+	//############################################################################################################################
+
+	$scope.setaFazenda = function(fazenda){
+		if(fazenda === null) return false;
+
+		$scope.fazendas.forEach(function(item){
+			if(item.key === fazenda.key) 	
+			{
+				$scope.fazenda = item;		
 			}
+		});
 
-			if(data.quanos){
-				if(data.quanos_ocorrencia==null || data.quanos_ocorrencia==''){
-					setMessageError('O ocorrência de "Quantidade de nós" é inválido!');
-					return true;
-				}
-				if(data.quanos_ocorrencia=='INTFIX' && (data.quanos_intervalo==null || data.quanos_intervalo=='')){
-					setMessageError('É preciso definir o intervalo da ocorrência de "Quantidade de nós"!');
-					return true;
-				}
-			}
+	};
 
-			if(data.disnos){
-				if(data.disnos_ocorrencia==null || data.disnos_ocorrencia==''){
-					setMessageError('O ocorrência de "Distância entre de nós" é inválido!');
-					return true;
-				}
-				if(data.disnos_ocorrencia=='INTFIX' && (data.disnos_intervalo==null || data.disnos_intervalo=='')){
-					setMessageError('É preciso definir o intervalo da ocorrência de "Distância entre de nós"!');
-					return true;
-				}
-			}
+	function setMessageError(message){
+		Notify.errorBottom(message);
+	};
 
-			if(data.quaast){
-				if(data.quaast_ocorrencia==null || data.quaast_ocorrencia==''){
-					setMessageError('O ocorrência de "Quantidade de Astes" é inválido!');
-					return true;
-				}
-				if(data.quaast_ocorrencia=='INTFIX' && (data.quaast_intervalo==null || data.quaast_intervalo=='')){
-					setMessageError('É preciso definir o intervalo da ocorrência de "Quantidade de Astes"!');
-					return true;
-				}
-			}
-
-			if(data.quavag){
-				if(data.quavag_ocorrencia==null || data.quavag_ocorrencia==''){
-					setMessageError('O ocorrência de "Quantidade de Vagem" é inválido!');
-					return true;
-				}
-				if(data.quavag_ocorrencia=='INTFIX' && (data.quavag_intervalo==null || data.quavag_intervalo=='')){
-					setMessageError('É preciso definir o intervalo da ocorrência de "Quantidade de Vagem"!');
-					return true;
-				}
-			}
-
-			if(data.altprivag){
-				if(data.altprivag_ocorrencia==null || data.altprivag_ocorrencia==''){
-					setMessageError('O ocorrência de "Altura primeira Vagem" é inválido!');
-					return true;
-				}
-				if(data.altprivag_ocorrencia=='INTFIX' && (data.altprivag_intervalo==null || data.altprivag_intervalo=='')){
-					setMessageError('É preciso definir o intervalo da ocorrência de "Altura primeira Vagem"!');
-					return true;
-				}
-			}
-
-			if(data.quagravag){
-				if(data.quagravag_ocorrencia==null || data.quagravag_ocorrencia==''){
-					setMessageError('O ocorrência de "Quantidade Grãos por Vagem" é inválido!');
-					return true;
-				}
-				if(data.quagravag_ocorrencia=='INTFIX' && (data.quagravag_intervalo==null || data.quagravag_intervalo=='')){
-					setMessageError('É preciso definir o intervalo da ocorrência de "Quantidade Grãos por Vagem"!');
-					return true;
-				}
-			}
-
-			return false;
-		};
-		
-		function isEmail(email){
-			er = /^[a-zA-Z0-9][a-zA-Z0-9\._-]+@([a-zA-Z0-9\._-]+\.)[a-zA-Z-0-9]{2}/;
-			return !!er.exec(email);
-		};
-
-		function validFormUsuario(data){
-
-			if(data.nome == ''){
-				setMessageError('O campo nome é inválido!');
+	function validForm(data){			
+		if(data.altura){
+			if(data.altura_ocorrencia==null || data.altura_ocorrencia==''){
+				setMessageError('O ocorrência de "Altura" é inválido!');
 				return true;
 			}
-			
-/*
-			if(isEmail(data.email) !== true){
-				setMessageError('O campo email é inválido!');
+			if(data.altura_ocorrencia=='INTFIX' && (data.altura_intervalo==null || data.altura_intervalo=='')){
+				setMessageError('É preciso definir o intervalo da ocorrência de "Altura"!');
 				return true;
 			}
-			*/
-			if(data.senha === ''){
-				setMessageError('O campo senha é inválido!');
-				return true;
-			}
+		}
 
-			if(data.senha == ''){
-				setMessageError('O campo senha é obrigatório!');
+		if(data.quanos){
+			if(data.quanos_ocorrencia==null || data.quanos_ocorrencia==''){
+				setMessageError('O ocorrência de "Quantidade de nós" é inválido!');
 				return true;
 			}
-
-			if(data.senha.length<6 ){
-				setMessageError('É necessário uma senha com no mínimo 6 caracteres!');
+			if(data.quanos_ocorrencia=='INTFIX' && (data.quanos_intervalo==null || data.quanos_intervalo=='')){
+				setMessageError('É preciso definir o intervalo da ocorrência de "Quantidade de nós"!');
 				return true;
 			}
+		}
 
-			if(data.telefone === '' ||   data.telefone.length < 14){
-				setMessageError('O campo telefone é inválido!');
+		if(data.disnos){
+			if(data.disnos_ocorrencia==null || data.disnos_ocorrencia==''){
+				setMessageError('O ocorrência de "Distância entre de nós" é inválido!');
 				return true;
 			}
-			if(data.cidade === ''){
-				setMessageError('O campo cidade é inválido!');
+			if(data.disnos_ocorrencia=='INTFIX' && (data.disnos_intervalo==null || data.disnos_intervalo=='')){
+				setMessageError('É preciso definir o intervalo da ocorrência de "Distância entre de nós"!');
 				return true;
 			}
+		}
 
-			return false;
-		};
+		if(data.quaast){
+			if(data.quaast_ocorrencia==null || data.quaast_ocorrencia==''){
+				setMessageError('O ocorrência de "Quantidade de Astes" é inválido!');
+				return true;
+			}
+			if(data.quaast_ocorrencia=='INTFIX' && (data.quaast_intervalo==null || data.quaast_intervalo=='')){
+				setMessageError('É preciso definir o intervalo da ocorrência de "Quantidade de Astes"!');
+				return true;
+			}
+		}
 
-		$scope.clear = function(){
-			$scope.frmCultura= {
-				abertura : false,
-				key_cultura:'',
-				altura : false,
-				altura_ocorrencia : '',
+		if(data.quavag){
+			if(data.quavag_ocorrencia==null || data.quavag_ocorrencia==''){
+				setMessageError('O ocorrência de "Quantidade de Vagem" é inválido!');
+				return true;
+			}
+			if(data.quavag_ocorrencia=='INTFIX' && (data.quavag_intervalo==null || data.quavag_intervalo=='')){
+				setMessageError('É preciso definir o intervalo da ocorrência de "Quantidade de Vagem"!');
+				return true;
+			}
+		}
+
+		if(data.altprivag){
+			if(data.altprivag_ocorrencia==null || data.altprivag_ocorrencia==''){
+				setMessageError('O ocorrência de "Altura primeira Vagem" é inválido!');
+				return true;
+			}
+			if(data.altprivag_ocorrencia=='INTFIX' && (data.altprivag_intervalo==null || data.altprivag_intervalo=='')){
+				setMessageError('É preciso definir o intervalo da ocorrência de "Altura primeira Vagem"!');
+				return true;
+			}
+		}
+
+		if(data.quagravag){
+			if(data.quagravag_ocorrencia==null || data.quagravag_ocorrencia==''){
+				setMessageError('O ocorrência de "Quantidade Grãos por Vagem" é inválido!');
+				return true;
+			}
+			if(data.quagravag_ocorrencia=='INTFIX' && (data.quagravag_intervalo==null || data.quagravag_intervalo=='')){
+				setMessageError('É preciso definir o intervalo da ocorrência de "Quantidade Grãos por Vagem"!');
+				return true;
+			}
+		}
+
+		return false;
+	};
+
+	function isEmail(email){
+		er = /^[a-zA-Z0-9][a-zA-Z0-9\._-]+@([a-zA-Z0-9\._-]+\.)[a-zA-Z-0-9]{2}/;
+		return !!er.exec(email);
+	};
+
+	function validFormUsuario(data){
+
+		if(data.nome == ''){
+			setMessageError('O campo nome é inválido!');
+			return true;
+		}
+
+
+		if(data.senha === ''){
+			setMessageError('O campo senha é inválido!');
+			return true;
+		}
+
+		if(data.senha == ''){
+			setMessageError('O campo senha é obrigatório!');
+			return true;
+		}
+
+		if(data.senha.length<6 ){
+			setMessageError('É necessário uma senha com no mínimo 6 caracteres!');
+			return true;
+		}
+
+		if(data.telefone === '' ||   data.telefone.length < 14){
+			setMessageError('O campo telefone é inválido!');
+			return true;
+		}
+		if(data.cidade === ''){
+			setMessageError('O campo cidade é inválido!');
+			return true;
+		}
+
+		return false;
+	};
+
+	$scope.clear = function(){
+		$scope.frmCultura= {
+			abertura : false,
+			key_cultura:'',
+			altura : false,
+			altura_ocorrencia : '',
 				//altura_intervalo : '',
 				altura_estagio : false,
 				quanos : false,

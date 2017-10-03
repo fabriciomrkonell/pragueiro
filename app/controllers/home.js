@@ -47,7 +47,7 @@ function initMap() {
 
 
 		angular.extend($scope, {
-			versao: '2.5',
+			versao: '2.6',
 			quadras: [],
 			culturas:[],
 			vistorias:[],
@@ -249,16 +249,25 @@ function initMap() {
 				count_tamanho++;
 				$scope.mCountTamanhos++;
 			}
-			if(tamanhos.length==1)
+
+
+			if(tamanhos.length==0)
 			{
 				praga['colspan']=2;			
-				praga['class']='text-right';			
+				praga['class']='text-right';	
+
+				var tam={};
+				tam['id']=$scope.mCountTamanhos;
+
+				$scope.mCountTamanhos++;
+				tamanhos.push(tam);		
 			}
 			else
 			{
 				praga['colspan']=1;
 				praga['class']='text-center';	
-			}
+			}			
+
 			praga['primeiro_tamanho']=primeiro_tamanho;
 			praga['tamanhos']=tamanhos;
 			$scope.todasPragas.push(praga);
@@ -440,6 +449,377 @@ function initMap() {
 		return vistoriaExistente;
 	}
 
+	function percorrePragas(lista_agrupada)
+	{
+
+		var pragas_com_valor=[];
+		var i=0;
+
+		$scope.todasPragas.forEach(function(objPraga)
+		{
+			if(objPraga.key=='37')
+			{
+				console.log('achou');
+			}
+			var pragaAtualizada=clone(objPraga);
+			var count_tamanho=0;
+			pragaAtualizada.index = pragas_com_valor.length;
+
+			if(pragaAtualizada.tamanhos[0].key!=null) // COM TAMANHO
+			{
+				for(var objInterno_tamanho in pragaAtualizada.tamanho ){
+					count_tamanho++;
+					var encontrou=false;
+					lista_agrupada.forEach(function(objInterno_lista){
+						if(objInterno_lista.key_praga==pragaAtualizada.key && (objInterno_lista.key_tamanho=='' ? 'a' : objInterno_lista.key_tamanho)==pragaAtualizada.tamanho[objInterno_tamanho].key)
+						{
+							encontrou=true;
+							if(objInterno_lista.valpre == null || objInterno_lista.valpre == false)
+							{
+								var valor_final;
+								if(objInterno_lista.tipo=='PLA')
+								{
+									valor_final=(objInterno_lista.valor*100) / (objInterno_lista.quapla * objInterno_lista.qtde_ponto);
+								}
+								else
+								{
+									valor_final=objInterno_lista.valor/ objInterno_lista.qtde_ponto;
+								}
+								var newObjeto={valor:valor_final.toFixed(3), tamanho:pragaAtualizada.tamanho[objInterno_tamanho], praga: pragaAtualizada}
+								pragas_com_valor.push(newObjeto);
+								if(valor_final>0)
+								{
+									$scope.addPragasEncontradas(pragaAtualizada);
+								}
+							}
+							else
+							{
+								console.log('teste na praga');
+							}
+						}
+					});
+					if(!encontrou)
+					{
+						var newObjeto={valor:'', tamanho:pragaAtualizada.tamanho[objInterno_tamanho], praga: pragaAtualizada}
+						pragas_com_valor.push(newObjeto);
+					}
+				};
+
+			}
+			else //Não têm tamanho
+			{
+				lista_agrupada.forEach(function(objInterno_lista){
+
+					if(objInterno_lista.key_praga==pragaAtualizada.key)
+					{
+						encontrou=true;
+						if(objInterno_lista.valpre == null || objInterno_lista.valpre == false)
+						{
+							var valor_final;
+							if(objInterno_lista.tipo=='PLA')
+							{
+								valor_final=(objInterno_lista.valor*100) / (objInterno_lista.quapla * objInterno_lista.qtde_ponto);
+							}
+							else
+							{
+								valor_final=objInterno_lista.valor/ objInterno_lista.qtde_ponto;
+							}
+
+							
+
+							var newObjeto={valor:valor_final.toFixed(3),  praga: pragaAtualizada}
+							pragas_com_valor.push(newObjeto);
+							if(valor_final>0)
+							{
+								$scope.addPragasEncontradas(pragaAtualizada);
+							}
+						}
+						else
+						{
+							
+							console.log('teste na praga');
+							var str_valores='';
+							var x=0;
+							objInterno_lista.valores.forEach(function(objValor){
+								if(x!=0)
+								{
+									str_valores += '\n';
+								}
+								str_valores +=  objValor.nome + ' ' + (objValor.qtde * 100 / objInterno_lista.qtde_ponto).toFixed(2);
+
+								x++;
+							});
+
+
+							var newObjeto={valor:str_valores,  valpre:true, praga: pragaAtualizada}
+							pragas_com_valor.push(newObjeto);
+
+							$scope.addPragasEncontradas(pragaAtualizada);
+						}
+					}
+				});
+				if(!encontrou)
+				{					
+
+					var newObjeto={valor:'', praga: pragaAtualizada}
+					pragas_com_valor.push(newObjeto);
+				}
+			}
+		});
+		return pragas_com_valor;
+	}
+
+	function percorreVistorias(obj2, variedade)
+	{
+		var obj=clone(obj2);
+		if(variedade!=null)
+		{
+			obj['variedade']=variedade;
+			obj.quadra.nome += ' - ' + variedade.nome;
+		}
+		var count_usuarios=0;
+
+		//--------USUARIO-----------------------------------
+		for(var propertyName in obj.vistoria) 
+		{
+			count_usuarios++;
+
+			var count_dias=0;
+			var vistoria_dias=[];
+			//-----------DIA---------------------------------------------------------
+			for(var propertyName_Dia in obj.vistoria[propertyName]) 
+			{
+				count_dias++;
+
+				var vistoria_dia_praga=[];
+				var count_ponto=0;
+				var key_estagio;
+				//-----------PONTO---------------------------------------------------------
+				for(var propertyName_ponto in obj.vistoria[propertyName][propertyName_Dia]) 
+				{
+					count_ponto++;
+
+					var count_praga=0;
+
+					for(var propertyName_vis in obj.vistoria[propertyName][propertyName_Dia][propertyName_ponto]) 
+					{
+						count_praga++;
+
+						vistoria_dia_praga.push(obj.vistoria[propertyName][propertyName_Dia][propertyName_ponto][propertyName_vis]);
+					}
+
+					obj.qtde_praga=count_praga;
+				}
+				obj.qtde_ponto=count_ponto;
+				//FIM-----------PONTO---------------------------------------------------------
+				vistoria_dia_praga.sort(compare);
+				var key_praga_old="";
+				var key_tamanho_old="";
+				var lista_agrupada=[];
+				var dataExtenso="";
+				var metodo="";									
+				var dataMilis=0;
+				var qtde_planta=0;
+				//-----------PERCORRE DIA---------------------------------------------------------
+				var listPontos=[];
+				var contadorVisdia=0;
+				for(var vis_det in vistoria_dia_praga )
+				{
+					console.log('variedade: ' + vistoria_dia_praga[vis_det].key_variedade );
+
+					if(variedade==null && vistoria_dia_praga[vis_det].key_variedade!=null)
+					{
+						for(var obj_variedades_cultura in $scope.variedades) 
+						{
+							var obj_varCul=$scope.variedades[obj_variedades_cultura];
+							for(var obj_variedades in obj_varCul) 
+							{
+								{
+									if(obj_varCul[obj_variedades].key == vistoria_dia_praga[vis_det].key_variedade)
+									{ 
+										obj['variedade']=obj_varCul[obj_variedades];
+										break;
+									}
+								};
+							}
+							break;
+						}
+					}
+
+
+					if(vistoria_dia_praga[vis_det].key =='-KvCItI8hulp8yIjicxs')
+					{
+						console.log('val pre');
+					}
+
+					if(contadorVisdia==0)
+					{
+						var objPonto={};
+						objPonto['ponto']=vistoria_dia_praga[vis_det].ponto;
+						objPonto['latitude']=vistoria_dia_praga[vis_det].latitude;
+						objPonto['longitude']=vistoria_dia_praga[vis_det].longitude;
+						listPontos.push(objPonto);
+					}
+					else
+					{
+						var mTem = false;
+
+						for(var x in listPontos )
+						{
+							if (listPontos[x].ponto == vistoria_dia_praga[vis_det].ponto) {
+								mTem = true;
+								break;
+							}
+						}
+						if (!mTem) {
+							var objPonto={};
+							objPonto['ponto']=vistoria_dia_praga[vis_det].ponto;
+							objPonto['latitude']=vistoria_dia_praga[vis_det].latitude;
+							objPonto['longitude']=vistoria_dia_praga[vis_det].longitude;
+							listPontos.push(objPonto);												
+						}
+					}
+					contadorVisdia++;
+					dataExtenso=vistoria_dia_praga[vis_det].dataString;
+					dataMilis=vistoria_dia_praga[vis_det].data;
+					metodo=vistoria_dia_praga[vis_det].tipo == 'PLA' ? 'Planta' : '%';
+					qtde_planta=vistoria_dia_praga[vis_det].quapla ;
+					key_estagio=vistoria_dia_praga[vis_det].key_estagio;
+
+
+
+					if(key_praga_old==vistoria_dia_praga[vis_det].key_praga)//Praga antiga, já teve anteriormente
+					{
+						if(key_tamanho_old==vistoria_dia_praga[vis_det].key_tamanho) //Tamanho antigo, já teve anteriormente
+						{
+							lista_agrupada[lista_agrupada.length-1]['qtde_ponto']=count_ponto;
+
+							if(vistoria_dia_praga[vis_det].valpre == null || vistoria_dia_praga[vis_det].valpre==false) //Não é valor prévio
+							{
+								lista_agrupada[lista_agrupada.length-1].valor=lista_agrupada[lista_agrupada.length-1].valor+vistoria_dia_praga[vis_det].valor;
+							}
+							else //É valor prévio
+							{												
+								lista_agrupada[lista_agrupada.length-1]=adicionaValores(lista_agrupada[lista_agrupada.length-1], vistoria_dia_praga[vis_det]); 												
+							}
+						}
+						else //Tamanho novo, não teve anteriormente
+						{
+							vistoria_dia_praga[vis_det]['qtde_ponto']=count_ponto;
+
+							if(vistoria_dia_praga[vis_det].valpre == null || vistoria_dia_praga[vis_det].valpre==false) //Não é valor prévio
+							{
+								lista_agrupada.push(vistoria_dia_praga[vis_det]);
+							}
+							else
+							{
+								lista_agrupada.push(adicionaValores(vistoria_dia_praga[vis_det], vistoria_dia_praga[vis_det]));											
+							}
+						}
+					}
+					else //Praga nova, não teve anteriormente
+					{
+						vistoria_dia_praga[vis_det]['qtde_ponto']=count_ponto;
+
+						if(vistoria_dia_praga[vis_det].valpre == null || vistoria_dia_praga[vis_det].valpre==false)
+						{													
+							lista_agrupada.push(vistoria_dia_praga[vis_det]);
+						}
+						else
+						{
+							lista_agrupada.push(adicionaValores(vistoria_dia_praga[vis_det], vistoria_dia_praga[vis_det]));		
+						}											
+					}
+					key_praga_old=vistoria_dia_praga[vis_det].key_praga;
+					key_tamanho_old=vistoria_dia_praga[vis_det].key_tamanho;
+
+				}
+				//FIM PERCORRE DIA---------------------------------------------------------
+
+				obj['dataExtenso']=dataExtenso;
+				obj['dataMilis']=dataMilis;
+				obj['metodo']=metodo;
+				obj['metodo']=metodo;
+				obj['qtde_planta']=qtde_planta;
+				obj['lista_pragas_encontradas']=lista_agrupada;
+				obj['listPontos']=listPontos;
+
+				$scope.usuarios.forEach(function(objInterno)
+				{
+					if(objInterno.key === propertyName)
+					{ 
+						obj['usuario']=objInterno;
+					}
+				});
+
+				$scope.quadras.forEach(function(objInterno)
+				{
+					if(objInterno.quadraxcultura.key === obj.quadra.key)
+					{ 
+						obj['quadraxcultura']=objInterno.quadraxcultura;
+						$scope.culturas.forEach(function(objInterno2){
+							if(objInterno2.key+'' === objInterno.quadraxcultura.key_cultura)
+							{ 
+								obj['cultura']=objInterno2;
+
+								for(var objInterno_est in objInterno2.estagios ){
+									if(objInterno_est==key_estagio)
+										obj['estagio']=objInterno2.estagios[objInterno_est];
+								}
+							}
+						});
+					}
+				});
+
+
+				obj.qtde_dia=count_dias;
+				var pragas_com_valor = percorrePragas(lista_agrupada);
+
+				$scope.myNumber=pragas_com_valor.length;
+				obj['pragas_com_valor']=pragas_com_valor;
+				obj['id']= new Date().getTime();
+				obj['id']= new Date().getTime();
+
+				$scope.ordsers.forEach(function(ordser) {
+					for (var propertyName in ordser.execucoes) {
+						var objExe=ordser.execucoes[propertyName];
+						if(objExe.key_quadra==obj.quadra.key)
+						{
+							var dataExecucao=new Date(objExe.data);
+
+							obj['datOrdser']= new Date(objExe.data);
+							obj['datOrdserExtenso']= formatDate(dataExecucao);
+
+							if($scope.fazenda.tipintapl!=null)//Se esta definido no cadastro da filial que tem um tipo
+							{
+								if($scope.fazenda.tipintapl=='Data atual')
+								{
+									obj['datOrdserIntervalo']=  $scope.diferencaData(dataExecucao, new Date());													
+								}
+								else
+								{
+									obj['datOrdserIntervalo']=  $scope.diferencaData(dataExecucao, new Date(dataMilis));
+								}
+							}
+							else
+							{
+								obj['datOrdserIntervalo']=  $scope.diferencaData(dataExecucao, new Date(dataMilis));
+							}
+						}
+					}
+				});
+
+				$scope.vistorias.push(clone(obj));
+			}
+			//FIM-----------DIA---------------------------------------------------------
+			$scope.vistorias.sort(compareData);
+			$scope.table_pronta=true;
+			if(!$scope.$$phase) {
+				$scope.$apply();
+			}
+		}
+		//-----FIM USUARIO-----------------------------------
+	}
 	//---
 	function atualizaVistorias()
 	{
@@ -458,14 +838,13 @@ function initMap() {
 				refVis.ref().on('child_added', function(snap) 
 				{
 					var obj2= snap.val();
-					if(obj2.quadra.key!='-KTL-ruZqa2zJ66MpcaO')
+					if(obj2.quadra.key!='-KPlzmSgB2mTl0ja07P1')
 					{
 						//return;
 					}
 					var mListVariedades=[];
 					for(var itemQuadraXsafra in $scope.quadras )
 					{
-
 						if(obj2.quadra!=null && $scope.quadras[itemQuadraXsafra].quadraxcultura.key==obj2.quadra.key)
 						{
 							obj2.quadra.ativo=$scope.quadras[itemQuadraXsafra].quadraxcultura.ativo;
@@ -486,6 +865,10 @@ function initMap() {
 
 					if(obj2.quadra!=null &&  $scope.fazenda.mosdes==true || (obj2.quadra.ativo!=null && obj2.quadra.ativo==true))
 					{
+						if(obj2.quadra.ativo==false)
+						{
+							return;
+						}
 						//----
 						//SEPARA POR VARIEDADE, FAZ DESSE JEITO
 						if(mListVariedades.length>0)//SEPARA POR VARIEDADE, FAZ DESSE JEITO
@@ -502,7 +885,7 @@ function initMap() {
 										{
 											if(obj_varCul[obj_variedades].key == mListVariedades[keyVar])
 											{ 
-												obj.quadra.nome=obj.quadra.nome + ' - ' + obj_varCul[obj_variedades].nome;
+												//obj.quadra.nome=obj.quadra.nome + ' - ' + obj_varCul[obj_variedades].nome;
 												obj['variedade']=obj_varCul[obj_variedades];
 												break;
 											}
@@ -512,580 +895,41 @@ function initMap() {
 								}
 
 								var count_usuarios=0;
+								var objeto_vistoria={};
+								objeto_vistoria.quadra = clone(obj.quadra);
+								objeto_vistoria.vistoria=obj.vistoria[mListVariedades[keyVar]];
 
-						//--------USUARIO-----------------------------------
-						var objeto_vistoria=obj.vistoria[mListVariedades[keyVar]];
-						for(var propertyName in objeto_vistoria) 
-						{
-							count_usuarios++;
-
-							var count_dias=0;
-							var vistoria_dias=[];
-							//-----------DIA---------------------------------------------------------
-							for(var propertyName_Dia in objeto_vistoria[propertyName]) 
-							{
-								count_dias++;
-
-								var vistoria_dia_praga=[];
-								var count_ponto=0;
-								var key_estagio;
-								//-----------PONTO---------------------------------------------------------
-								for(var propertyName_ponto in objeto_vistoria[propertyName][propertyName_Dia]) 
-								{
-									count_ponto++;
-
-									var count_praga=0;
-
-									for(var propertyName_vis in objeto_vistoria[propertyName][propertyName_Dia][propertyName_ponto]) 
-									{
-										count_praga++;
-
-										vistoria_dia_praga.push(objeto_vistoria[propertyName][propertyName_Dia][propertyName_ponto][propertyName_vis]);
-									}
-
-									obj.qtde_praga=count_praga;
-								}
-								obj.qtde_ponto=count_ponto;
-									//FIM-----------PONTO---------------------------------------------------------
-									vistoria_dia_praga.sort(compare);
-									var key_praga_old="";
-									var key_tamanho_old="";
-									var lista_agrupada=[];
-									var dataExtenso="";
-									var metodo="";									
-									var dataMilis=0;
-									var qtde_planta=0;
-									//-----------PERCORRE DIA---------------------------------------------------------
-									for(var vis_det in vistoria_dia_praga )
-									{
-										if(vistoria_dia_praga[vis_det].key =='-KvCItI8hulp8yIjicxs')
-										{
-											console.log('val pre');
-										}
-										dataExtenso=vistoria_dia_praga[vis_det].dataString;
-										dataMilis=vistoria_dia_praga[vis_det].data;
-										metodo=vistoria_dia_praga[vis_det].tipo == 'PLA' ? 'Planta' : '%';
-										qtde_planta=vistoria_dia_praga[vis_det].quapla ;
-										key_estagio=vistoria_dia_praga[vis_det].key_estagio;
-										if(key_praga_old==vistoria_dia_praga[vis_det].key_praga)
-										{
-											if(key_tamanho_old==vistoria_dia_praga[vis_det].key_tamanho)
-											{
-												if(vistoria_dia_praga[vis_det].valpre == null || vistoria_dia_praga[vis_det].valpre==false)
-												{
-													lista_agrupada[lista_agrupada.length-1].valor=lista_agrupada[lista_agrupada.length-1].valor+vistoria_dia_praga[vis_det].valor;
-													lista_agrupada[lista_agrupada.length-1]['qtde_ponto']=count_ponto;
-												}
-												else
-												{
-													console.log('val pre');
-												}
-											}
-											else
-											{
-												vistoria_dia_praga[vis_det]['qtde_ponto']=count_ponto;
-												lista_agrupada.push(vistoria_dia_praga[vis_det]);
-											}
-
-										}
-										else
-										{
-											vistoria_dia_praga[vis_det]['qtde_ponto']=count_ponto;
-											lista_agrupada.push(vistoria_dia_praga[vis_det]);
-										}
-										key_praga_old=vistoria_dia_praga[vis_det].key_praga;
-										key_tamanho_old=vistoria_dia_praga[vis_det].key_tamanho;
-
-									}
-									//FIM PERCORRE DIA---------------------------------------------------------
-									//var objetoFinalDia = {ista:lista_agrupada};
-									obj['dataExtenso']=dataExtenso;
-									obj['dataMilis']=dataMilis;
-									obj['metodo']=metodo;
-									obj['metodo']=metodo;
-									obj['qtde_planta']=qtde_planta;
-									obj['lista_pragas_encontradas']=lista_agrupada;
-
-									$scope.usuarios.forEach(function(objInterno)
-									{
-										if(objInterno.key === propertyName)
-										{ 
-											obj['usuario']=objInterno;
-										}
-									});
-
-									$scope.quadras.forEach(function(objInterno)
-									{
-										if(objInterno.quadraxcultura.key === obj.quadra.key)
-										{ 
-											obj['quadraxcultura']=objInterno.quadraxcultura;
-											$scope.culturas.forEach(function(objInterno2){
-												if(objInterno2.key+'' === objInterno.quadraxcultura.key_cultura)
-												{ 
-													obj['cultura']=objInterno2;
-
-													for(var objInterno_est in objInterno2.estagios ){
-														if(objInterno_est==key_estagio)
-															obj['estagio']=objInterno2.estagios[objInterno_est];
-													}
-												}
-											});
-										}
-									});
-
-
-									obj.qtde_dia=count_dias;
-									var pragas_com_valor=[];
-									$scope.todasPragas.forEach(function(objPraga)
-									{
-										var pragaAtualizada=clone(objPraga);
-										var count_tamanho=0;
-										for(var objInterno_tamanho in pragaAtualizada.tamanho ){
-											count_tamanho++;
-											var encontrou=false;
-											lista_agrupada.forEach(function(objInterno_lista){
-												if(objInterno_lista.key_praga==pragaAtualizada.key && (objInterno_lista.key_tamanho=='' ? 'a' : objInterno_lista.key_tamanho)==pragaAtualizada.tamanho[objInterno_tamanho].key)
-												{
-													encontrou=true;
-													var valor_final;
-													if(objInterno_lista.tipo=='PLA')
-													{
-														valor_final=(objInterno_lista.valor*100) / (objInterno_lista.quapla * objInterno_lista.qtde_ponto);
-													}
-													else
-													{
-														valor_final=objInterno_lista.valor/ objInterno_lista.qtde_ponto;
-													}
-													var newObjeto={valor:valor_final.toFixed(3), tamanho:pragaAtualizada.tamanho[objInterno_tamanho], praga: pragaAtualizada}
-													pragas_com_valor.push(newObjeto);
-													if(valor_final>0)
-													{
-														$scope.addPragasEncontradas(pragaAtualizada);
-													}
-												}
-											});
-											if(!encontrou)
-											{
-												var newObjeto={valor:0, tamanho:pragaAtualizada.tamanho[objInterno_tamanho], praga: pragaAtualizada}
-												pragas_com_valor.push(newObjeto);
-											}
-										};
-									});
-									$scope.myNumber=pragas_com_valor.length;
-									obj['pragas_com_valor']=pragas_com_valor;
-									obj['id']= new Date().getTime();
-									obj['id']= new Date().getTime();
-
-									$scope.ordsers.forEach(function(ordser) {
-										for (var propertyName in ordser.execucoes) {
-											var objExe=ordser.execucoes[propertyName];
-											if(objExe.key_quadra==obj.quadra.key)
-											{
-												var dataExecucao=new Date(objExe.data);
-
-												obj['datOrdser']= new Date(objExe.data);
-												obj['datOrdserExtenso']= formatDate(dataExecucao);
-												if($scope.fazenda.tipintapl!=null)//Se esta definido no cadastro da filial que tem um tipo
-												{
-													if($scope.fazenda.tipintapl=='Data atual')
-													{
-														obj['datOrdserIntervalo']=  $scope.diferencaData(dataExecucao, new Date());													
-													}
-													else
-													{
-														obj['datOrdserIntervalo']=  $scope.diferencaData(dataExecucao, new Date(dataMilis));
-													}
-												}
-												else
-												{
-													obj['datOrdserIntervalo']=  $scope.diferencaData(dataExecucao, new Date(dataMilis));
-												}
-											}
-										}
-									});
-
-									$scope.vistorias.push(clone(obj));
-
-								}
-							//FIM-----------DIA---------------------------------------------------------
-							$scope.vistorias.sort(compareData);
-							$scope.table_pronta=true;
-							if(!$scope.$$phase) 
-							{
-								$scope.$apply();
+								percorreVistorias(objeto_vistoria, obj.variedade);
 							}
 						}
-						//-----FIM USUARIO-----------------------------------
-					}
-				}
-					else //###########//NAOOOO SEPARA POR VARIEDADE
-					{
-						var obj=clone(obj2);
-						var count_usuarios=0;
-
-						//--------USUARIO-----------------------------------
-						for(var propertyName in obj.vistoria) 
+						else //NÃO SEPARA VARIEDADE
 						{
-							count_usuarios++;
-
-							var count_dias=0;
-							var vistoria_dias=[];
-							//-----------DIA---------------------------------------------------------
-							for(var propertyName_Dia in obj.vistoria[propertyName]) 
-							{
-								count_dias++;
-
-								var vistoria_dia_praga=[];
-								var count_ponto=0;
-								var key_estagio;
-								//-----------PONTO---------------------------------------------------------
-								for(var propertyName_ponto in obj.vistoria[propertyName][propertyName_Dia]) 
-								{
-									count_ponto++;
-
-									var count_praga=0;
-
-									for(var propertyName_vis in obj.vistoria[propertyName][propertyName_Dia][propertyName_ponto]) 
-									{
-										count_praga++;
-
-										vistoria_dia_praga.push(obj.vistoria[propertyName][propertyName_Dia][propertyName_ponto][propertyName_vis]);
-									}
-
-									obj.qtde_praga=count_praga;
-								}
-								obj.qtde_ponto=count_ponto;
-									//FIM-----------PONTO---------------------------------------------------------
-									vistoria_dia_praga.sort(compare);
-									var key_praga_old="";
-									var key_tamanho_old="";
-									var lista_agrupada=[];
-									var dataExtenso="";
-									var metodo="";									
-									var dataMilis=0;
-									var qtde_planta=0;
-									//-----------PERCORRE DIA---------------------------------------------------------
-									var listPontos=[];
-									var contadorVisdia=0;
-									for(var vis_det in vistoria_dia_praga )
-									{
-
-										if(vistoria_dia_praga[vis_det].key =='-KvCItI8hulp8yIjicxs')
-										{
-											console.log('val pre');
-										}
-
-										if(contadorVisdia==0)
-										{
-											var objPonto={};
-											objPonto['ponto']=vistoria_dia_praga[vis_det].ponto;
-											objPonto['latitude']=vistoria_dia_praga[vis_det].latitude;
-											objPonto['longitude']=vistoria_dia_praga[vis_det].longitude;
-											listPontos.push(objPonto);
-										}
-										else
-										{
-											var mTem = false;
-
-											for(var x in listPontos )
-											{
-												if (listPontos[x].ponto == vistoria_dia_praga[vis_det].ponto) {
-													mTem = true;
-													break;
-												}
-											}
-											if (!mTem) {
-												var objPonto={};
-												objPonto['ponto']=vistoria_dia_praga[vis_det].ponto;
-												objPonto['latitude']=vistoria_dia_praga[vis_det].latitude;
-												objPonto['longitude']=vistoria_dia_praga[vis_det].longitude;
-												listPontos.push(objPonto);												
-											}
-										}
-										contadorVisdia++;
-										dataExtenso=vistoria_dia_praga[vis_det].dataString;
-										dataMilis=vistoria_dia_praga[vis_det].data;
-										metodo=vistoria_dia_praga[vis_det].tipo == 'PLA' ? 'Planta' : '%';
-										qtde_planta=vistoria_dia_praga[vis_det].quapla ;
-										key_estagio=vistoria_dia_praga[vis_det].key_estagio;
-
-										if(key_praga_old==vistoria_dia_praga[vis_det].key_praga)//Praga antiga, já teve anteriormente
-										{
-											if(key_tamanho_old==vistoria_dia_praga[vis_det].key_tamanho) //Tamanho antigo, já teve anteriormente
-											{
-												lista_agrupada[lista_agrupada.length-1]['qtde_ponto']=count_ponto;
-
-												if(vistoria_dia_praga[vis_det].valpre == null || vistoria_dia_praga[vis_det].valpre==false) //Não é valor prévio
-												{
-													lista_agrupada[lista_agrupada.length-1].valor=lista_agrupada[lista_agrupada.length-1].valor+vistoria_dia_praga[vis_det].valor;
-												}
-												else //É valor prévio
-												{												
-													lista_agrupada[lista_agrupada.length-1]=adicionaValores(lista_agrupada[lista_agrupada.length-1], vistoria_dia_praga[vis_det]); 												
-												}
-											}
-											else //Tamanho novo, não teve anteriormente
-											{
-												vistoria_dia_praga[vis_det]['qtde_ponto']=count_ponto;
-
-												if(vistoria_dia_praga[vis_det].valpre == null || vistoria_dia_praga[vis_det].valpre==false) //Não é valor prévio
-												{
-													lista_agrupada.push(vistoria_dia_praga[vis_det]);
-												}
-												else
-												{
-													lista_agrupada.push(adicionaValores(vistoria_dia_praga[vis_det], vistoria_dia_praga[vis_det]));											
-												}
-											}
-
-										}
-										else //Praga nova, não teve anteriormente
-										{
-											vistoria_dia_praga[vis_det]['qtde_ponto']=count_ponto;
-											
-											if(vistoria_dia_praga[vis_det].valpre == null || vistoria_dia_praga[vis_det].valpre==false)
-											{													
-												lista_agrupada.push(vistoria_dia_praga[vis_det]);
-											}
-											else
-											{
-												lista_agrupada.push(adicionaValores(vistoria_dia_praga[vis_det], vistoria_dia_praga[vis_det]));		
-											}											
-										}
-										key_praga_old=vistoria_dia_praga[vis_det].key_praga;
-										key_tamanho_old=vistoria_dia_praga[vis_det].key_tamanho;
-
-									}
-									//FIM PERCORRE DIA---------------------------------------------------------
-
-									obj['dataExtenso']=dataExtenso;
-									obj['dataMilis']=dataMilis;
-									obj['metodo']=metodo;
-									obj['metodo']=metodo;
-									obj['qtde_planta']=qtde_planta;
-									obj['lista_pragas_encontradas']=lista_agrupada;
-									obj['listPontos']=listPontos;
-
-									$scope.usuarios.forEach(function(objInterno)
-									{
-										if(objInterno.key === propertyName)
-										{ 
-											obj['usuario']=objInterno;
-										}
-									});
-
-									$scope.quadras.forEach(function(objInterno)
-									{
-										if(objInterno.quadraxcultura.key === obj.quadra.key)
-										{ 
-											obj['quadraxcultura']=objInterno.quadraxcultura;
-											$scope.culturas.forEach(function(objInterno2){
-												if(objInterno2.key+'' === objInterno.quadraxcultura.key_cultura)
-												{ 
-													obj['cultura']=objInterno2;
-
-													for(var objInterno_est in objInterno2.estagios ){
-														if(objInterno_est==key_estagio)
-															obj['estagio']=objInterno2.estagios[objInterno_est];
-													}
-												}
-											});
-										}
-									});
-
-
-									obj.qtde_dia=count_dias;
-									var pragas_com_valor=[];
-									var i=0;
-									$scope.todasPragas.forEach(function(objPraga)
-									{
-										if(objPraga.key=='37')
-										{
-											console.log('achou');
-										}
-										var pragaAtualizada=clone(objPraga);
-										var count_tamanho=0;
-										if(pragaAtualizada.tamanho!=null)
-										{
-											for(var objInterno_tamanho in pragaAtualizada.tamanho ){
-												count_tamanho++;
-												var encontrou=false;
-												lista_agrupada.forEach(function(objInterno_lista){
-													if(objInterno_lista.key_praga==pragaAtualizada.key && (objInterno_lista.key_tamanho=='' ? 'a' : objInterno_lista.key_tamanho)==pragaAtualizada.tamanho[objInterno_tamanho].key)
-													{
-														encontrou=true;
-														if(objInterno_lista.valpre == null || objInterno_lista.valpre == false)
-														{
-															var valor_final;
-															if(objInterno_lista.tipo=='PLA')
-															{
-																valor_final=(objInterno_lista.valor*100) / (objInterno_lista.quapla * objInterno_lista.qtde_ponto);
-															}
-															else
-															{
-																valor_final=objInterno_lista.valor/ objInterno_lista.qtde_ponto;
-															}
-															var newObjeto={valor:valor_final.toFixed(3), tamanho:pragaAtualizada.tamanho[objInterno_tamanho], praga: pragaAtualizada}
-															pragas_com_valor.push(newObjeto);
-															if(valor_final>0)
-															{
-																$scope.addPragasEncontradas(pragaAtualizada);
-															}
-														}
-														else
-														{
-															console.log('teste na praga');
-														}
-													}
-												});
-												if(!encontrou)
-												{
-													var newObjeto={valor:'', tamanho:pragaAtualizada.tamanho[objInterno_tamanho], praga: pragaAtualizada}
-													pragas_com_valor.push(newObjeto);
-												}
-											};
-
-										}
-										else //Não têm tamanho
-										{
-											lista_agrupada.forEach(function(objInterno_lista){
-												if(objInterno_lista.key_praga==pragaAtualizada.key)
-												{
-													encontrou=true;
-													if(objInterno_lista.valpre == null || objInterno_lista.valpre == false)
-													{
-														var valor_final;
-														if(objInterno_lista.tipo=='PLA')
-														{
-															valor_final=(objInterno_lista.valor*100) / (objInterno_lista.quapla * objInterno_lista.qtde_ponto);
-														}
-														else
-														{
-															valor_final=objInterno_lista.valor/ objInterno_lista.qtde_ponto;
-														}
-														var newObjeto={valor:valor_final.toFixed(3), tamanho:pragaAtualizada.tamanho[objInterno_tamanho], praga: pragaAtualizada}
-														pragas_com_valor.push(newObjeto);
-														if(valor_final>0)
-														{
-															$scope.addPragasEncontradas(pragaAtualizada);
-														}
-													}
-													else
-													{
-														pragaAtualizada.index = pragas_com_valor.length;
-														console.log('teste na praga');
-														var str_valores='';
-														var x=0;
-														objInterno_lista.valores.forEach(function(objValor){
-															if(x!=0)
-															{
-																str_valores += '\n';
-															}
-															str_valores +=  objValor.nome + ' ' + (objValor.qtde * 100 / objInterno_lista.qtde_ponto).toFixed(2);
-
-															x++;
-														});
-														var tam ={};
-														tam['nome']=' ';
-														pragaAtualizada.tamanhos=[];
-														pragaAtualizada.tamanhos.push(tam);
-														pragaAtualizada.tamanho=tam;
-														var newObjeto={index: i, tamanho:tam, valor:str_valores, praga: pragaAtualizada}
-														pragas_com_valor.push(newObjeto);
-
-														$scope.addPragasEncontradas(pragaAtualizada);
-													}
-												}
-											});
-											if(!encontrou)
-											{
-												var newObjeto={valor:'', praga: pragaAtualizada}
-												pragas_com_valor.push(newObjeto);
-											}
-										}
-										
-									});
-									$scope.myNumber=pragas_com_valor.length;
-									obj['pragas_com_valor']=pragas_com_valor;
-									obj['id']= new Date().getTime();
-									obj['id']= new Date().getTime();
-
-									$scope.ordsers.forEach(function(ordser) {
-										for (var propertyName in ordser.execucoes) {
-											var objExe=ordser.execucoes[propertyName];
-											if(objExe.key_quadra==obj.quadra.key)
-											{
-												var dataExecucao=new Date(objExe.data);
-
-												obj['datOrdser']= new Date(objExe.data);
-												obj['datOrdserExtenso']= formatDate(dataExecucao);
-
-												if($scope.fazenda.tipintapl!=null)//Se esta definido no cadastro da filial que tem um tipo
-												{
-													if($scope.fazenda.tipintapl=='Data atual')
-													{
-														obj['datOrdserIntervalo']=  $scope.diferencaData(dataExecucao, new Date());													
-													}
-													else
-													{
-														obj['datOrdserIntervalo']=  $scope.diferencaData(dataExecucao, new Date(dataMilis));
-													}
-												}
-												else
-												{
-													obj['datOrdserIntervalo']=  $scope.diferencaData(dataExecucao, new Date(dataMilis));
-												}
-											}
-										}
-									});
-
-									$scope.vistorias.push(clone(obj));
-
-
-								}
-							//FIM-----------DIA---------------------------------------------------------
-							$scope.vistorias.sort(compareData);
-							$scope.table_pronta=true;
-							if(!$scope.$$phase) {
-								$scope.$apply();
-							}
+							percorreVistorias(obj2, null);
 						}
-						//-----FIM USUARIO-----------------------------------
+
+						if($scope.exibirSomenteEn)
+						{
+							$scope.pragasExibir=$scope.pragasEncontradasGeral;
+						}
+						else
+						{
+							$scope.pragasExibir=$scope.todasPragas;
+						}
+
+						//FIM-----------DIA---------------------------------------------------------
+						$scope.vistorias.sort(compareData);
+						$scope.table_pronta=true;
+						if(!$scope.$$phase) {
+							$scope.$apply();
+						}
+
 					}
+					return;
 
-				}
-				if($scope.exibirSomenteEn)
-				{
-					$scope.pragasExibir=$scope.pragasEncontradasGeral;
-				}
-				else
-				{
-					$scope.pragasExibir=$scope.todasPragas;
-				}
-
-
-
-			});
-			//----
-			refVis.on('child_changed', function(snap) {
-				console.log('Houve uma atualização', snap.name(), snap.val());
-				var objNovo= snap.val();
-
-				var x=0;
-				var posicao=null;
-				$scope.vistorias.forEach(function(obj){
-					if(obj.$id === objNovo.$id)
-					{ 
-						posicao=x;
-					}
-					x++;
 
 				});
-				if(posicao!=null)
-					$scope.vistorias[posicao]=objNovo;
 
-			});
-		}
+			}
 
 	//############################################################################################################################
 	//############################################################################################################################

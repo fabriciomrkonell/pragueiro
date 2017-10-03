@@ -503,7 +503,7 @@
 
 			if($scope.todasQuadras.length==$scope.qtde_quadras
 				&& $scope.todasCulturas.length==$scope.qtde_culturas
-				&& $scope.todasVariedades.length==$scope.qtde_variedades
+				&& $scope.todasVariedades.length>=$scope.qtde_variedades
 				&& $scope.fazendas.length == $scope.qtde_fazendas
 				)
 			{
