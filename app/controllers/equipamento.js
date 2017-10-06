@@ -21,6 +21,8 @@
 			}
 		});
 
+		$scope.terminou=false;
+
 		var ref = new Firebase(Constant.Url + '/equipamento');
 		$scope.todasEquipamentos = $firebaseArray(ref);
 		//var refFazendas = new Firebase(Constant.Url + '/filial');

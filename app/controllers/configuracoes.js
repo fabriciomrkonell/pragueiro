@@ -66,6 +66,7 @@
 			key: 'INTFIX'
 		}];
 
+		$scope.terminou=false;
 
 		var ref = new Firebase(Constant.Url + '/configuracoes');
 		$scope.todasConfiguracoess = $firebaseArray(ref);
@@ -202,6 +203,8 @@
 
 		function atualizaListaFiliais()
 		{
+			$scope.terminou=true;
+			console.log('atualizaListaFiliais()')
 			$('#myPleaseWait').modal('show');
 
 			var refUser = new Firebase(Constant.Url + '/usuarioxauth/'+Session.getUser().uid);		
@@ -224,7 +227,8 @@
 					refNovo.on('child_added', function(snap) {
 						$('#myPleaseWait').modal('hide');
 
-						//console.log('Adicionou filial', snap.name(), snap.val());
+						console.log('Adicionou filial', snap.name(), snap.val());
+
 						var obj= snap.val();
 						$scope.fazendas.push(obj.filial);
 
@@ -501,8 +505,9 @@
 					$scope.$apply();
 				}	
 
-				if(verificaTermino())
+				if(verificaTermino() && !$scope.terminou)
 				{
+					console.log('recuperaCultura terminou()')
 					atualizaListaFiliais();
 				}					
 
@@ -542,8 +547,9 @@
 				if (!$scope.$$phase) {
 					$scope.$apply();
 				}
-				if(verificaTermino())
+				if(verificaTermino() && !$scope.terminou)
 				{
+					console.log('recuperaControleacesso terminou')
 					atualizaListaFiliais();
 				}					
 
@@ -555,6 +561,9 @@
 		function recuperaControleacessoPorUsuario() {
 			if($scope.fazenda==null) return false;
 			if($scope.usuario.key==null) return false;
+
+
+
 
 			var i=0
 			$scope.todosControleacessos.forEach(function(controle){
@@ -620,7 +629,17 @@
 
 		function verificaTermino()
 		{
-			if($scope.qtde_culturas==$scope.todasCulturas.length && $scope.qtde_controleacesso== $scope.todosControleacessos.length)
+
+			console.log(' --------------------- ');
+
+			console.log('todasCulturas: ' + $scope.todasCulturas.length + ' - qde: ' + $scope.qtde_culturas);
+			console.log('todosControleacessos: ' + $scope.todosControleacessos.length + ' - qde: ' + $scope.qtde_controleacesso);		
+			//console.log('todoUsuarios: ' + $scope.todosUsuarios.length + ' - qde: ' + $scope.qtde_usuario);
+
+			//console.log(' --------------------- ');
+
+			if($scope.qtde_culturas==$scope.todasCulturas.length 
+				&& $scope.qtde_controleacesso== $scope.todosControleacessos.length)
 			{
 				return true;
 			}
