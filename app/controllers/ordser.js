@@ -1218,138 +1218,138 @@ $scope.chengeSafra = function(key_safra) {
 
 		}
 	};
-//-------------------------------------------------------------------
-$scope.chengeFazenda = function(fazenda) {
-	if (fazenda === null) return false;
-	$scope.safras = [];
-	for (var propertyName in fazenda.safra) {
-		$scope.safras.push(fazenda.safra[propertyName]);
-	}
-	$scope.ordsers=[];
-	$scope.gridOptions.data = $scope.ordsers;
+	//-------------------------------------------------------------------
+	$scope.chengeFazenda = function(fazenda) {
+		if (fazenda === null) return false;
+		$scope.safras = [];
+		for (var propertyName in fazenda.safra) {
+			$scope.safras.push(fazenda.safra[propertyName]);
+		}
+		$scope.ordsers=[];
+		$scope.gridOptions.data = $scope.ordsers;
 
-	listenerCodigo(fazenda);
+		listenerCodigo(fazenda);
 
-	refOrdser = new Firebase(Constant.Url + '/ordser/' + fazenda.key);
+		refOrdser = new Firebase(Constant.Url + '/ordser/' + fazenda.key);
 
-	refOrdser.on('child_added', function(snap) {
-		$('#myPleaseWait').modal('hide');
-		var objNovo = snap.val();
-		var x = 0;
-		var posicao = null;
-		$scope.ordsers.forEach(function(obj) {
-			if (obj.key === objNovo.key) {
-				posicao = x;
-			}
-			x++;
-
-		});
-		if (posicao == null) {
-			$scope.todasTipatis.forEach(function(obj2) {
-				if (obj2.key!=null && objNovo.key_tipati === obj2.key) {
-					objNovo['tipati'] = obj2;
+		refOrdser.on('child_added', function(snap) {
+			$('#myPleaseWait').modal('hide');
+			var objNovo = snap.val();
+			var x = 0;
+			var posicao = null;
+			$scope.ordsers.forEach(function(obj) {
+				if (obj.key === objNovo.key) {
+					posicao = x;
 				}
-			});
+				x++;
 
-			$scope.safras.forEach(function(obj2) {
-				if (objNovo.key_safra === obj2.key) {
-					objNovo['safra'] = obj2;
+			});
+			if (posicao == null) {
+				$scope.todasTipatis.forEach(function(obj2) {
+					if (obj2.key!=null && objNovo.key_tipati === obj2.key) {
+						objNovo['tipati'] = obj2;
+					}
+				});
+
+				$scope.safras.forEach(function(obj2) {
+					if (objNovo.key_safra === obj2.key) {
+						objNovo['safra'] = obj2;
+					}
+				});
+
+				$scope.todasEquipes.forEach(function(obj2) {
+					if (objNovo.key_equipe === obj2.key) {
+						objNovo['equipe'] = obj2;
+					}
+				});
+
+				var area_total_tmp=0;
+				var area_total_executada_tmp=0;
+				var per_total_executada_tmp = 0;
+				for (var propertyName in objNovo.quadras) {
+					if(objNovo.quadras[propertyName].area!=null)
+					{
+						area_total_tmp +=objNovo.quadras[propertyName].area;
+					}
 				}
-			});
+				for (var propertyName in objNovo.execucoes) {
+					var objExe=objNovo.execucoes[propertyName];
 
-			$scope.todasEquipes.forEach(function(obj2) {
-				if (objNovo.key_equipe === obj2.key) {
-					objNovo['equipe'] = obj2;
-				}
-			});
-
-			var area_total_tmp=0;
-			var area_total_executada_tmp=0;
-			var per_total_executada_tmp = 0;
-			for (var propertyName in objNovo.quadras) {
-				if(objNovo.quadras[propertyName].area!=null)
+					area_total_executada_tmp += objExe.area;
+					per_total_executada_tmp = (area_total_executada_tmp*100) / area_total_tmp ;
+				};
+				if(!isNaN(area_total_executada_tmp))
 				{
-					area_total_tmp +=objNovo.quadras[propertyName].area;
+					objNovo['area_total_executada']=area_total_executada_tmp;
 				}
+				if(!isNaN(per_total_executada_tmp))
+				{
+					objNovo['per_total_executada']=per_total_executada_tmp.toFixed(2);
+				}
+				$scope.ordsers.push(objNovo);
+				$scope.gridOptions.data = $scope.ordsers;
 			}
-			for (var propertyName in objNovo.execucoes) {
-				var objExe=objNovo.execucoes[propertyName];
+			if (!$scope.$$phase) {
+				$scope.$apply();
+			}
+		});
 
-				area_total_executada_tmp += objExe.area;
-				per_total_executada_tmp = (area_total_executada_tmp*100) / area_total_tmp ;
-			};
-			if(!isNaN(area_total_executada_tmp))
-			{
-				objNovo['area_total_executada']=area_total_executada_tmp;
-			}
-			if(!isNaN(per_total_executada_tmp))
-			{
-				objNovo['per_total_executada']=per_total_executada_tmp.toFixed(2);
-			}
-			$scope.ordsers.push(objNovo);
-			$scope.gridOptions.data = $scope.ordsers;
-		}
-		if (!$scope.$$phase) {
-			$scope.$apply();
-		}
-	});
+		refOrdser.on('child_changed', function(snap) {
+			$('#myPleaseWait').modal('hide');
+			var objNovo = snap.val();
+			var x = 0;
+			var posicao = null;
+			$scope.ordsers.forEach(function(obj) {
+				if (obj.key === objNovo.key) {
+					posicao = x;
+				}
+				x++;
 
-	refOrdser.on('child_changed', function(snap) {
-		$('#myPleaseWait').modal('hide');
-		var objNovo = snap.val();
-		var x = 0;
-		var posicao = null;
-		$scope.ordsers.forEach(function(obj) {
-			if (obj.key === objNovo.key) {
-				posicao = x;
+			});
+			if (posicao != null) {
+
+				$scope.todasTipatis.forEach(function(obj2) {
+					if (objNovo.key_tipati === obj2.key) {
+						objNovo['tipati'] = obj2;
+					}
+				});
+
+				$scope.safras.forEach(function(obj2) {
+					if (objNovo.key_safra === obj2.key) {
+						objNovo['safra'] = obj2;
+					}
+				});
+
+				$scope.todasEquipes.forEach(function(obj2) {
+					if (objNovo.key_equipe === obj2.key) {
+						objNovo['equipe'] = obj2;
+					}
+				});
+
+				$scope.ordsers[posicao] = objNovo;
 			}
-			x++;
+
+			if (!$scope.$$phase) {
+				$scope.$apply();
+			}
+		});
+
+		refOrdser.on('child_removed', function(snap) {
+			var objNovo = snap.val();
+			var x = 0;
+			var posicao = null;
+			$scope.ordsers.forEach(function(obj) {
+				if (obj.key === objNovo.key) {
+					posicao = x;
+				}
+				x++;
+
+			});
+			if (posicao != null) {
+				delete $scope.ordsers[posicao];
+			}
 
 		});
-		if (posicao != null) {
-
-			$scope.todasTipatis.forEach(function(obj2) {
-				if (objNovo.key_tipati === obj2.key) {
-					objNovo['tipati'] = obj2;
-				}
-			});
-
-			$scope.safras.forEach(function(obj2) {
-				if (objNovo.key_safra === obj2.key) {
-					objNovo['safra'] = obj2;
-				}
-			});
-
-			$scope.todasEquipes.forEach(function(obj2) {
-				if (objNovo.key_equipe === obj2.key) {
-					objNovo['equipe'] = obj2;
-				}
-			});
-
-			$scope.ordsers[posicao] = objNovo;
-		}
-
-		if (!$scope.$$phase) {
-			$scope.$apply();
-		}
-	});
-
-	refOrdser.on('child_removed', function(snap) {
-		var objNovo = snap.val();
-		var x = 0;
-		var posicao = null;
-		$scope.ordsers.forEach(function(obj) {
-			if (obj.key === objNovo.key) {
-				posicao = x;
-			}
-			x++;
-
-		});
-		if (posicao != null) {
-			delete $scope.ordsers[posicao];
-		}
-
-	});
 	//-------------------------------------------------------------------
 	$scope.tipatis = [];
 	for (var propertyName in fazenda.tipati) {
@@ -1881,7 +1881,7 @@ $scope.adicionarQuadra = function(data, data_quadra) {
 					objAgendamento['key_filial']=data.fazenda.key;
 					objAgendamento['key_quadra']=data_quadra.quadra.key;
 					objAgendamento['key_ordser']=data.key;
-					objAgendamento['status']='Agendado';
+					objAgendamento['situacao']='Agendado';
 					var d = new Date();
 					d.setDate(data.datpre.getDate() - data.diaant);
 
@@ -1908,7 +1908,7 @@ $scope.adicionarQuadra = function(data, data_quadra) {
 				objAgendamento['key_filial']=data.fazenda.key;
 				objAgendamento['key_quadra']=data_quadra.quadra.key;
 				objAgendamento['key_ordser']=data.key;
-				objAgendamento['status']='Agendado';
+				objAgendamento['situacao']='Agendado';
 				var d = new Date();
 				d.setDate(data.datpre.getDate() + data.diaant);
 
@@ -2100,7 +2100,7 @@ $scope.adicionarAgendamento = function(data, data_agendamento) {
 		objAgendamento['key_usuario']=usuario.key;
 	}
 	objAgendamento['key_ordser']=data.key;
-	objAgendamento['status']='Agendado';
+	objAgendamento['situacao']='Agendado';
 	objAgendamento.data= new Date(data_agendamento.data).getTime(); 
 	objAgendamento.data_string=new Date(data_agendamento.data).getDate()+'/'+new Date(data_agendamento.data).getMonth()+'/'+new Date(data_agendamento.data).getFullYear();
 

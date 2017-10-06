@@ -47,7 +47,7 @@ function initMap() {
 
 
 		angular.extend($scope, {
-			versao: '2.6',
+			versao: '2.7',
 			quadras: [],
 			culturas:[],
 			vistorias:[],

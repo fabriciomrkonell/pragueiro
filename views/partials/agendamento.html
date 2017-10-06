@@ -18,24 +18,124 @@
 				</select>
 
 			</div>
+			<div class="col-sm-4 col-sm-no-bottom ">
+				<form class="form-signin" role="form" >
+					<div class="form-group">
+						<label>Safra</label>						
+						<select class="form-control"   ng-options="safra as (safra.descricao) for safra in safras"  ng-model="data.safra"  ng-change="chengeSafra(data.safra)" > 							
+							<option></option>
+						</select>
+					</div>
+				</form>
+			</div>
 		</div>
 		<hr/>
 		<div class="row">
 			<div class="col-sm-6">
-				<button type="button" class="btn btn-success" ng-show="save" ng-click="salvarEquipe(data)">Salvar</button>
-				<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarEquipe
-				(data)">Atualizar</button>
-				<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar/Novo</button>
-				<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="excluir()">Excluir</button>
-				<br />
-				<br />
-
 				
 
-				<div class="calendar" ng-model="eventSources" calendar="myCalendar1" ui-calendar="uiConfig.calendar"></div>
+				<button class="btn btn-success" ng-click="changeView('agendaDay', 'myCalendar')">AgendaDay</button>
+
+
+				<div  ui-calendar="uiConfig" ng-model="eventSources"  calendar="myCalendar"  ></div>
+
+
+
+
+
+				<br>
+				<p><b>Legenda </b></p>
+				<span class="glyphicon glyphicon-stop corFinalizado"></span>&nbsp;Finalizado
+				<br>
+				<span class="glyphicon glyphicon-stop corAtrasado"></span> &nbsp;Atrasado (vencido)
+				<br>
+				<span class="glyphicon glyphicon-stop corAgendado"></span> &nbsp;Agendado
+				<br>
 			</div>
 			<div class="col-sm-6">
+				<button type="button" class="btn btn-success" ng-show="true" ng-click="novo()">Novo</button>
+				<button type="button" class="btn btn-success" ng-show="detalhe" ng-click="mostrarDetalhe(data_agendamento)">Detalhar</button>
+				<br />
+				<br />
 				<div ui-grid="gridOptions" ui-grid-selection class="gridEquipe"></div>	
+			</div>
+		</div>
+	</div>
+	<!-- Modal DELETE-->
+	<div class="modal fade" id="modalDetalhe" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Detalhe do agendamento</h4>
+				</div>
+
+				<div class="modal-body">
+					<form class="form-signin" role="form">
+						<div class="form-group">
+							<label>Data</label>						
+							<input type="date" class="form-control" ng-disabled=edit ng-model="data_agendamento.data">
+						</div>	
+						<br>
+						<div class="row">
+							<div class="col-sm-5 col-sm-no-bottom">
+								<div class="form-group">
+									<label>Tipo</label>						
+									<p>{{data_agendamento.tipo}}</p>
+								</div>	
+							</div>
+							<div class="col-sm-5 col-sm-no-bottom" ng-show="edit">
+								<div class="form-group">
+									<label>Situacao</label>						
+									<p>{{data_agendamento.situacao}}</p>
+								</div>	
+							</div>
+						</div>
+						<br>
+						<div class="form-group" ng-show="data_agendamento.temUsuario">
+							<label>Monitor/usuário</label>		
+
+							<select class="form-control" ng-model="data_agendamento.usuario"  ng-disabled="desabilitaQuadras" ng-options="usuario as (usuario.nome) for usuario in todosUsuarios">
+								<option></option>
+							</select>
+						</div>
+						<br>
+						<div class="row">
+							<div class="col-sm-5 col-sm-no-bottom">
+								<div class="form-group">
+									<label>Quadra(s)/Região</label>	
+									<p ng-show="edit" >{{data_agendamento.quadra.nome}}</p>
+
+									<select ng-show="save" class="form-control" ng-model="data_agendamento.quadra" ng-change="chengeQuadra(data_quadra)" ng-disabled="desabilitaQuadras" ng-options="pl as (pl.quadra.nome) for pl in todosPlanejamento">
+										<option></option>
+									</select>
+
+								</div>
+							</div>
+							<div class="col-sm-5 col-sm-no-bottom" ng-show="edit">
+								<div class="form-group">
+									<label>Ordem de Serviço/Atividade</label>	
+									<p>{{data_agendamento.ordser.codigo}}</p>
+								</div>
+							</div>
+						</div>
+						<br>
+						<div class="form-group" ng-show="!data_agendamento.temUsuario && edit">
+							<label>Tipo Ordem Serviço/Atividade</label>		
+
+							<p>{{data_agendamento.tipordser.codigo}} - {{data_agendamento.tipordser.descricao}}</p>
+						</div>
+					</form>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-success" ng-show="save" ng-click="salvarAgendamento(data_agendamento)">Salvar</button>
+					<button type="button" class="btn btn-success" ng-disabled="finalizado" ng-show="edit && data_agendamento.temUsuario" ng-click="editarAgendamento
+					(data_agendamento)">Atualizar</button>
+					<button type="button" class="btn btn-default btn-danger" ng-show="edit && data_agendamento.temUsuario" ng-click="excluir()">Excluir</button>
+					<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar</button>
+					
+				</div>
 			</div>
 		</div>
 	</div>
@@ -50,13 +150,13 @@
 				</div>
 
 				<div class="modal-body">
-					<p>Têm certeza que deseja excluir a Equipe '{{data.nome}}'?</p>
+					<p>Têm certeza que deseja excluir o Agendamento do dia {{data_agendamento.data.getDate()}}/ {{data_agendamento.data.getMonth()+1}}/{{data_agendamento.data.getFullYear()}}?</p>
 					<p class="debug-url"></p>
 				</div>
 
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-					<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="excluirEquipe(data)">Excluir</button>
+					<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="excluirAgendamento(data_agendamento)">Excluir</button>
 				</div>
 			</div>
 		</div>

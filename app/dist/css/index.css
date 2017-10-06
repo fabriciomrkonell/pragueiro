@@ -1,5 +1,26 @@
+
+.corFinalizado {
+	color: #39ac39;
+}
+
+.corAtrasado {
+	color: #ff9999;
+}
+
+
+.corAgendado {
+	color: #ffad33;
+}
+
 .white-space-pre-line {
 	white-space: pre-line;
+}
+
+.fc-time{
+	display : none;
+}
+.fc-day-grid-event > .fc-content {
+	white-space: normal;
 }
 
 .gridOrdserEquipamentos {
