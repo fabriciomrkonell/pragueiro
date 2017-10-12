@@ -428,7 +428,10 @@ function atualizaListaFiliais() {
 				}
 			});
 			if (posicao != null)
+			{
+				objNovo['filial'].aceempsObj= $scope.fazendas[posicao].aceempsObj;
 				$scope.fazendas[posicao] = objNovo['filial'];
+			}
 
 			if(objNovo['filial'].key==$scope.fazenda.key)
 			{

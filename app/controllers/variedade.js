@@ -101,13 +101,13 @@
 						}
 					});
 					if (posicao != null)
+					{
+						objNovo['filial'].aceempsObj= $scope.fazendas[posicao].aceempsObj;
 						$scope.fazendas[posicao] = objNovo['filial'];
+					}
 
 					if(objNovo['filial'].key==$scope.fazenda.key)
-					{
-						objNovo['filial'].aceempsObj= JSON.parse(window.localStorage.getItem('aceempsObj'));
-						objNovo['filial'].aceemps= JSON.parse(window.localStorage.getItem('aceemps'));
-
+					{						
 						window.localStorage.setItem('filialCorrente', JSON.stringify( objNovo['filial']));
 						$scope.fazenda=objNovo['filial'];
 					}
@@ -273,36 +273,6 @@
 		// QUADRA
 		//############################################################################################################################
 		
-
-		$scope.getDadosVariedade = function(obj, nomeColuna){
-			var retorno = '';
-			if(nomeColuna=='nome')
-			{
-				$scope.todasVariedades.forEach(function(item){
-					if(item.$id === obj.$id) retorno = item['nome'];
-				});
-			}
-			if(nomeColuna=='codigo')
-			{
-				$scope.todasVariedades.forEach(function(item){
-					if(item.$id === obj.$id) retorno = item['codigo'];
-				});
-			}
-			if(nomeColuna=='ativo')
-			{
-				$scope.todasVariedades.forEach(function(item){
-					if(item.$id === obj.$id) retorno = item['ativo'];
-				});
-			}
-			if(nomeColuna=='coordenadas')
-			{
-				$scope.todasVariedades.forEach(function(item){
-					if(item.$id === obj.$id) retorno = item['coordenadas'];
-				});
-			}
-			return retorno;
-		};
-
 		$scope.salvarVariedade = function(data){
 			if(validForm(data)) return false;
 			if($scope.fazenda==null) return false;
@@ -397,7 +367,7 @@
 				}
 			}
 			
-			var refVariedadeNovo = new Firebase(Constant.Url + '/variedade/'+objeto.key_filial+'/'+'/'+objeto.key);
+			var refVariedadeNovo = new Firebase(Constant.Url + '/variedade/'+$scope.fazenda.key+'/'+'/'+objeto.key);
 			refVariedadeNovo.remove();
 
 			var refFilial = new Firebase(Constant.Url + '/filial/'+$scope.fazenda.key+'/variedade'+'/'+objeto.key);
