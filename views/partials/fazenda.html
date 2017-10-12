@@ -12,7 +12,7 @@
 		</div>
 
 		<div class="row">
-			<div class="col-sm-12">
+			<div class="col-sm-6">
 				<button type="button" class="btn btn-success" ng-disabled="false" ng-show="save && objetoTelaAcesso.inclusao" ng-click="salvarFazenda(data)">Salvar</button>
 				<button type="button" class="btn btn-success" ng-show="edit && objetoTelaAcesso.edicao" ng-click="editarFazenda(data)">Atualizar</button>
 				<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar/Novo</button>
@@ -80,8 +80,12 @@
 					<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarFazenda(data)">Atualizar</button>
 					<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar/Novo</button>
 				</form>
-			</div>			
+			</div>	
+			<div class="col-sm-6">
+				<div ui-grid="gridOptions" ui-grid-selection class="gridFazenda"></div>	
+			</div>		
 		</div>
+		
 	</div>
 	<div class="modal fade" tabindex="-1" role="dialog" id="modalUsuarios">
 		<div class="modal-dialog modal-lg">

@@ -290,44 +290,7 @@
 			Constant.filialCorrente = data;
 			Constant.todosControleacessos= $scope.todosControleacessos;
 
-			$('#myPleaseWait').modal('hide');
-			$scope.menu='<nav class="navbar navbar-default navbar-fixed-top">';
-			$scope.menu+='	<div class="container-fluid">';
-			$scope.menu+='		<div class="navbar-header">';
-			$scope.menu+='			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">';
-			$scope.menu+='				<span class="sr-only">Toggle navigation</span>';
-			$scope.menu+='				<span class="icon-bar"></span>';
-			$scope.menu+='				<span class="icon-bar"></span>';
-			$scope.menu+='				<span class="icon-bar"></span>';
-			$scope.menu+='			</button>';
-			$scope.menu+='			<a class="navbar-brand"><img src="dist/img/actionbar_title.png" class="logo-actionbar_title"</a>';
-			$scope.menu+='		</div>';
-			$scope.menu+='		<div id="navbar" class="navbar-collapse collapse">';
-			$scope.menu+='			<ul class="nav navbar-nav">';
-			$scope.menu+='				<li><a href="#/home">Início</a></li>';
-
-			var oldGrupo;
-
-
-			var acessos = [];
 			var i=0;
-			if(data.aceemps.length==0)
-			{
-				$scope.todosControleacessos.forEach(function(controle){
-					$scope.todosControleacessos[i]['visualizacao']= true;
-					$scope.todosControleacessos[i]['inclusao']=true;
-					$scope.todosControleacessos[i]['edicao']= true;
-					$scope.todosControleacessos[i]['exclusao']= true;
-					i++;
-				});
-
-				acessos=$scope.todosControleacessos;
-			}
-			else
-			{
-				acessos=data.aceemps;
-			}
-			i=0;
 			$scope.todosControleacessos.forEach(function(controle){
 				$scope.todosControleacessos[i]['visualizacao']= true;
 				$scope.todosControleacessos[i]['inclusao']=true;
@@ -336,85 +299,17 @@
 				i++;
 			});
 
-
-			//window.localStorage.setItem('menu', Controleacesso.refazMenu_Acesso(acessos));
+			if(data.aceemps.length==0)
+			{
+				data.aceempsObj={};
+				$scope.todosControleacessos.forEach(function(controle){				
+					data.aceempsObj[controle.link] = controle;
+				});
+			}			
+			
 			window.localStorage.setItem('menu', Controleacesso.refazMenu_Acesso($scope.todosControleacessos));
-
-
-/*
-			i=0;
-			acessos.forEach(function(obj){
-				i++;
-				if(obj.ativo==null || obj.ativo==false || obj.visualizacao==null || obj.visualizacao==false)
-				{
-					if(acessos.length==i)
-					{
-						$scope.menu +='	</ul>';
-						$scope.menu +='</li>';
-					}
-					return;
-				}
-				if(obj.grupo)
-				{
-					if(oldGrupo!=null)
-					{
-						$scope.menu +='</ul>';
-						$scope.menu +='</li>';
-					}
-
-					oldGrupo = obj;
-
-					$scope.menu +='<li class="dropdown">';
-					$scope.menu +='		<a href="#'+ obj.link + '" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">' + obj.nome + ' <span class="caret"></span></a>';
-					$scope.menu +='		<ul class="dropdown-menu">';
-				}
-				else
-				{
-					$scope.menu +='			<li><a href="#/'+obj.link +'">'+ obj.nome +'</a></li>';
-					if(acessos.length==i)
-					{
-						$scope.menu +='	</ul>';
-						$scope.menu +='</li>';
-					}
-				}
-
-			});
-
-			$scope.menu+=	'</ul>';
-
-
-
-			$scope.menu+=	'<ul class="nav navbar-nav navbar-right">';
-			$scope.menu+=	'	<li class="dropdown">';
-			$scope.menu+=	'		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Configurações <span class="caret"></span></a>';
-			$scope.menu+=	'		<ul class="dropdown-menu">';
-			$scope.menu+=	'			<li><a href="#/perfil">Meu perfil</a></li>';
-			$scope.menu+=	'			<li><a href="#/sair">Sair</a></li>';
-			$scope.menu+=	'			<!--<li><a href="#/erros">Erros</a></li>-->';
-			$scope.menu+=	'		</ul>';
-			$scope.menu+=	'	</li>';
-			$scope.menu+=	'</ul>';
-
-			$scope.menu+=	'<ul class="nav navbar-nav navbar-right">';
-			$scope.menu+=	'	<li>';
-			$scope.menu+=	'		<div class="navFazenda" > Fazenda <select class="navFazenda select" ng-options="fazenda.nome for fazenda in fazendas" ng-model="fazenda"  ng-change="chengeFazenda(fazenda)">	</select> </div>';
-			$scope.menu+=	'	</li>';
-			$scope.menu+=	'</ul>';
-
-
-			$scope.menu+=	'</div></div></nav>';
-
-
-			Constant.menu= $scope.menu;
-			*/
-
-			Constant.todasFiliais = $scope.fazendas;
-			Constant.filialCorrente = data;
-			Constant.todosControleacessos= $scope.todosControleacessos;
-
 			window.localStorage.setItem('todasFiliais', JSON.stringify( $scope.fazendas));
 			window.localStorage.setItem('filialCorrente', JSON.stringify(data));
-			//window.localStorage.setItem('menu', $scope.menu);
 			window.localStorage.setItem('key_usuario', key_usuario);
 
 			var i=0;

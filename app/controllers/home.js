@@ -48,7 +48,7 @@ function initMap() {
 		
 
 		angular.extend($scope, {
-			versao: '2.7',
+			versao: '3.0',
 			quadras: [],
 			culturas:[],
 			vistorias:[],
@@ -115,7 +115,7 @@ function initMap() {
 		$scope.mCountTamanhos = 0;
 		$scope.mCont = 0;
 
-		//gravarAcesso();
+		gravarAcesso();
 		
 		//atualizaTodasPragas();
 
@@ -146,7 +146,6 @@ function initMap() {
 
 	$scope.chart = chart1;
 
-	$scope.myText = '<b> menu nome é jonas</b>'
 
 	$scope.aa=1*$scope.chart.data[1][1];
 	$scope.bb=1*$scope.chart.data[2][1];

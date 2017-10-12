@@ -179,8 +179,7 @@
 
 				//--------------------------------------
 				//Controle Acesso	
-				$scope.menu  = $sce.trustAsHtml(Controleacesso.refazMenu_Acesso(fazenda.aceemps));
-				$scope.objetoTelaAcesso=Controleacesso.retornaObjetoTela(fazenda.aceemps, 'safra');
+				$scope.objetoTelaAcesso=fazenda.aceempsObj.safra;
 
 				if($scope.objetoTelaAcesso==null || $scope.objetoTelaAcesso.visualizacao==null || $scope.objetoTelaAcesso.visualizacao==false)
 				{

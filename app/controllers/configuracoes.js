@@ -292,6 +292,7 @@
 			}
 			else
 			{		
+				$scope.exibePermissoes=false
 				//--------------------------------------
 				//Controle Acesso	
 				//$scope.menu  = $sce.trustAsHtml(Controleacesso.refazMenu_Acesso(fazenda.aceemps));

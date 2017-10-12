@@ -129,8 +129,7 @@
 
 				//--------------------------------------
 				//Controle Acesso	
-				$scope.menu  = $sce.trustAsHtml(Controleacesso.refazMenu_Acesso(fazenda.aceemps));
-				$scope.objetoTelaAcesso=Controleacesso.retornaObjetoTela(fazenda.aceemps, 'variedade');
+				$scope.objetoTelaAcesso=fazenda.aceempsObj.variedade;
 
 				if($scope.objetoTelaAcesso==null || $scope.objetoTelaAcesso.visualizacao==null || $scope.objetoTelaAcesso.visualizacao==false)
 				{

@@ -46,6 +46,10 @@
 		$scope.fazenda  = $scope.fazendas[$scope.posicaoFilial];
 		var key_usuario  = window.localStorage.getItem('key_usuario');
 
+
+		$scope.objetoTelaAcesso=$scope.fazenda.aceempsObj.fazenda;
+
+
 		$scope.data = $scope.fazenda;
 
 		delete $scope.data.aceemps;
@@ -414,6 +418,7 @@
 		}
 
 		atualizaListaFiliais();
+		atualizaListaFiliais2()
 
 	}
 
