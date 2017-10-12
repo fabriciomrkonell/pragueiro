@@ -4,9 +4,9 @@
 
 	angular.module('Pragueiro.controllers').registerCtrl('agendamentoCtrl', agendamentoCtrl);
 
-	agendamentoCtrl.$inject = ['$scope', '$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Notify', '$timeout', 'uiCalendarConfig'];
+	agendamentoCtrl.$inject = ['$scope', '$compile', '$sce','$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Notify', '$timeout', 'uiCalendarConfig'];
 
-	function agendamentoCtrl($scope, $firebaseArray, $firebaseObject, Session, Constant, Notify,  $compile, $timeout, uiCalendarConfig) {
+	function agendamentoCtrl($scope, $compile, $sce, $firebaseArray, $firebaseObject, Session, Constant, Notify,  $compile, $timeout, uiCalendarConfig) {
 
 		angular.extend($scope, {
 			edit: false,
@@ -21,9 +21,12 @@
 		});
 
 
-		var ref = new Firebase(Constant.Url + '/equipe');
-		$scope.todasEquipes = $firebaseArray(ref);
-		//var refFazendas = new Firebase(Constant.Url + '/filial');
+		$scope.menu  = $sce.trustAsHtml(window.localStorage.getItem('menu'));
+		$scope.fazendas  = JSON.parse(window.localStorage.getItem('todasFiliais'));
+		$scope.todasFazendasAceemps = JSON.parse(window.localStorage.getItem('todasFazendasAceemps'));
+		$scope.posicaoFilial = window.localStorage.getItem('posicaoFilial');
+		$scope.fazenda  = $scope.fazendas[$scope.posicaoFilial];
+		var key_usuario  = window.localStorage.getItem('key_usuario');
 
 		$scope.todasOrdser = [];
 		$scope.todasQuadras = [];
@@ -441,16 +444,28 @@
 			}
 			else
 			{	
-				$scope.safra = {};
-				$scope.safras = [];
-				for (var propertyName in fazenda.safra) {
-					$scope.safras.push(fazenda.safra[propertyName]);
-				}
 
-				$scope.data.safra=$scope.safras[0];
-				$scope.chengeSafra($scope.data.safra);
+			//--------------------------------------
+			//Controle Acesso	
+			fazenda.aceempsObj = $scope.todasFazendasAceemps[fazenda.key].aceempsObj;
+			$scope.objetoTelaAcesso=fazenda.aceempsObj.agendamento;
+
+			if($scope.objetoTelaAcesso==null || $scope.objetoTelaAcesso.visualizacao==null || $scope.objetoTelaAcesso.visualizacao==false)
+			{
+				window.location.href = '#home';
 			}
-		};
+			//--------------------------------------
+
+			$scope.safra = {};
+			$scope.safras = [];
+			for (var propertyName in fazenda.safra) {
+				$scope.safras.push(fazenda.safra[propertyName]);
+			}
+
+			$scope.data.safra=$scope.safras[0];
+			$scope.chengeSafra($scope.data.safra);
+		}
+	};
 		//---
 		$scope.chengeSafra = function(safra)
 		{

@@ -54,6 +54,7 @@ function showDicas()
 
 		$scope.menu  = $sce.trustAsHtml(window.localStorage.getItem('menu'));
 		$scope.fazendas  = JSON.parse(window.localStorage.getItem('todasFiliais'));
+		$scope.todasFazendasAceemps = JSON.parse(window.localStorage.getItem('todasFazendasAceemps'));
 		$scope.posicaoFilial = window.localStorage.getItem('posicaoFilial');
 		$scope.fazenda  = $scope.fazendas[$scope.posicaoFilial];
 		var key_usuario  = window.localStorage.getItem('key_usuario');
@@ -165,6 +166,10 @@ function showDicas()
 						objNovo['filial'].aceempsObj= $scope.fazendas[posicao].aceempsObj;
 						$scope.fazendas[posicao] = objNovo['filial'];
 					}
+					else
+					{
+						alert('não achou');
+					}
 
 					if(objNovo['filial'].key==$scope.fazenda.key)
 					{
@@ -173,6 +178,7 @@ function showDicas()
 
 						window.localStorage.setItem('filialCorrente', JSON.stringify( objNovo['filial']));
 						$scope.fazenda=objNovo['filial'];
+						$scope.fazenda.aceempsObj = $scope.todasFazendasAceemps[$scope.fazenda.key].aceempsObj;
 					}
 					window.localStorage.setItem('todasFiliais', JSON.stringify( $scope.fazendas));
 
@@ -184,6 +190,7 @@ function showDicas()
 
 			//--------------------------------------
 			//Controle Acesso	
+			fazenda.aceempsObj = $scope.todasFazendasAceemps[fazenda.key].aceempsObj;
 			$scope.objetoTelaAcesso=fazenda.aceempsObj.quadra;
 
 			if($scope.objetoTelaAcesso==null || $scope.objetoTelaAcesso.visualizacao==null || $scope.objetoTelaAcesso.visualizacao==false)

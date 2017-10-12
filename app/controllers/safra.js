@@ -44,6 +44,7 @@
 
 		$scope.menu  = $sce.trustAsHtml(window.localStorage.getItem('menu'));
 		$scope.fazendas  = JSON.parse(window.localStorage.getItem('todasFiliais'));
+		$scope.todasFazendasAceemps = JSON.parse(window.localStorage.getItem('todasFazendasAceemps'));
 		$scope.posicaoFilial = window.localStorage.getItem('posicaoFilial');
 		$scope.fazenda  = $scope.fazendas[$scope.posicaoFilial];
 		var key_usuario  = window.localStorage.getItem('key_usuario');
@@ -146,7 +147,7 @@
 					{
 						window.localStorage.setItem('filialCorrente', JSON.stringify( objNovo['filial']));
 						$scope.fazenda  = $scope.fazendas[$scope.posicaoFilial];
-						$scope.chengeFazenda($scope.fazenda);
+						$scope.fazenda.aceempsObj = $scope.todasFazendasAceemps[$scope.fazenda.key].aceempsObj;
 					}
 					window.localStorage.setItem('todasFiliais', JSON.stringify( $scope.fazendas));
 
@@ -162,16 +163,16 @@
 						}
 					});
 					if (posicao != null)
+					{
+						objNovo['filial'].aceempsObj= $scope.fazendas[posicao].aceempsObj;
 						$scope.fazendas[posicao] = objNovo['filial'];
+					}
 
 					if(objNovo['filial'].key==$scope.fazenda.key)
 					{
-						objNovo['filial'].aceempsObj= JSON.parse(window.localStorage.getItem('aceempsObj'));
-						objNovo['filial'].aceemps= JSON.parse(window.localStorage.getItem('aceemps'));
-						
 						window.localStorage.setItem('filialCorrente', JSON.stringify( objNovo['filial']));
-						$scope.fazenda=objNovo['filial'];
-						$scope.chengeFazenda($scope.fazenda);
+						$scope.fazenda  = $scope.fazendas[$scope.posicaoFilial];
+						$scope.fazenda.aceempsObj = $scope.todasFazendasAceemps[$scope.fazenda.key].aceempsObj;
 					}
 					window.localStorage.setItem('todasFiliais', JSON.stringify( $scope.fazendas));
 
@@ -185,6 +186,7 @@
 
 				//--------------------------------------
 				//Controle Acesso	
+				fazenda.aceemps = $scope.todasFazendasAceemps[fazenda.key].aceempsObj;
 				$scope.objetoTelaAcesso=fazenda.aceempsObj.safra;
 
 				if($scope.objetoTelaAcesso==null || $scope.objetoTelaAcesso.visualizacao==null || $scope.objetoTelaAcesso.visualizacao==false)

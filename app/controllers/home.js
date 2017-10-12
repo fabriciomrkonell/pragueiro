@@ -48,7 +48,7 @@ function initMap() {
 		
 
 		angular.extend($scope, {
-			versao: '3.0',
+			versao: '3.01',
 			quadras: [],
 			culturas:[],
 			vistorias:[],
@@ -69,6 +69,7 @@ function initMap() {
 
 		$scope.menu  = $sce.trustAsHtml(window.localStorage.getItem('menu'));
 		$scope.fazendas  = JSON.parse(window.localStorage.getItem('todasFiliais'));
+		$scope.todasFazendasAceemps = JSON.parse(window.localStorage.getItem('todasFazendasAceemps'));
 		$scope.posicaoFilial = window.localStorage.getItem('posicaoFilial');
 		$scope.fazenda  = $scope.fazendas[$scope.posicaoFilial];
 		var key_usuario  = window.localStorage.getItem('key_usuario');
@@ -327,6 +328,7 @@ function initMap() {
 				{
 					window.localStorage.setItem('filialCorrente', JSON.stringify( objNovo['filial']));
 					$scope.fazenda=objNovo['filial'];
+					$scope.fazenda.aceemps = $scope.todasFazendasAceemps[$scope.fazenda.key].aceempsObj;
 				}
 				window.localStorage.setItem('todasFiliais', JSON.stringify( $scope.fazendas));
 
@@ -412,6 +414,10 @@ function initMap() {
 
 		$scope.chengeFazenda = function(fazenda){
 			$('#myPleaseWait').modal('hide');
+			//--------------------------------------
+			//Controle Acesso	
+			fazenda.aceempsObj = $scope.todasFazendasAceemps[fazenda.key].aceempsObj;
+
 			atualizaTodasPragas(fazenda);
 
 			$scope.ordsers=[];

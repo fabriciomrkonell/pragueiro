@@ -47,6 +47,9 @@
 
 		$scope.todosControleacessos =[];
 		$scope.aceemps=[];
+
+		$scope.todasFazendasAceemps ={};
+
 		$scope.qtde_controleacesso=0;
 		$scope.qtde_controleacesso_porusuario=0;
 		$scope.qtde_filial=0;
@@ -182,6 +185,8 @@
 				if(fazenda.qtde_controleacesso_porusuario>0)
 				{
 					fazenda.aceempsObj={};
+					$scope.todasFazendasAceemps[fazenda.key]={};
+					$scope.todasFazendasAceemps[fazenda.key]['aceempsObj']={};
 					recuperaControleacessoPorUsuario(fazenda);
 				}
 				else
@@ -223,6 +228,7 @@
 				fazenda.aceemps.push(clone(objNovo));
 
 				fazenda.aceempsObj[objNovo.link] = objNovo;
+				$scope.todasFazendasAceemps[fazenda.key].aceempsObj=fazenda.aceempsObj;
 
 				var posicao;
 				$scope.todosControleacessos.forEach(function(controle){
@@ -308,10 +314,12 @@
 			}			
 			
 			window.localStorage.setItem('aceemps',  JSON.stringify(data.aceemps));		
-			
+
 			window.localStorage.setItem('aceempsObj',  JSON.stringify(data.aceempsObj));			
 			window.localStorage.setItem('menu', Controleacesso.refazMenu_Acesso($scope.todosControleacessos));			
 			window.localStorage.setItem('todasFiliais', JSON.stringify( $scope.fazendas));
+			window.localStorage.setItem('todasFazendasAceemps', JSON.stringify($scope.todasFazendasAceemps));
+
 			window.localStorage.setItem('filialCorrente', JSON.stringify(data));
 			window.localStorage.setItem('key_usuario', key_usuario);
 

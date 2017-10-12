@@ -13,6 +13,7 @@
 
 		$scope.menu  = $sce.trustAsHtml(window.localStorage.getItem('menu'));
 		$scope.fazendas  = JSON.parse(window.localStorage.getItem('todasFiliais'));
+		$scope.todasFazendasAceemps = JSON.parse(window.localStorage.getItem('todasFazendasAceemps'));
 		$scope.posicaoFilial = window.localStorage.getItem('posicaoFilial');
 		$scope.fazenda  = $scope.fazendas[$scope.posicaoFilial];
 		var key_usuario  = window.localStorage.getItem('key_usuario');	

@@ -85,6 +85,7 @@
 
 		$scope.menu  = $sce.trustAsHtml(window.localStorage.getItem('menu'));
 		$scope.fazendas  = JSON.parse(window.localStorage.getItem('todasFiliais'));
+		$scope.todasFazendasAceemps = JSON.parse(window.localStorage.getItem('todasFazendasAceemps'));
 		$scope.posicaoFilial = window.localStorage.getItem('posicaoFilial');
 		$scope.fazenda  = $scope.fazendas[$scope.posicaoFilial];
 		var key_usuario  = window.localStorage.getItem('key_usuario');
@@ -137,7 +138,8 @@
 			modifierKeysToMultiSelect : false,
 
 			columnDefs : [
-			{ field: "nome", displayName: "Nome", width: 300 }
+			{ field: "nome", displayName: "Nome", width: 300 },
+			{ field: "email", displayName: "E-mail", width: 300 }
 			],
 			appScopeProvider: {
 				mapValue: function(row) {
@@ -269,6 +271,7 @@
 
 						window.localStorage.setItem('filialCorrente', JSON.stringify( objNovo['filial']));
 						$scope.fazenda=objNovo['filial'];
+						$scope.fazenda.aceempsObj = $scope.todasFazendasAceemps[$scope.fazenda.key].aceempsObj;
 					}
 					window.localStorage.setItem('todasFiliais', JSON.stringify( $scope.fazendas));
 
@@ -287,7 +290,7 @@
 				$scope.exibePermissoes=false
 				//--------------------------------------
 				//Controle Acesso	
-				//$scope.menu  = $sce.trustAsHtml(Controleacesso.refazMenu_Acesso(fazenda.aceemps));
+				fazenda.aceempsObj = $scope.todasFazendasAceemps[fazenda.key].aceempsObj;
 				$scope.objetoTelaAcesso=Controleacesso.retornaObjetoTela(fazenda.aceemps, 'configuracoes');
 
 				if($scope.objetoTelaAcesso==null || $scope.objetoTelaAcesso.visualizacao==null || $scope.objetoTelaAcesso.visualizacao==false)
