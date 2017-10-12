@@ -98,7 +98,7 @@
 				<div class="form-group">
 
 				</div>
-				<div class="">
+				<div class="" ng-show=edit>
 
 					<div class="form-group">
 						<label>Variedades</label>
@@ -130,15 +130,15 @@
 						
 						<div class="form-group col-sm-3">
 							<label>% Germinação</label><br>
-							<input type="number" class="form-control" placeholder="%"  ng-model="formPlanejamento.perger" />
+							<input type="number" class="form-control" placeholder="%"  ng-model="formPlanejamento.perger"  ng-change="chengeStes()"/>
 						</div>
 						<div class="form-group col-sm-2">
 							<label>Pits/m<br></label>
-							<input type="number" class="form-control" placeholder="Pits"  ng-model="formPlanejamento.pitm" />
+							<input type="number" class="form-control" placeholder="Pits"  ng-model="formPlanejamento.pitm"  ng-change="chengeStes()"  />
 						</div>
 						<div class="form-group col-sm-3">
 							<label>Stes/m<br></label>
-							<input type="number" class="form-control" placeholder="Stes"  ng-model="formPlanejamento.stem" />
+							<input type="number" class="form-control" placeholder="Stes"  ng-model="formPlanejamento.stem" ng-disabled=true />
 						</div>
 						<div class="form-group col-sm-3">
 							<label>KG/ha<br></label>

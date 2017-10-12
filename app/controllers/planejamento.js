@@ -186,7 +186,7 @@
 					{
 						objNovo['filial'].aceempsObj= JSON.parse(window.localStorage.getItem('aceempsObj'));
 						objNovo['filial'].aceemps= JSON.parse(window.localStorage.getItem('aceemps'));
-						
+
 						window.localStorage.setItem('filialCorrente', JSON.stringify( objNovo['filial']));
 						$scope.fazenda=objNovo['filial'];
 					}
@@ -198,6 +198,16 @@
 		//---	
 		$scope.chengeFazenda = function(fazenda){
 			if (fazenda === null) return false;
+
+			//--------------------------------------
+			//Controle Acesso	
+			$scope.objetoTelaAcesso=fazenda.aceempsObj.planejamento;
+
+			if($scope.objetoTelaAcesso==null || $scope.objetoTelaAcesso.visualizacao==null || $scope.objetoTelaAcesso.visualizacao==false)
+			{
+				window.location.href = '#home';
+			}
+			//--------------------------------------
 
 			if(fazenda.quadra!=null)
 			{
@@ -1127,12 +1137,25 @@
 		$scope.chengeQtdeKg = function(){
 			if($scope.formPlanejamento.area!=null && $scope.formPlanejamento.kgha!=null)
 			{
-				$scope.formPlanejamento.qtdekg = $scope.formPlanejamento.area * $scope.formPlanejamento.kgha;
+				$scope.formPlanejamento.qtdekg = Number(($scope.formPlanejamento.area * $scope.formPlanejamento.kgha).toFixed(2));
 			}
 			else
 			{
 				$scope.formPlanejamento.qtdekg = null;
 			}
+		}
+
+
+		$scope.chengeStes= function(){
+			if($scope.formPlanejamento.perger!=null && $scope.formPlanejamento.pitm!=null)
+			{
+				$scope.formPlanejamento.stem =Number(((($scope.formPlanejamento.pitm * 100) / $scope.formPlanejamento.perger)).toFixed(2));
+			}
+			else
+			{
+				$scope.formPlanejamento.stem = null;
+			}
+
 		}
 
 		//############################################################################################################################

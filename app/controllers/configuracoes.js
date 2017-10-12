@@ -85,7 +85,9 @@
 
 		$scope.menu  = $sce.trustAsHtml(window.localStorage.getItem('menu'));
 		$scope.fazendas  = JSON.parse(window.localStorage.getItem('todasFiliais'));
-		$scope.fazenda  = JSON.parse(window.localStorage.getItem('filialCorrente'));
+		$scope.posicaoFilial = window.localStorage.getItem('posicaoFilial');
+		$scope.fazenda  = $scope.fazendas[$scope.posicaoFilial];
+		var key_usuario  = window.localStorage.getItem('key_usuario');
 
 		$scope.usuario_inclusao={};
 
@@ -236,52 +238,42 @@
 			console.log('atualizaListaFiliais()')
 			$('#myPleaseWait').modal('hide');
 
+			var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
+			var refNovo = new Firebase.util.NormalizedCollection(
+				[baseRef.child("/usuario/"+key_usuario+"/filial/"), "$key"],
+				baseRef.child("/filial")
+				).select(
+				{"key":"$key.$key","alias":"key"},
+				{"key":"filial.$value","alias":"filial"}
+				).ref();
 
-			return;
-
-			var refUser = new Firebase(Constant.Url + '/usuarioxauth/'+Session.getUser().uid);		
-			var obj = $firebaseObject(refUser);
-			var key_usuario;
-			obj.$loaded().then(function() {
-				key_usuario= obj.$value;
-				
-				$scope.fazendas=[];
-				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
-				var refNovo = new Firebase.util.NormalizedCollection(
-					[baseRef.child("/usuario/"+key_usuario+"/filial/"), "$key"],
-					baseRef.child("/filial")
-					).select(
-					{"key":"$key.$key","alias":"key"},
-					{"key":"filial.$value","alias":"filial"}
-					).ref();
-
-					var i=0;
-					refNovo.on('child_added', function(snap) {
-						$('#myPleaseWait').modal('hide');
-
-						console.log('Adicionou filial', snap.name(), snap.val());
-
-						var obj= snap.val();
-						$scope.fazendas.push(obj.filial);
-
-						if(i==0)
-						{
-							$scope.chengeFazenda($scope.fazendas[0]);
-							$scope.fazenda=$scope.fazendas[0];
-							recuperaConfiguracao($scope.fazendas[0]);
-						}
-						if(!$scope.$$phase) {
-							$scope.$apply();
+				refNovo.on('child_changed', function(snap) {
+					$('#myPleaseWait').modal('hide');
+					var objNovo = snap.val();
+					var posicao = null;
+					$scope.fazendas.forEach(function(obj) {
+						if (obj.key === objNovo['filial'].key) {
+							posicao = $scope.fazendas.indexOf(obj);
 						}
 					});
-
-					
-					if($scope.fazendas.length==0)
+					if (posicao != null)
 					{
-						$('#myPleaseWait').modal('hide');
+						objNovo['filial'].aceempsObj= $scope.fazendas[posicao].aceempsObj;
+						$scope.fazendas[posicao] = objNovo['filial'];
 					}
-			});// final do load
-		}		
+
+					if(objNovo['filial'].key==$scope.fazenda.key)
+					{
+						objNovo['filial'].aceempsObj= JSON.parse(window.localStorage.getItem('aceempsObj'));
+						objNovo['filial'].aceemps= JSON.parse(window.localStorage.getItem('aceemps'));
+
+						window.localStorage.setItem('filialCorrente', JSON.stringify( objNovo['filial']));
+						$scope.fazenda=objNovo['filial'];
+					}
+					window.localStorage.setItem('todasFiliais', JSON.stringify( $scope.fazendas));
+
+				});
+			}		
 
 		//---------------------
 		$scope.chengeFazenda = function(fazenda)
@@ -574,9 +566,7 @@
 			baseRef.on('child_added', function(snapshot) {
 
 				var objNovo = snapshot.val();
-				$scope.todoUsuarios.push(objNovo);
-
-				
+				$scope.todoUsuarios.push(objNovo);			
 
 
 			}, function(error) {
@@ -779,6 +769,12 @@
 		};
 
 
+		//############################################################################################################################
+		//############################################################################################################################
+		// CULTURA
+		//############################################################################################################################
+		
+
 		$scope.salvarConfcul = function(data){
 			if($scope.frmCultura.key_cultura==null) return false;
 			if($scope.fazenda==null) return false;
@@ -791,6 +787,12 @@
 			refConfiguracoes.set($scope.frmCultura);
 			Notify.successBottom('Configurações relativo a cultura atualizadas com sucesso!');
 		};
+
+		//############################################################################################################################
+		//############################################################################################################################
+		// USUARIO X FIL
+		//############################################################################################################################
+
 
 		$scope.salvarUsuarioXfil = function(usuario){
 			if(usuario==null) return false;
@@ -814,6 +816,12 @@
 			usuario = null;
 		};
 
+		//############################################################################################################################
+		//############################################################################################################################
+		// NOVO USUÁRIO
+		//############################################################################################################################
+
+
 		$scope.chamaNovoUsuario = function(){		
 			$('#modalNovoUsuario').modal('show');			
 		};
@@ -835,14 +843,18 @@
 
 					$('#myPleaseWait').modal('hide');
 				} else {
-
-					var refNovoAuth = new Firebase(Constant.Url + '/usuarioxauth/' + user.uid);
-					var foo =  {};  
-					foo [ user.uid ]  =  user.uid ; 
-					refNovoAuth.set( user.uid);
+					data['key']= user.uid;
+					if(data.key==null)
+					{
+						Notify.errorBottom('Houve um problema ao criar o usuário. Entre em contao com a equipe do Pragueiro.');
+						return;
+					}
+					var refNovoAuth = new Firebase(Constant.Url + '/usuarioxauth/' +data.key);
+					
+					refNovoAuth.set( data.key);
 
 					data['key']= user.uid;
-					var refNovo = new Firebase(Constant.Url + '/usuario/' + data.uid);
+					var refNovo = new Firebase(Constant.Url + '/usuario/' + data.key);
 					refNovo.set(data);
 
 					var refNovo = new Firebase(Constant.Url + '/filial/' + $scope.fazenda.key + '/usuario/'+data.key);
@@ -866,6 +878,12 @@
 			});
 
 		}
+
+		//############################################################################################################################
+		//############################################################################################################################
+		// ACESSOS (PERMISSOES)
+		//############################################################################################################################
+
 
 		$scope.gravarAceemp= function(aceemp)
 		{
@@ -995,158 +1013,158 @@
 
 		}
 
-	//############################################################################################################################
-	//############################################################################################################################
-	//UTEIS
-	//############################################################################################################################
+		//############################################################################################################################
+		//############################################################################################################################
+		//UTEIS
+		//############################################################################################################################
 
-	recuperaTodosUsuarios();
-	recuperaCulturaQtde();
-	recuperaControleacessoQtde();
+		recuperaTodosUsuarios();
+		recuperaCulturaQtde();
+		recuperaControleacessoQtde();
 
-	$scope.setaFazenda = function(fazenda){
-		if(fazenda === null) return false;
+		$scope.setaFazenda = function(fazenda){
+			if(fazenda === null) return false;
 
-		$scope.fazendas.forEach(function(item){
-			if(item.key === fazenda.key) 	
-			{
-				$scope.fazenda = item;		
+			$scope.fazendas.forEach(function(item){
+				if(item.key === fazenda.key) 	
+				{
+					$scope.fazenda = item;		
+				}
+			});
+
+		};
+
+		function setMessageError(message){
+			Notify.errorBottom(message);
+		};
+
+		function validForm(data){			
+			if(data.altura){
+				if(data.altura_ocorrencia==null || data.altura_ocorrencia==''){
+					setMessageError('O ocorrência de "Altura" é inválido!');
+					return true;
+				}
+				if(data.altura_ocorrencia=='INTFIX' && (data.altura_intervalo==null || data.altura_intervalo=='')){
+					setMessageError('É preciso definir o intervalo da ocorrência de "Altura"!');
+					return true;
+				}
 			}
-		});
 
-	};
+			if(data.quanos){
+				if(data.quanos_ocorrencia==null || data.quanos_ocorrencia==''){
+					setMessageError('O ocorrência de "Quantidade de nós" é inválido!');
+					return true;
+				}
+				if(data.quanos_ocorrencia=='INTFIX' && (data.quanos_intervalo==null || data.quanos_intervalo=='')){
+					setMessageError('É preciso definir o intervalo da ocorrência de "Quantidade de nós"!');
+					return true;
+				}
+			}
 
-	function setMessageError(message){
-		Notify.errorBottom(message);
-	};
+			if(data.disnos){
+				if(data.disnos_ocorrencia==null || data.disnos_ocorrencia==''){
+					setMessageError('O ocorrência de "Distância entre de nós" é inválido!');
+					return true;
+				}
+				if(data.disnos_ocorrencia=='INTFIX' && (data.disnos_intervalo==null || data.disnos_intervalo=='')){
+					setMessageError('É preciso definir o intervalo da ocorrência de "Distância entre de nós"!');
+					return true;
+				}
+			}
 
-	function validForm(data){			
-		if(data.altura){
-			if(data.altura_ocorrencia==null || data.altura_ocorrencia==''){
-				setMessageError('O ocorrência de "Altura" é inválido!');
+			if(data.quaast){
+				if(data.quaast_ocorrencia==null || data.quaast_ocorrencia==''){
+					setMessageError('O ocorrência de "Quantidade de Astes" é inválido!');
+					return true;
+				}
+				if(data.quaast_ocorrencia=='INTFIX' && (data.quaast_intervalo==null || data.quaast_intervalo=='')){
+					setMessageError('É preciso definir o intervalo da ocorrência de "Quantidade de Astes"!');
+					return true;
+				}
+			}
+
+			if(data.quavag){
+				if(data.quavag_ocorrencia==null || data.quavag_ocorrencia==''){
+					setMessageError('O ocorrência de "Quantidade de Vagem" é inválido!');
+					return true;
+				}
+				if(data.quavag_ocorrencia=='INTFIX' && (data.quavag_intervalo==null || data.quavag_intervalo=='')){
+					setMessageError('É preciso definir o intervalo da ocorrência de "Quantidade de Vagem"!');
+					return true;
+				}
+			}
+
+			if(data.altprivag){
+				if(data.altprivag_ocorrencia==null || data.altprivag_ocorrencia==''){
+					setMessageError('O ocorrência de "Altura primeira Vagem" é inválido!');
+					return true;
+				}
+				if(data.altprivag_ocorrencia=='INTFIX' && (data.altprivag_intervalo==null || data.altprivag_intervalo=='')){
+					setMessageError('É preciso definir o intervalo da ocorrência de "Altura primeira Vagem"!');
+					return true;
+				}
+			}
+
+			if(data.quagravag){
+				if(data.quagravag_ocorrencia==null || data.quagravag_ocorrencia==''){
+					setMessageError('O ocorrência de "Quantidade Grãos por Vagem" é inválido!');
+					return true;
+				}
+				if(data.quagravag_ocorrencia=='INTFIX' && (data.quagravag_intervalo==null || data.quagravag_intervalo=='')){
+					setMessageError('É preciso definir o intervalo da ocorrência de "Quantidade Grãos por Vagem"!');
+					return true;
+				}
+			}
+
+			return false;
+		};
+
+		function isEmail(email){
+			er = /^[a-zA-Z0-9][a-zA-Z0-9\._-]+@([a-zA-Z0-9\._-]+\.)[a-zA-Z-0-9]{2}/;
+			return !!er.exec(email);
+		};
+
+		function validFormUsuario(data){
+
+			if(data.nome == ''){
+				setMessageError('O campo nome é inválido!');
 				return true;
 			}
-			if(data.altura_ocorrencia=='INTFIX' && (data.altura_intervalo==null || data.altura_intervalo=='')){
-				setMessageError('É preciso definir o intervalo da ocorrência de "Altura"!');
+
+
+			if(data.senha === ''){
+				setMessageError('O campo senha é inválido!');
 				return true;
 			}
-		}
 
-		if(data.quanos){
-			if(data.quanos_ocorrencia==null || data.quanos_ocorrencia==''){
-				setMessageError('O ocorrência de "Quantidade de nós" é inválido!');
+			if(data.senha == ''){
+				setMessageError('O campo senha é obrigatório!');
 				return true;
 			}
-			if(data.quanos_ocorrencia=='INTFIX' && (data.quanos_intervalo==null || data.quanos_intervalo=='')){
-				setMessageError('É preciso definir o intervalo da ocorrência de "Quantidade de nós"!');
+
+			if(data.senha.length<6 ){
+				setMessageError('É necessário uma senha com no mínimo 6 caracteres!');
 				return true;
 			}
-		}
 
-		if(data.disnos){
-			if(data.disnos_ocorrencia==null || data.disnos_ocorrencia==''){
-				setMessageError('O ocorrência de "Distância entre de nós" é inválido!');
+			if(data.telefone === '' ||   data.telefone.length < 14){
+				setMessageError('O campo telefone é inválido!');
 				return true;
 			}
-			if(data.disnos_ocorrencia=='INTFIX' && (data.disnos_intervalo==null || data.disnos_intervalo=='')){
-				setMessageError('É preciso definir o intervalo da ocorrência de "Distância entre de nós"!');
+			if(data.cidade === ''){
+				setMessageError('O campo cidade é inválido!');
 				return true;
 			}
-		}
 
-		if(data.quaast){
-			if(data.quaast_ocorrencia==null || data.quaast_ocorrencia==''){
-				setMessageError('O ocorrência de "Quantidade de Astes" é inválido!');
-				return true;
-			}
-			if(data.quaast_ocorrencia=='INTFIX' && (data.quaast_intervalo==null || data.quaast_intervalo=='')){
-				setMessageError('É preciso definir o intervalo da ocorrência de "Quantidade de Astes"!');
-				return true;
-			}
-		}
+			return false;
+		};
 
-		if(data.quavag){
-			if(data.quavag_ocorrencia==null || data.quavag_ocorrencia==''){
-				setMessageError('O ocorrência de "Quantidade de Vagem" é inválido!');
-				return true;
-			}
-			if(data.quavag_ocorrencia=='INTFIX' && (data.quavag_intervalo==null || data.quavag_intervalo=='')){
-				setMessageError('É preciso definir o intervalo da ocorrência de "Quantidade de Vagem"!');
-				return true;
-			}
-		}
-
-		if(data.altprivag){
-			if(data.altprivag_ocorrencia==null || data.altprivag_ocorrencia==''){
-				setMessageError('O ocorrência de "Altura primeira Vagem" é inválido!');
-				return true;
-			}
-			if(data.altprivag_ocorrencia=='INTFIX' && (data.altprivag_intervalo==null || data.altprivag_intervalo=='')){
-				setMessageError('É preciso definir o intervalo da ocorrência de "Altura primeira Vagem"!');
-				return true;
-			}
-		}
-
-		if(data.quagravag){
-			if(data.quagravag_ocorrencia==null || data.quagravag_ocorrencia==''){
-				setMessageError('O ocorrência de "Quantidade Grãos por Vagem" é inválido!');
-				return true;
-			}
-			if(data.quagravag_ocorrencia=='INTFIX' && (data.quagravag_intervalo==null || data.quagravag_intervalo=='')){
-				setMessageError('É preciso definir o intervalo da ocorrência de "Quantidade Grãos por Vagem"!');
-				return true;
-			}
-		}
-
-		return false;
-	};
-
-	function isEmail(email){
-		er = /^[a-zA-Z0-9][a-zA-Z0-9\._-]+@([a-zA-Z0-9\._-]+\.)[a-zA-Z-0-9]{2}/;
-		return !!er.exec(email);
-	};
-
-	function validFormUsuario(data){
-
-		if(data.nome == ''){
-			setMessageError('O campo nome é inválido!');
-			return true;
-		}
-
-
-		if(data.senha === ''){
-			setMessageError('O campo senha é inválido!');
-			return true;
-		}
-
-		if(data.senha == ''){
-			setMessageError('O campo senha é obrigatório!');
-			return true;
-		}
-
-		if(data.senha.length<6 ){
-			setMessageError('É necessário uma senha com no mínimo 6 caracteres!');
-			return true;
-		}
-
-		if(data.telefone === '' ||   data.telefone.length < 14){
-			setMessageError('O campo telefone é inválido!');
-			return true;
-		}
-		if(data.cidade === ''){
-			setMessageError('O campo cidade é inválido!');
-			return true;
-		}
-
-		return false;
-	};
-
-	$scope.clear = function(){
-		$scope.frmCultura= {
-			abertura : false,
-			key_cultura:'',
-			altura : false,
-			altura_ocorrencia : '',
+		$scope.clear = function(){
+			$scope.frmCultura= {
+				abertura : false,
+				key_cultura:'',
+				altura : false,
+				altura_ocorrencia : '',
 				//altura_intervalo : '',
 				altura_estagio : false,
 				quanos : false,

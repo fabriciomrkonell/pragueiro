@@ -30,7 +30,7 @@
       {
         acessos.forEach(function(obj){
           i++;
-          if(obj.ativo==null || obj.ativo==false || obj.visualizacao==null || obj.visualizacao==false)
+          if(obj.ativo==null || obj.ativo==false || obj.visualizacao==null || obj.visualizacao==false || obj.app==true)
           {
             if(acessos.length==i)
             {
