@@ -5,7 +5,7 @@ if(ref.getAuth() === null) window.location.href = '/login';
 
 
 angular.module('Pragueiro.controllers', [ 'firebase', 'ngSanitize', 'googlechart',  'angularGeoFire', 
-	'ui.grid', 'ui.grid.pagination', 'ui.grid.selection', 'ui.grid.edit', 'ui.grid.resizeColumns', 'ngMap', 'checklist-model', 'angular.filter', 'ui.calendar'])
+	'ui.grid', 'ui.grid.pagination', 'ui.grid.selection', 'ui.grid.edit', 'ui.grid.resizeColumns', 'ngMap', 'checklist-model', 'angular.filter', 'ui.calendar',  'ui.grid.grouping'])
 //'uiGmapgoogle-maps'
 /*
 .config(['uiGmapGoogleMapApiProvider', function (GoogleMapApi) {
@@ -27,6 +27,10 @@ angular.module('Pragueiro.constant', []).constant('Constant', {
 		'Error: The specified password is incorrect.': 'A senha está inválida!',
 		'Error: The specified email address is already in use.': 'O endereço de email já está em uso!'
 	},
+	todosFiliais: [],
+	todosControleacessos: [],
+	filialCorrente: {},
+	menu: ''
 });
 
 

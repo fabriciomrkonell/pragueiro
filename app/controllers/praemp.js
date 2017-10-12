@@ -4,19 +4,20 @@
 
 	angular.module('Pragueiro.controllers').registerCtrl('praempCtrl', praempCtrl);
 
-	praempCtrl.$inject = ['$scope', 'Constant', 'Session', '$firebaseArray', '$firebaseObject', 'Notify', '$interval'];
+	praempCtrl.$inject = ['$scope', '$compile', '$sce', 'Constant', 'Session', '$firebaseArray', '$firebaseObject', 'Notify', '$interval', 'Controleacesso'];
 
-	function praempCtrl($scope, Constant, Session, $firebaseArray, $firebaseObject, Notify, $interval) {
+	function praempCtrl($scope, $compile,  $sce,  Constant, Session, $firebaseArray, $firebaseObject, Notify, $interval, Controleacesso) {
 
 		angular.extend($scope, {
 			edit: false,			
-			
+			save: true,
 			data: {
 				ativo:true,
 				tamanhos:false,
 				texto: ' ',
 				key_praga:'40',
 				nome_cientifico: ' ',
+				tipo:'PRA',
 				valor:[],
 				tamanho:[]
 			},
@@ -52,6 +53,12 @@
 
 		});
 
+		$scope.menu  = $sce.trustAsHtml(window.localStorage.getItem('menu'));
+		$scope.fazendas  = JSON.parse(window.localStorage.getItem('todasFiliais'));
+		$scope.posicaoFilial = window.localStorage.getItem('posicaoFilial');
+		$scope.fazenda  = $scope.fazendas[$scope.posicaoFilial];
+		var key_usuario  = window.localStorage.getItem('key_usuario');
+
 		$scope.tipos = [
 		{nome:'Praga', key:'PRA'},
 		{nome:'Doença', key:'DOE'},
@@ -69,7 +76,7 @@
 
 		$scope.tamanhos=[];
 		$scope.valor=[];
-		recuperaQtdePragaPadrao();
+		
 
 		//--
 		$scope.clonar = function(){		
@@ -292,13 +299,13 @@ Notify.successBottom('Praga clonada com sucesso!');
 
 			appScopeProvider: {
 				mapValue: function(row) {
-					return row.entity.ativo ? 'Sim' : 'Não';
+					return row.entity.ativo != null && row.entity.ativo ? 'Sim' : 'Não';
 				},
 				mapValueTamanhos: function(row) {
-					return row.entity.postam ? 'Sim' : 'Não';
+					return row.entity.postam != null && row.entity.postam ? 'Sim' : 'Não';
 				},
 				mapValueValor: function(row) {
-					return row.entity.valpre ? 'Sim' : 'Não';
+					return row.entity.valpre != null && row.entity.valpre ? 'Sim' : 'Não';
 				}
 			}
 
@@ -421,51 +428,44 @@ Notify.successBottom('Praga clonada com sucesso!');
 		{
 			$('#myPleaseWait').modal('show');
 
-			var refUser = new Firebase(Constant.Url + '/usuarioxauth/'+Session.getUser().uid);		
-			var obj = $firebaseObject(refUser);
-			var key_usuario;
-			obj.$loaded().then(function() {
-				key_usuario= obj.$value;
+			$scope.chengeFazenda($scope.fazenda);
 
-				$scope.fazendas=[];
-				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
-				var refNovo = new Firebase.util.NormalizedCollection(
-					[baseRef.child("/usuario/"+key_usuario+"/filial/"), "$key"],
-					baseRef.child("/filial")
-					).select(
-					{"key":"$key.$key","alias":"key"},
-					{"key":"filial.$value","alias":"filial"}
-					).ref();
+			var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
+			var refNovo = new Firebase.util.NormalizedCollection(
+				[baseRef.child("/usuario/"+key_usuario+"/filial/"), "$key"],
+				baseRef.child("/filial")
+				).select(
+				{"key":"$key.$key","alias":"key"},
+				{"key":"filial.$value","alias":"filial"}
+				).ref();
 
-					var i=0;
-					refNovo.on('child_added', function(snap) {
-						$('#myPleaseWait').modal('hide');
-
-						//console.log('Adicionou filial', snap.name(), snap.val());
-						var obj= snap.val();
-						$scope.fazendas.push(obj.filial);
-
-						if(i==0)
-						{
-							$scope.fazenda=$scope.fazendas[0];
-							$scope.chengeFazenda($scope.fazendas[0]);							
-						}
-						i++;
-						if(!$scope.$$phase) {
-							$scope.$apply();
+				refNovo.on('child_changed', function(snap) {
+					$('#myPleaseWait').modal('hide');
+					var objNovo = snap.val();
+					var posicao = null;
+					$scope.fazendas.forEach(function(obj) {
+						if (obj.key === objNovo['filial'].key) {
+							posicao = $scope.fazendas.indexOf(obj);
 						}
 					});
+					if (posicao != null)
+						$scope.fazendas[posicao] = objNovo['filial'];
 
-					if($scope.fazendas.length==0)
+					if(objNovo['filial'].key==$scope.fazenda.key)
 					{
-						$('#myPleaseWait').modal('hide');
+						window.localStorage.setItem('filialCorrente', JSON.stringify( objNovo['filial']));
+						$scope.fazenda=objNovo['filial'];
 					}
-			});// final do load
-		}		
+					window.localStorage.setItem('todasFiliais', JSON.stringify( $scope.fazendas));
+
+				});
+
+			}		
 
 		//---------------------
 		$scope.chengeFazenda = function(fazenda)
 		{
+			$scope.clear();
 			if(fazenda === null) 
 			{
 				$scope.todasPragas =null;
@@ -473,11 +473,31 @@ Notify.successBottom('Praga clonada com sucesso!');
 			else
 			{		
 
+				//--------------------------------------
+				//Controle Acesso	
+				$scope.menu  = $sce.trustAsHtml(Controleacesso.refazMenu_Acesso(fazenda.aceemps));
+				$scope.objetoTelaAcesso=Controleacesso.retornaObjetoTela(fazenda.aceemps, 'praemp');
+
+				if($scope.objetoTelaAcesso==null || $scope.objetoTelaAcesso.visualizacao==null || $scope.objetoTelaAcesso.visualizacao==false)
+				{
+					window.location.href = '#home';
+				}
+				//--------------------------------------
+				$scope.clear();
+				$scope.todasPragas=[];
+				$scope.todasClapras= [];
+				$scope.todasClaprasTipo = [];
+
+				$scope.gridOptions.data = $scope.todasPragas;
 
 				if(fazenda.clapraemp!=null)
 				{
 					$scope.qtde_clapras = castObjToArray(fazenda.clapraemp).length;
-					recuperaClapra(fazenda.key);
+
+				}
+				else
+				{
+					$scope.qtde_clapras=0;
 				}
 				if(fazenda.praemp!=null)
 				{
@@ -486,8 +506,9 @@ Notify.successBottom('Praga clonada com sucesso!');
 				else
 				{
 					$scope.qtde_praemp=0;
+					$('#myPleaseWait').modal('hide');
 				}
-
+				recuperaClapra(fazenda.key);
 			}
 		};
 
@@ -542,66 +563,61 @@ Notify.successBottom('Praga clonada com sucesso!');
 
 				$scope.todasPragas=[];
 
-				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
-				var refNovoQuadra = new Firebase.util.NormalizedCollection(
-					baseRef.child("/filial/"+fazenda.key+"/praemp"),
-					[baseRef.child("/praemp/"+fazenda.key), "$key"]
-					).select(
-					{"key":"praemp.$value","alias":"filial"},
-					{"key":"$key.$value","alias":"praemps"}
-					).ref();
+				var baseRef = new Firebase(Constant.Url + "/praemp/"+fazenda.key);
+				
 
+				var i=1;
+				baseRef.on('child_added', function(snap) {
 
-					var i=1;
-					refNovoQuadra.on('child_added', function(snap) {
+					var objNovo= snap.val();
+					$scope.todasPragas.push(objNovo);
+					if(!$scope.$$phase) {
+						$scope.$apply();
+					}
+					$scope.gridOptions.data = $scope.todasPragas;
 
-						var objNovo= snap.val();
-						$scope.todasPragas.push(objNovo['praemps']);
-						if(!$scope.$$phase) {
-							$scope.$apply();
-						}
-						$scope.gridOptions.data = $scope.todasPragas;
-
-						if($scope.todasPragas.length==$scope.qtde_praemp)
-						{
-							$('#myPleaseWait').modal('hide');
-						}
-					});
-
-					refNovoQuadra.on('child_changed', function(snap) {
+					if($scope.todasPragas.length>=$scope.qtde_praemp)
+					{
 						$('#myPleaseWait').modal('hide');
-						var objNovo = snap.val();
-						var posicao = null;
-						$scope.todasPragas.forEach(function(obj) {
-							if (obj.key === objNovo['praemps'].key) {
-								posicao = $scope.todasPragas.indexOf(obj);
-							}
-						});
-						if (posicao != null)
-							$scope.todasPragas[posicao] = objNovo['praemps'];
+					}
+				});
 
-						if (!$scope.$$phase) {
-							$scope.$apply();
+				baseRef.on('child_changed', function(snap) {
+					$('#myPleaseWait').modal('hide');
+					var objNovo = snap.val();
+					var posicao = null;
+					$scope.todasPragas.forEach(function(obj) {
+						if (obj.key === objNovo.key) {
+							posicao = $scope.todasPragas.indexOf(obj);
 						}
 					});
+					if (posicao != null)
+						$scope.todasPragas[posicao] = objNovo;
 
-					refNovoQuadra.on('child_removed', function(snap) {
-						var posicao = null;
-						$scope.todasPragas.forEach(function(obj) {
-							if (obj.key == snap.key()) {
-								posicao = $scope.todasPragas.indexOf(obj);
-							}
-						});
-						if (posicao != null)
-							delete $scope.todasPragas[posicao];
+					if (!$scope.$$phase) {
+						$scope.$apply();
+					}
+				});
 
-						$scope.gridOptions.data = $scope.todasPragas;
+				baseRef.on('child_removed', function(snap) {
+					var posicao = null;
+					$scope.todasPragas.forEach(function(obj) {
+						if (obj.key == snap.key()) {
+							posicao = $scope.todasPragas.indexOf(obj);
+						}
 					});
-				}
-			};
+					if (posicao != null)
+						delete $scope.todasPragas[posicao];
+
+					$scope.gridOptions.data = $scope.todasPragas;
+				});
+			}
+		};
 
 		//---------------------
 		function recuperaClapra(key_fazenda) {
+
+
 
 			var baseRef2 = new Firebase(Constant.Url+'/clapraemp/'+key_fazenda);
 
@@ -610,8 +626,10 @@ Notify.successBottom('Praga clonada com sucesso!');
 				var objNovo3 = snapshot3.val();
 				$scope.todasClapras.push(objNovo3);		
 
-				if(	$scope.qtde_clapras-1==$scope.todasClapras.length)
+				if(	$scope.qtde_clapras==$scope.todasClapras.length)
 				{
+					$scope.changeTipo();
+
 					$scope.buscaPragas($scope.fazenda);
 					if(!$scope.$$phase) {
 						$scope.$apply();
@@ -842,6 +860,44 @@ Notify.successBottom('Praga clonada com sucesso!');
 					$scope.todasClaprasTipo.push(obj);
 				}
 			});
+		}
+
+		$scope.chamaClonar = function()
+		{
+			$('#modalClonar').modal('show');
+		}
+
+		$scope.clonar = function()
+		{	
+			if($scope.fazendaCopia==null)
+			{
+				Notify.errorBottom('É preciso selecionar uma fazenda!');
+				return;
+			}
+
+			if($scope.fazendaCopia.key == $scope.fazenda.key)
+			{
+				Notify.errorBottom('É preciso selecionar uma fazenda diferente da atual!');
+				return;
+			}
+
+
+			$scope.todasPragas.forEach(function(obj){
+				var classeClonada = clone(obj);
+
+				delete classeClonada.$$hashKey;	
+
+				var refClapra= new Firebase(Constant.Url + '/praemp/' + $scope.fazendaCopia.key + '/' + classeClonada.key  );
+
+				refClapra.set(classeClonada);
+
+				var refFilial = new Firebase(Constant.Url + '/filial/'+$scope.fazendaCopia.key + '/praemp/'+classeClonada.key);
+				refFilial.set(true);
+			});
+
+			Notify.successBottom('Pragas copiadas com sucesso!');
+
+			$('#modalClonar').modal('hide');
 		}
 		//############################################################################################################################
 		//############################################################################################################################
@@ -1338,7 +1394,6 @@ Notify.successBottom('Praga clonada com sucesso!');
 		//UTEIS
 		//############################################################################################################################
 
-
 		function setMessageError(message){
 			Notify.errorBottom(message);
 		};
@@ -1522,7 +1577,6 @@ Notify.successBottom('Praga clonada com sucesso!');
 			$scope.data.descricao='';
 			$scope.data.nome_cientifico=' ';
 			$scope.data.img='';
-			//$scope.data.key_clapra='';
 			$scope.data.key_praga='40';
 			$scope.data.ativo=true;
 			$scope.data.codigo='';
@@ -1541,12 +1595,15 @@ Notify.successBottom('Praga clonada com sucesso!');
 			if(!$scope.$$phase) {
 				$scope.$apply();
 			}
-			//$scope.chengeFazenda($scope.fazenda);
-			//$scope.data.fazenda=fazendaTmp;
 		};
 		
 
-		//$scope.clear();
+		//############################################################################################################################
+		//############################################################################################################################
+		//INICIA TUDO
+		//############################################################################################################################
+
+		recuperaQtdePragaPadrao();
 
 	}
 

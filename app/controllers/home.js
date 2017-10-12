@@ -41,10 +41,11 @@ function initMap() {
 
 	angular.module('Pragueiro.controllers').registerCtrl('homeCtrl', homeCtrl);
 
-	homeCtrl.$inject = ['$scope', 'Constant', 'Session', '$firebaseArray', '$firebaseObject', 'Notify', '$routeParams', '$geofire', 'NgMap', '$location', '$anchorScroll', '$window'];
+	homeCtrl.$inject = [ '$scope', '$compile', '$sce', 'Constant', 'Session', '$firebaseArray', '$firebaseObject', 'Notify', '$routeParams', '$geofire', 'NgMap', '$location', '$anchorScroll', '$window'];
 
-	function homeCtrl($scope, Constant, Session, $firebaseArray, $firebaseObject, Notify, $routeParams,  $geofire, NgMap, $location, $anchorScroll, $window) {
+	function homeCtrl($scope, $compile, $sce, Constant, Session, $firebaseArray, $firebaseObject, Notify, $routeParams,  $geofire, NgMap, $location, $anchorScroll, $window) {
 
+		
 
 		angular.extend($scope, {
 			versao: '2.7',
@@ -60,6 +61,19 @@ function initMap() {
 			selecionarTodasQuadras : true
 
 		});
+
+
+		$scope.renderHtml = function(html) {
+			return html;
+		};
+
+		$scope.menu  = $sce.trustAsHtml(window.localStorage.getItem('menu'));
+		$scope.fazendas  = JSON.parse(window.localStorage.getItem('todasFiliais'));
+		$scope.posicaoFilial = window.localStorage.getItem('posicaoFilial');
+		$scope.fazenda  = $scope.fazendas[$scope.posicaoFilial];
+		var key_usuario  = window.localStorage.getItem('key_usuario');
+
+
 		$scope.formMapa = {
 			quadras: []
 		};
@@ -96,18 +110,13 @@ function initMap() {
 		$scope.myNumber = 5;
 		$scope.table_pronta=false;
 		$scope.todascoordenadasCentroidMapaInfestacao=[];
-
-
-
-
-
+		$scope.todosControleacessos =[];
+		
 		$scope.mCountTamanhos = 0;
 		$scope.mCont = 0;
 
-		gravarAcesso();
-		atualizaListaFiliais();
-		atualizaCulturas();
-		atualizaUsuarios();
+		//gravarAcesso();
+		
 		//atualizaTodasPragas();
 
 		var chart1 = {};
@@ -137,6 +146,8 @@ function initMap() {
 
 	$scope.chart = chart1;
 
+	$scope.myText = '<b> menu nome é jonas</b>'
+
 	$scope.aa=1*$scope.chart.data[1][1];
 	$scope.bb=1*$scope.chart.data[2][1];
 	$scope.cc=1*$scope.chart.data[3][1];
@@ -153,6 +164,7 @@ function initMap() {
 
 	function gravarAcesso()
 	{
+		console.log('gravarAcesso');
 		if(Session.getUser().uid!=null)
 		{
 			var refAcessos = new Firebase(Constant.Url + '/informacoes/' + Session.getUser().uid + '/acessos_web' );
@@ -169,9 +181,9 @@ function initMap() {
 		}
 	}
 
-
 	function atualizaCulturas()
 	{
+		console.log('atualizaCulturas');
 		var refCultura = new Firebase(Constant.Url + '/cultura');
 		refCultura.ref().on('child_added', function(snap) {
 			$scope.culturas.push(snap.val());
@@ -180,6 +192,7 @@ function initMap() {
 
 	function atualizaVariedade(key_filial)
 	{
+		console.log('atualizaVariedade');
 		var refVariedades = new Firebase(Constant.Url + '/variedade/'+ key_filial);
 		refVariedades.ref().on('child_added', function(snap) {
 			$scope.variedades.push(snap.val());
@@ -188,6 +201,7 @@ function initMap() {
 
 	function atualizaUsuarios()
 	{
+		console.log('atualizaUsuarios');
 		var refUsuarios= new Firebase(Constant.Url + '/usuario');
 		refUsuarios.ref().on('child_added', function(snap) {
 			$scope.usuarios.push(snap.val());
@@ -196,6 +210,7 @@ function initMap() {
 
 	function atualizaPragas()
 	{
+		console.log('atualizaPragas');
 		var refPraga= new Firebase(Constant.Url + '/praga');
 		refPraga.ref().on('child_added', function(snap) {
 
@@ -233,10 +248,11 @@ function initMap() {
 
 	function atualizaTodasPragas(fazenda)
 	{
+		console.log('atualizaTodasPragas');
 		$scope.todasPragas=[];
 		var refPraga= new Firebase(Constant.Url + '/praemp/' + fazenda.key );
 		refPraga.ref().on('child_added', function(snap) {
-
+			$('#myPleaseWait').modal('hide');
 			var praga=snap.val();
 			var count_tamanho=0;
 			var tamanhos=[];
@@ -279,131 +295,176 @@ function initMap() {
 	//############################################################################################################################
 	// FAZENDA/FILIAL
 	//############################################################################################################################
-
 	function atualizaListaFiliais()
 	{
-		$('#myPleaseWait').modal('show');
-		var refUser = new Firebase(Constant.Url + '/usuarioxauth/'+Session.getUser().uid);		
-		var obj = $firebaseObject(refUser);
-		var key_usuario;
-		obj.$loaded().then(function() {
-			key_usuario= obj.$value;
+		console.log('atualizaListaFiliais');
 
-			$scope.fazendas=[];
-			var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
-			var refNovo = new Firebase.util.NormalizedCollection(
-				[baseRef.child("/usuario/"+key_usuario+"/filial/"), "$key"],
-				baseRef.child("/filial")
-				).select(
-				{"key":"$key.$value","alias":"usuario"},
-				{"key":"filial.$value","alias":"filial"}
-				).ref();
+		if(!$('#myPleaseWait').hasClass('in')){ $('#myPleaseWait').modal('show')};
 
-				var i=0;
+		$scope.chengeFazenda($scope.fazenda);			
 
-				refNovo.on('child_added', function(snap) {
+		var baseRef = new Firebase(Constant.Url);
+		var refNovo = new Firebase.util.NormalizedCollection(
+			[baseRef.child("/usuario/"+key_usuario+"/filial/"), "$key"],
+			baseRef.child("/filial")
+			).select(
+			{"key":"$key.$key","alias":"key"},
+			{"key":"filial.$value","alias":"filial"}
+			).ref();
 
-					$('#myPleaseWait').modal('hide');
-					var obj= snap.val();
-					$scope.fazendas.push(obj.filial);
-
-					if(i==0)
-					{
-
-						$scope.chengeFazenda($scope.fazendas[0]);
-						$scope.fazenda=$scope.fazendas[0];
-					}
-
-					if(!$scope.$$phase) {
-						$scope.$apply();
+			refNovo.on('child_changed', function(snap) {
+				$('#myPleaseWait').modal('hide');
+				var objNovo = snap.val();
+				var posicao = null;
+				$scope.fazendas.forEach(function(obj) {
+					if (obj.key === objNovo['filial'].key) {
+						posicao = $scope.fazendas.indexOf(obj);
 					}
 				});
+				if (posicao != null)
+					$scope.fazendas[posicao] = objNovo['filial'];
 
-				refNovo.on('child_changed', function(snap) {
-					var objNovo= snap.val();
+				if(objNovo['filial'].key==$scope.fazenda.key)
+				{
+					window.localStorage.setItem('filialCorrente', JSON.stringify( objNovo['filial']));
+					$scope.fazenda=objNovo['filial'];
+				}
+				window.localStorage.setItem('todasFiliais', JSON.stringify( $scope.fazendas));
 
-					var x=0;
-					var posicao=null;
-					$scope.fazendas.forEach(function(obj){
-						if(obj.key === objNovo.filial.key)
-						{ 
-							posicao=x;
+			});
+		}	
+
+		//---	
+
+		function atualizaListaFiliais2()
+		{
+
+			return;
+			var refUser = new Firebase(Constant.Url + '/usuarioxauth/'+Session.getUser().uid);		
+			var obj = $firebaseObject(refUser);
+			var key_usuario;
+			obj.$loaded().then(function() {
+				key_usuario= obj.$value;
+
+				$scope.fazendas=[];
+				var baseRef = new Firebase(Constant.Url);
+				var refNovo = new Firebase.util.NormalizedCollection(
+					[baseRef.child("/usuario/"+key_usuario+"/filial/"), "$key"],
+					baseRef.child("/filial")
+					).select(
+					{"key":"$key.$value","alias":"usuario"},
+					{"key":"filial.$value","alias":"filial"}
+					).ref();
+
+					var i=0;
+
+					refNovo.on('child_added', function(snap) {
+
+						$('#myPleaseWait').modal('hide');
+						var obj= snap.val();
+						$scope.fazendas.push(obj.filial);
+
+						if(i==0)
+						{
+
+							$scope.chengeFazenda($scope.fazendas[0]);
+							$scope.fazenda=$scope.fazendas[0];
 						}
-						x++;
+
+						if(!$scope.$$phase) {
+							$scope.$apply();
+						}
+					});
+
+					refNovo.on('child_changed', function(snap) {
+						var objNovo= snap.val();
+
+						var x=0;
+						var posicao=null;
+						$scope.fazendas.forEach(function(obj){
+							if(obj.key === objNovo.filial.key)
+							{ 
+								posicao=x;
+							}
+							x++;
+
+						});
+						if(posicao!=null)
+							$scope.fazendas[posicao]=objNovo.filial;
 
 					});
-					if(posicao!=null)
-						$scope.fazendas[posicao]=objNovo.filial;
 
+					refNovo.on('child_removed', function(snap) {
+						atualizaListaFiliais();
+					});
+					if($scope.fazendas.length==0)
+					{
+						$('#myPleaseWait').modal('hide');
+					}
 				});
+		}		
 
-				refNovo.on('child_removed', function(snap) {
-					atualizaListaFiliais();
-				});
-				if($scope.fazendas.length==0)
-				{
-					$('#myPleaseWait').modal('hide');
-				}
-			});
-	}		
-
-	$scope.chengeSafra = function(){
-		atualizaListaQuadras();
-	};
-
-	$scope.chengeFazenda = function(fazenda){
-
-		atualizaTodasPragas(fazenda);
-
-		$scope.ordsers=[];
-
-		var refOrdser = new Firebase(Constant.Url + '/ordser/' + fazenda.key);
-
-		refOrdser.on('child_added', function(snap) {
+		$scope.chengeSafra = function(){			
+			$scope.table_pronta=false;
+			$scope.vistorias=[];
 			$('#myPleaseWait').modal('hide');
-			var objNovo = snap.val();
-			var x = 0;
-			var posicao = null;
-			$scope.ordsers.forEach(function(obj) {
-				if (obj.key === objNovo.key) {
-					posicao = x;
+			atualizaListaQuadras();
+		};
+
+		$scope.chengeFazenda = function(fazenda){
+			$('#myPleaseWait').modal('hide');
+			atualizaTodasPragas(fazenda);
+
+			$scope.ordsers=[];
+			$scope.vistorias=[];
+
+			var refOrdser = new Firebase(Constant.Url + '/ordser/' + fazenda.key);
+
+			refOrdser.on('child_added', function(snap) {
+				$('#myPleaseWait').modal('hide');
+				var objNovo = snap.val();
+				var x = 0;
+				var posicao = null;
+				$scope.ordsers.forEach(function(obj) {
+					if (obj.key === objNovo.key) {
+						posicao = x;
+					}
+					x++;
+
+				});
+				if (posicao == null && objNovo.aplagr) {
+					$scope.ordsers.push(objNovo);
 				}
-				x++;
-
+				if (!$scope.$$phase) {
+					$scope.$apply();
+				}
 			});
-			if (posicao == null && objNovo.aplagr) {
-				$scope.ordsers.push(objNovo);
-			}
-			if (!$scope.$$phase) {
-				$scope.$apply();
-			}
-		});
-	};
+		};
 
-	$scope.setaFazenda = function(fazenda){
-		if(fazenda === null) return false;
+		$scope.setaFazenda = function(fazenda){
+			if(fazenda === null) return false;
 
-		$scope.fazendas.forEach(function(item){
-			if(item.key === fazenda.key) 	
+			$scope.fazendas.forEach(function(item){
+				if(item.key === fazenda.key) 	
+				{
+					$scope.data.fazenda = item;		
+				}
+			});
+		};
+
+		$scope.addPragasEncontradas = function(praga){
+			var encontrou=false;
+			$scope.pragasEncontradasGeral.forEach(function(item){
+				if(item.key === praga.key) 	
+				{
+					encontrou=true;	
+				}
+			});
+			if(!encontrou)
 			{
-				$scope.data.fazenda = item;		
-			}
-		});
-	};
-
-	$scope.addPragasEncontradas = function(praga){
-		var encontrou=false;
-		$scope.pragasEncontradasGeral.forEach(function(item){
-			if(item.key === praga.key) 	
-			{
-				encontrou=true;	
-			}
-		});
-		if(!encontrou)
-		{
-			$scope.pragasEncontradasGeral.push(praga);
-		}	
-	};
+				$scope.pragasEncontradasGeral.push(praga);
+			}	
+		};
 
 
 
@@ -414,6 +475,8 @@ function initMap() {
 
 	function adicionaValores(vistoriaExistente, vistoriaNova)
 	{
+		console.log('adicionaValores');
+
 		if(vistoriaExistente.valores==null) //A lista de valores é nulo, é o primeiro
 		{
 			vistoriaExistente['valores']=[];
@@ -451,16 +514,13 @@ function initMap() {
 
 	function percorrePragas(lista_agrupada)
 	{
+		console.log('percorrePragas');
 
 		var pragas_com_valor=[];
 		var i=0;
 
 		$scope.todasPragas.forEach(function(objPraga)
-		{
-			if(objPraga.key=='37')
-			{
-				console.log('achou');
-			}
+		{			
 			var pragaAtualizada=clone(objPraga);
 			var count_tamanho=0;
 			pragaAtualizada.index = pragas_com_valor.length;
@@ -494,7 +554,7 @@ function initMap() {
 							}
 							else
 							{
-								console.log('teste na praga');
+								
 							}
 						}
 					});
@@ -537,7 +597,6 @@ function initMap() {
 						else
 						{
 							
-							console.log('teste na praga');
 							var str_valores='';
 							var x=0;
 							objInterno_lista.valores.forEach(function(objValor){
@@ -571,6 +630,10 @@ function initMap() {
 
 	function percorreVistorias(obj2, variedade)
 	{
+		console.log('percorreVistorias');
+
+		if(!$('#myPleaseWait').hasClass('in')){ $('#myPleaseWait').modal('show')};
+		
 		var obj=clone(obj2);
 		if(variedade!=null)
 		{
@@ -625,8 +688,7 @@ function initMap() {
 				var contadorVisdia=0;
 				for(var vis_det in vistoria_dia_praga )
 				{
-					console.log('variedade: ' + vistoria_dia_praga[vis_det].key_variedade );
-
+					
 					if(variedade==null && vistoria_dia_praga[vis_det].key_variedade!=null)
 					{
 						for(var obj_variedades_cultura in $scope.variedades) 
@@ -644,13 +706,7 @@ function initMap() {
 							}
 							break;
 						}
-					}
-
-
-					if(vistoria_dia_praga[vis_det].key =='-KvCItI8hulp8yIjicxs')
-					{
-						console.log('val pre');
-					}
+					}					
 
 					if(contadorVisdia==0)
 					{
@@ -823,10 +879,13 @@ function initMap() {
 	//---
 	function atualizaVistorias()
 	{
+		console.log('atualizaVistorias');
+
+		$('#myPleaseWait').modal('hide');
 		var count_geral_id=0;
 		$scope.vistorias=[];
 		$scope.pragas_com_valor=[];
-		var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
+		var baseRef = new Firebase(Constant.Url);
 		var refVis = new Firebase.util.NormalizedCollection(
 			[baseRef.child("/vistoria/"+$scope.fazenda.key+"/"+$scope.safra.key+"/"), "$key"],
 			baseRef.child("/quadra")
@@ -834,102 +893,100 @@ function initMap() {
 			{"key":"$key.$value","alias":"vistoria"},
 			{"key":"quadra.$value","alias":"quadra"}
 			).ref();
-				//----	
-				refVis.ref().on('child_added', function(snap) 
+			refVis.ref().on('child_added', function(snap) 
+			{
+				if(!$('#myPleaseWait').hasClass('in')){ $('#myPleaseWait').modal('show')};
+				var obj2= snap.val();
+
+				var mListVariedades=[];
+				for(var itemQuadraXsafra in $scope.quadras )
 				{
-					var obj2= snap.val();
-					if(obj2.quadra.key!='-KPlzmSgB2mTl0ja07P1')
+					if(obj2.quadra!=null && $scope.quadras[itemQuadraXsafra].quadraxcultura.key==obj2.quadra.key)
 					{
-						//return;
-					}
-					var mListVariedades=[];
-					for(var itemQuadraXsafra in $scope.quadras )
-					{
-						if(obj2.quadra!=null && $scope.quadras[itemQuadraXsafra].quadraxcultura.key==obj2.quadra.key)
-						{
-							obj2.quadra.ativo=$scope.quadras[itemQuadraXsafra].quadraxcultura.ativo;
-							obj2.quadra['key_cultura']=$scope.quadras[itemQuadraXsafra].quadraxcultura.key_cultura;
-							if($scope.quadras[itemQuadraXsafra].quadraxcultura.hasOwnProperty("separar_variedade")){
+						obj2.quadra.ativo=$scope.quadras[itemQuadraXsafra].quadraxcultura.ativo;
+						obj2.quadra['key_cultura']=$scope.quadras[itemQuadraXsafra].quadraxcultura.key_cultura;
+						if($scope.quadras[itemQuadraXsafra].quadraxcultura.hasOwnProperty("separar_variedade")){
 
-								if($scope.quadras[itemQuadraXsafra].quadraxcultura.separar_variedade==true)
-								{
-									for(var var_quadraxsafra in $scope.quadras[itemQuadraXsafra].quadraxcultura.variedades ){
-										console.log("teste");
-										mListVariedades.push(var_quadraxsafra);
-									}
-								}
-							}
-							break;
-						}
-					}
-
-					if(obj2.quadra!=null &&  $scope.fazenda.mosdes==true || (obj2.quadra.ativo!=null && obj2.quadra.ativo==true))
-					{
-						if(obj2.quadra.ativo==false)
-						{
-							return;
-						}
-						//----
-						//SEPARA POR VARIEDADE, FAZ DESSE JEITO
-						if(mListVariedades.length>0)//SEPARA POR VARIEDADE, FAZ DESSE JEITO
-						{
-							for(var keyVar in mListVariedades) 
+							if($scope.quadras[itemQuadraXsafra].quadraxcultura.separar_variedade==true)
 							{
-
-								var obj=clone(obj2);
-								for(var obj_variedades_cultura in $scope.variedades) 
-								{
-									var obj_varCul=$scope.variedades[obj_variedades_cultura];
-									for(var obj_variedades in obj_varCul) 
-									{
-										{
-											if(obj_varCul[obj_variedades].key == mListVariedades[keyVar])
-											{ 
-												//obj.quadra.nome=obj.quadra.nome + ' - ' + obj_varCul[obj_variedades].nome;
-												obj['variedade']=obj_varCul[obj_variedades];
-												break;
-											}
-										};
-									}
-									break;
+								for(var var_quadraxsafra in $scope.quadras[itemQuadraXsafra].quadraxcultura.variedades ){
+									mListVariedades.push(var_quadraxsafra);
 								}
-
-								var count_usuarios=0;
-								var objeto_vistoria={};
-								objeto_vistoria.quadra = clone(obj.quadra);
-								objeto_vistoria.vistoria=obj.vistoria[mListVariedades[keyVar]];
-
-								percorreVistorias(objeto_vistoria, obj.variedade);
 							}
 						}
-						else //NÃO SEPARA VARIEDADE
-						{
-							percorreVistorias(obj2, null);
-						}
-
-						if($scope.exibirSomenteEn)
-						{
-							$scope.pragasExibir=$scope.pragasEncontradasGeral;
-						}
-						else
-						{
-							$scope.pragasExibir=$scope.todasPragas;
-						}
-
-						//FIM-----------DIA---------------------------------------------------------
-						$scope.vistorias.sort(compareData);
-						$scope.table_pronta=true;
-						if(!$scope.$$phase) {
-							$scope.$apply();
-						}
-
+						break;
 					}
-					return;
+				}
+
+				if(obj2.quadra!=null &&  $scope.fazenda.mosdes==true || (obj2.quadra.ativo!=null && obj2.quadra.ativo==true))
+				{
+					if(obj2.quadra.ativo==false)
+					{
+						return;
+					}
+					//----
+					//SEPARA POR VARIEDADE, FAZ DESSE JEITO
+					if(mListVariedades.length>0)//SEPARA POR VARIEDADE, FAZ DESSE JEITO
+					{
+						for(var keyVar in mListVariedades) 
+						{
+
+							var obj=clone(obj2);
+							for(var obj_variedades_cultura in $scope.variedades) 
+							{
+								var obj_varCul=$scope.variedades[obj_variedades_cultura];
+								for(var obj_variedades in obj_varCul) 
+								{
+									{
+										if(obj_varCul[obj_variedades].key == mListVariedades[keyVar])
+										{ 
+											//obj.quadra.nome=obj.quadra.nome + ' - ' + obj_varCul[obj_variedades].nome;
+											obj['variedade']=obj_varCul[obj_variedades];
+											break;
+										}
+									};
+								}
+								break;
+							}
+
+							var count_usuarios=0;
+							var objeto_vistoria={};
+							objeto_vistoria.quadra = clone(obj.quadra);
+							objeto_vistoria.vistoria=obj.vistoria[mListVariedades[keyVar]];
+
+							percorreVistorias(objeto_vistoria, obj.variedade);
+						}
+					}
+					else //NÃO SEPARA VARIEDADE
+					{
+						percorreVistorias(obj2, null);
+					}
+
+					if($scope.exibirSomenteEn)
+					{
+						$scope.pragasExibir=$scope.pragasEncontradasGeral;
+					}
+					else
+					{
+						$scope.pragasExibir=$scope.todasPragas;
+					}
+
+					//FIM-----------DIA---------------------------------------------------------
+					$scope.vistorias.sort(compareData);
+					$scope.table_pronta=true;
+					if(!$scope.$$phase) {
+						$scope.$apply();
+					}
+					
+
+				}
+				$('#myPleaseWait').modal('hide');
+				return;
 
 
-				});
+			});
 
-			}
+		}
 
 	//############################################################################################################################
 	//############################################################################################################################
@@ -938,69 +995,41 @@ function initMap() {
 
 	function atualizaListaQuadras()
 	{
+		console.log('atualizaListaQuadras');
+
 		if($scope.safra==null) return;
 		atualizaVariedade($scope.fazenda.key);
-		$('#myPleaseWait').modal('show');
-		var refUser = new Firebase(Constant.Url + '/usuarioxauth/'+Session.getUser().uid);		
-		var obj = $firebaseObject(refUser);
-		var key_usuario;
-		obj.$loaded().then(function() {
-			key_usuario= obj.$value;
 
-			$scope.quadras=[];
-			var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
-			var refNovo = new Firebase.util.NormalizedCollection(
-				[baseRef.child("/filial/"+$scope.fazenda.key+"/safra/"+$scope.safra.key+"/quadra"), "quadraxcul"],
-				baseRef.child("/quadra")
-					//,baseRef.child("/coordenada")
-					).select(
-					{"key":"quadraxcul.$value","alias":"quadraxcultura"},
-					{"key":"quadra.$value","alias":"quadra"}
-					//,{"key":"coordenada.$value","alias":"listCoordenadas"}
-					).ref();
+		if($scope.fazenda.quadra==null || $scope.fazenda.quadra.length==0)
+		{
+			$('#myPleaseWait').modal('hide');
+		}
 
-					refNovo.on('child_added', function(snap) {
-						$('#myPleaseWait').modal('hide');
-						//console.log('Adicionou filial', snap.name(), snap.val());
+		$scope.quadras=[];
+		var baseRef = new Firebase(Constant.Url);
+		var refNovo = new Firebase.util.NormalizedCollection(
+			[baseRef.child("/filial/"+$scope.fazenda.key+"/safra/"+$scope.safra.key+"/quadra"), "quadraxcul"],
+			baseRef.child("/quadra")
+			).select(
+			{"key":"quadraxcul.$value","alias":"quadraxcultura"},
+			{"key":"quadra.$value","alias":"quadra"}
+			).ref();
 
-						var obj= snap.val();
-						obj.cultura=$scope.getCulturaNome(obj.quadraxcultura.key_cultura)
-						$scope.quadras.push(obj);
-						$scope.formMapa.quadras.push(obj.quadra);
-						//atualizaCoordenadasQuadra(obj.quadra.key)
-						if($scope.quadras.length==1)
-						{
-							atualizaVistorias();
-						}
+			refNovo.on('child_added', function(snap) {
+				
 
-					});
+				var obj= snap.val();
+				obj.cultura=$scope.getCulturaNome(obj.quadraxcultura.key_cultura)
+				$scope.quadras.push(obj);
+				$scope.formMapa.quadras.push(obj.quadra);
+				if($scope.quadras.length==1)
+				{
+					atualizaVistorias();
+				}
 
-					refNovo.on('child_changed', function(snap) {
-						//console.log('Houve uma atualização', snap.name(), snap.val());
-						var objNovo= snap.val();
+			});				
 
-						var x=0;
-						var posicao=null;
-						$scope.quadras.forEach(function(obj){
-							if(obj.key === objNovo.quadra.key)
-							{ 
-								posicao=x;
-							}
-							x++;
-
-						});
-						if(posicao!=null)
-							$scope.quadras[posicao]=objNovo.quadra;
-
-					});
-
-					refNovo.on('child_removed', function(snap) {
-						//console.log('Houve uma remoção', snap.name(), snap.val());
-						atualizaListaFiliais();
-					});
-					
-			});// final do load1
-	}
+		}
 
 	//############################################################################################################################
 	//############################################################################################################################
@@ -1013,6 +1042,8 @@ function initMap() {
 
 	$scope.pragaAnterior=function()
 	{
+		console.log('pragaAnterior');
+
 		contador_anterior=0;
 		$scope.pragasExibir.forEach(function(obj)
 		{
@@ -1036,6 +1067,9 @@ function initMap() {
 
 	$scope.pragaProxima=function()
 	{
+
+		console.log('pragaProxima');
+
 		$scope.pragasExibir.forEach(function(obj)
 		{
 			if(proximo)
@@ -1063,6 +1097,8 @@ function initMap() {
 
 	$scope.gerarMapa=function()
 	{
+
+		console.log('gerarMapa');
 
 		$scope.todascoordenadasQuadraEspecifica2=[];
 
@@ -1235,6 +1271,9 @@ function initMap() {
 
 		function atualizaCoordenadasQuadraMapaInfestacao(key_quadra, nome_quadra, qdteRegistro)
 		{
+
+			console.log('atualizaCoordenadasQuadraMapaInfestacao');
+
 			var todascoordenadasQuadraEspecifica=[];
 			var todascoordenadasCentroidQuadraEspecifica=[];
 
@@ -1260,7 +1299,6 @@ function initMap() {
 				if(qdteRegistro==i)
 				{
 					$('#myPleaseWait').modal('hide');
-					console.log('terminou coordenadas, quadra '+ key_quadra);
 
 					var infowindow = new google.maps.InfoWindow({
 						content: nome_quadra
@@ -1296,13 +1334,11 @@ function initMap() {
 
 		function setaCoordenadasMapaInfestacao(todascoordenadasCentroid, todascoordenadasQuadraEspecifica)
 		{
+
 			console.log('setaCoordenadasMapaInfestacao');
 
 			if(todascoordenadasCentroid != null && todascoordenadasCentroid.length>0 && todascoordenadasQuadraEspecifica.length>0)
 			{	
-				console.log('setaCoordenadasMapaInfestacao tem');
-
-
 
 				setaCentroMapaInfestacao();
 				var mundo = [
@@ -2127,7 +2163,7 @@ function setaCentroMapaInfestacao()
 }
 
 $scope.abrirMapa = function(vistoria) {
-	$('#myPleaseWait').modal('show');
+	//if(!$('#myPleaseWait').hasClass('in')){ $('#myPleaseWait').modal('show')};
 
 	var refCoordenadas = new Firebase(Constant.Url + '/coordenada/'+ vistoria.quadra.key);
 	refCoordenadas.on('value', function(snapshot) {
@@ -2145,6 +2181,8 @@ $scope.abrirMapa = function(vistoria) {
 
 function atualizaCoordenadasQuadra(vistoria, qdteRegistro)
 {
+	console.log('atualizaCoordenadasQuadra');
+
 	var todascoordenadasQuadraEspecifica=[];
 	var todascoordenadasCentroidQuadraEspecifica=[];
 
@@ -2182,11 +2220,10 @@ function atualizaCoordenadasQuadra(vistoria, qdteRegistro)
 
 function setaCoordenadasPontos(vistoria, todascoordenadasCentroid, todascoordenadasQuadraEspecifica)
 {
-	console.log('setaCoordenadas');
+	console.log('setaCoordenadasPontos');
 
 	if(todascoordenadasCentroid != null && todascoordenadasCentroid.length>0 && todascoordenadasQuadraEspecifica.length>0)
 	{
-		console.log('setaCoordenadas tem');
 		var region = new Region(todascoordenadasCentroid);			
 		$scope.centerMapa=new google.maps.LatLng(region.centroid().x, region.centroid().y);
 		initMap(new google.maps.LatLng(region.centroid().x, region.centroid().y), 14);
@@ -2239,6 +2276,7 @@ function setaCoordenadasPontos(vistoria, todascoordenadasCentroid, todascoordena
 
 $scope.efetuaSelecionarTodasQuadras = function()
 {
+	console.log('efetuaSelecionarTodasQuadras');
 	$scope.selecionarTodasQuadras=true;
 	$scope.quadras.forEach(function(obj){
 		$scope.formMapa.quadras.push(obj.quadra);
@@ -2247,17 +2285,25 @@ $scope.efetuaSelecionarTodasQuadras = function()
 
 $scope.DesEfetuaSelecionarTodasQuadras= function()
 {
+	console.log('DesEfetuaSelecionarTodasQuadras');
+
 	$scope.selecionarTodasQuadras=false;
 	$scope.formMapa.quadras=[];
 }
 
 $scope.clickQuadras = function()
 {
+
+	console.log('clickQuadras');
+
 	$scope.selecionarTodasQuadras=false;;
 }
 
 $scope.setaExibirSomenteEncontradas = function()
 {
+
+	console.log('setaExibirSomenteEncontradas');
+
 	if($scope.exibirSomenteEn)
 	{
 		if(checkLocalHistoryCompatibilidade())
@@ -2279,6 +2325,9 @@ $scope.setaExibirSomenteEncontradas = function()
 
 $scope.setaExibirNomeQuadras = function()
 {
+
+	console.log('setaExibirNomeQuadras');
+
 	if($scope.exibirNomeQuadra)
 	{
 		if(checkLocalHistoryCompatibilidade())
@@ -2298,22 +2347,22 @@ $scope.setaExibirNomeQuadras = function()
 //############################################################################################################################
 //############################################################################################################################
 //RECUPERA NOME QUADRA/CULTURA
-		//############################################################################################################################
-		$scope.getCulturaNome = function(culturaId){
-			var retorno = '';
-			$scope.culturas.forEach(function(item){
-				if(item.key === culturaId) retorno = item.nome;
-			});
-			return retorno;
-		};
+//############################################################################################################################
+$scope.getCulturaNome = function(culturaId){
+	var retorno = '';
+	$scope.culturas.forEach(function(item){
+		if(item.key === culturaId) retorno = item.nome;
+	});
+	return retorno;
+};
 
-		$scope.getQuadraNome = function(quadraId){
-			var retorno = '';
-			$scope.quadras.forEach(function(item){
-				if(item.$id === quadraId) retorno = item.nome;
-			});
-			return retorno;
-		};
+$scope.getQuadraNome = function(quadraId){
+	var retorno = '';
+	$scope.quadras.forEach(function(item){
+		if(item.$id === quadraId) retorno = item.nome;
+	});
+	return retorno;
+};
 
 
 		//############################################################################################################################
@@ -2381,6 +2430,12 @@ $scope.setaExibirNomeQuadras = function()
 			{
 				return resultado -1
 			}
+		}
+
+		$scope.logout = function(){
+			var ref = new Firebase(Constant.Url);
+			ref.unauth();
+			window.location.href = '/login';
 		}
 
 		function checkLocalHistoryCompatibilidade(){
@@ -2610,6 +2665,11 @@ $scope.setaExibirNomeQuadras = function()
 
 			}
 		}
+
+		atualizaListaFiliais();
+		atualizaCulturas();
+		atualizaUsuarios();
+
 
 		function Point(x, y) {
 			this.x = x;
@@ -2960,6 +3020,7 @@ $scope.setaExibirNomeQuadras = function()
 		};
 
 	}
+
 
 
 

@@ -1,5 +1,7 @@
 <div ng-controller="clapraempCtrl" class="ng-scope ng_scope">
 
+	<div ng-bind-html="menu" init-bind></div>
+
 	<div class="container container-view">
 		<div class="row">
 			<div class="col-sm-6 col-sm-no-bottom">
@@ -9,24 +11,13 @@
 			</div>
 		</div>
 		
-
-		<div class="row">
-			<div class="col-sm-6 col-sm-no-bottom">
-
-				<label>Fazenda</label>
-				<select class="form-control" ng-disabled=edit ng-options="fazenda.nome for fazenda in fazendas" ng-model="fazenda" ng-change="chengeFazenda(fazenda)">
-					<option value="">Selecione</option>
-				</select>
-
-			</div>
-		</div>
 		<hr/>
 		<div class="row">
 			<div class="col-sm-6">
-				<button type="button" class="btn btn-success" ng-show="save" ng-click="salvarClapra(data)">Salvar</button>
-				<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarClapra(data)">Atualizar</button>
+				<button type="button" class="btn btn-success" ng-show="save && objetoTelaAcesso.inclusao" ng-click="salvarClapra(data)">Salvar</button>
+				<button type="button" class="btn btn-success" ng-show="edit && objetoTelaAcesso.edicao" ng-click="editarClapra(data)">Atualizar</button>
 				<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar/Novo</button>
-				<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="excluir()">Excluir</button>
+				<button type="button" class="btn btn-default btn-danger" ng-show="edit && objetoTelaAcesso.exclusao" ng-click="excluir()">Excluir</button>
 				<br />
 				<br />
 				<form class="form-signin" role="form">
@@ -71,7 +62,14 @@
 			</form>
 		</div>
 		<div class="col-sm-6">
-			<div ui-grid="gridOptions" ui-grid-selection class="gridClapra"></div>	
+			<div class="row">
+				<button type="button" class="btn btn-warning" ng-show="save" ng-click="chamaClonar()">Copiar todas para outra fazenda</button>
+				<br>
+			</div>
+			<div class="row">
+				<br>
+				<div ui-grid="gridOptions" ui-grid-selection class="gridClapra"></div>	
+			</div>
 		</div>
 	</div>
 </div>
@@ -97,27 +95,50 @@
 		</div>
 	</div>
 </div>
-<!-- Modal Start here-->
-<div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"
-role="dialog" aria-hidden="true" data-backdrop="static">
-<div class="modal-dialog modal-sm">
-	<div class="modal-content">
-		<div class="modal-header">
-			<h4 class="modal-title">
-				<span class="glyphicon glyphicon-time">
-				</span>&nbsp;&nbsp;Aguarde, carregando...
-			</h4>
-		</div>
-		<div class="modal-body">
-			<div class="progress">
-				<div class="progress-bar progress-bar-info
-				progress-bar-striped active"
-				style="width: 100%">
+<!-- Modal Clonar-->
+<div class="modal fade bs-example-modal-md" id="modalClonar" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+	<div class="modal-dialog modal-md">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">
+					Selecione uma fazenda que irá receber uma cópia de TODAS as classes:
+				</h4>
+				<br />
+				<br />
+			</div>
+			<div class="modal-body">
+
+				<label>Fazenda</label>
+				<select class="form-control" ng-disabled=desabilitaFazenda ng-options="fazenda.nome for fazenda in fazendas" ng-model="fazendaCopia">
+					<option value="">Selecione</option>
+				</select>
+				<br />
+				<br />
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+				<button type="button" class="btn btn-default btn-warning"  ng-click="clonar()">Copiar</button>
 			</div>
 		</div>
 	</div>
 </div>
-</div>
+<div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">
+					<span class="glyphicon glyphicon-time">
+					</span>&nbsp;&nbsp;Aguarde, carregando...
+				</h4>
+			</div>
+			<div class="modal-body">
+				<div class="progress">
+					<div class="progress-bar progress-bar-info 	progress-bar-striped active" style="width: 100%">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 <!-- Modal ends Here -->
 </div>

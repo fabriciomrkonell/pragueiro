@@ -4,9 +4,9 @@
 
 	angular.module('Pragueiro.controllers').registerCtrl('planejamentoCtrl', planejamentoCtrl);
 
-	planejamentoCtrl.$inject = ['$scope', 'Constant', 'Session', '$firebaseArray', '$firebaseObject', 'Notify', '$interval'];
+	planejamentoCtrl.$inject = ['$scope', '$compile', '$sce', 'Constant', 'Session', '$firebaseArray', '$firebaseObject', 'Notify', '$interval', 'Controleacesso'];
 
-	function planejamentoCtrl($scope, Constant, Session, $firebaseArray, $firebaseObject, Notify, $interval) {
+	function planejamentoCtrl($scope, $compile, $sce, Constant, Session, $firebaseArray, $firebaseObject, Notify, $interval, Controleacesso) {
 
 		angular.extend($scope, {
 			objSafra: {},
@@ -42,9 +42,12 @@
 			}
 		});
 		
-		$scope.fazendaSelecioanda;
+		$scope.menu  = $sce.trustAsHtml(window.localStorage.getItem('menu'));
+		$scope.fazendas  = JSON.parse(window.localStorage.getItem('todasFiliais'));
+		$scope.posicaoFilial = window.localStorage.getItem('posicaoFilial');
+		$scope.fazenda  = $scope.fazendas[$scope.posicaoFilial];
+		var key_usuario  = window.localStorage.getItem('key_usuario');
 
-		$scope.fazendas=[];
 		$scope.qtde_fazendas = 0 ; 
 		$scope.qtde_quadras = 0 ; 
 		$scope.qtde_culturas = 0;
@@ -63,7 +66,7 @@
 		
 		refHistoricoQuadrasCulturas = null;
 
-		recuperaCulturaQtde();
+		
 
 		//atualizaListaFiliais();
 		//recuperaCultura();
@@ -153,73 +156,68 @@
 		function atualizaListaFiliais() {
 			$('#myPleaseWait').modal('show');
 
-			var refUser = new Firebase(Constant.Url + '/usuarioxauth/' + Session.getUser().uid);
-			var obj = $firebaseObject(refUser);
-			var key_usuario;
+			$scope.chengeFazenda($scope.fazenda);			
 
-			var i=0;
-			obj.$loaded().then(function() {
-				key_usuario = obj.$value;
+			var baseRef = new Firebase(Constant.Url);
+			var refNovo = new Firebase.util.NormalizedCollection(
+				[baseRef.child("/usuario/"+key_usuario+"/filial/"), "$key"],
+				baseRef.child("/filial")
+				).select(
+				{"key":"$key.$key","alias":"key"},
+				{"key":"filial.$value","alias":"filial"}
+				).ref();
 
-				$scope.fazendas = [];
-				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
-				var refNovo = new Firebase.util.NormalizedCollection(
-					[baseRef.child("/usuario/" + key_usuario + "/filial/"), "$key"],
-					baseRef.child("/filial")
-					).select({
-						"key": "$key.$key",
-						"alias": "key"
-					}, {
-						"key": "filial.$value",
-						"alias": "filial"
-					}).ref();
-					var i=0;
-
-					refNovo.on('child_added', function(snap) {
-						$scope.qtde_fazendas ++;
-						var obj = snap.val();
-						$scope.fazendas.push(obj.filial);
-
-
-						if(i==0)
-						{
-							if(obj.filial.quadra!=null)
-							{
-								$scope.qtde_quadras =+ Object.keys(obj.filial.quadra).length;
-							}
-							else
-							{
-								$scope.qtde_quadras =+ 0;
-							}
-							if(obj.filial.variedade!=null)
-							{
-								$scope.qtde_variedades =+ Object.keys(obj.filial.variedade).length;
-							}
-							else
-							{
-								$scope.qtde_variedades =+ 0;
-							}
-							recuperaQuadra(obj);
-							recuperaVariedade(obj);
-
+				refNovo.on('child_changed', function(snap) {
+					$('#myPleaseWait').modal('hide');
+					var objNovo = snap.val();
+					var posicao = null;
+					$scope.fazendas.forEach(function(obj) {
+						if (obj.key === objNovo['filial'].key) {
+							posicao = $scope.fazendas.indexOf(obj);
 						}
-						
-						if (!$scope.$$phase) {
-							$scope.$apply();
-						}
-						i++;
 					});
+					if (posicao != null)
+						$scope.fazendas[posicao] = objNovo['filial'];
 
-			}); // final do load
-		}		
+					if(objNovo['filial'].key==$scope.fazenda.key)
+					{
+						window.localStorage.setItem('filialCorrente', JSON.stringify( objNovo['filial']));
+						$scope.fazenda=objNovo['filial'];
+					}
+					window.localStorage.setItem('todasFiliais', JSON.stringify( $scope.fazendas));
+
+				});
+			}	
+
+		//---	
 		$scope.chengeFazenda = function(fazenda){
 			if (fazenda === null) return false;
+
+			if(fazenda.quadra!=null)
+			{
+				$scope.qtde_quadras =+ Object.keys(fazenda.quadra).length;
+			}
+			else
+			{
+				$scope.qtde_quadras =+ 0;
+			}
+			if(fazenda.variedade!=null)
+			{
+				$scope.qtde_variedades =+ Object.keys(fazenda.variedade).length;
+			}
+			else
+			{
+				$scope.qtde_variedades =+ 0;
+			}
+			recuperaQuadra(fazenda);
+			recuperaVariedade(fazenda);
+
 			$scope.planejamentos=[];
 			$scope.clearForm();
+
 			$scope.edit = false;
 			$scope.save = true;
 			$scope.gridOptions.data = $scope.planejamentos;
-			$scope.fazendaSelecioanda = fazenda;
 			$scope.safra = {};
 			$scope.safras = [];
 			for (var propertyName in fazenda.safra) {
@@ -227,50 +225,61 @@
 			}
 			if(verificaFinalizacaoCarregamento())
 			{			
-				$scope.chengeSafra($scope.safras[0]);
-				$scope.safra=$scope.safras[0];
+				if(Array.isArray(fazenda.safra))
+				{
+					$scope.chengeSafra(fazenda.safra[0]);
+					$scope.safra=fazenda.safra[0];						
+				}
+				else
+				{
+					$scope.chengeSafra(castObjToArray(fazenda.safra)[0]);
+					$scope.safra=(castObjToArray(fazenda.safra)[0]);
+				}
 			}
 		};
 		//-------------------------------------------------------------------
 		$scope.chengeSafra = function(safra){
-			
-
-
 			$scope.clearForm();
+
 			$scope.edit = false;
 			$scope.save = true;
+
 			$scope.planejamentos=[];
 			$scope.gridOptions.data = $scope.planejamentos;
 
-			if ($scope.fazendaSelecioanda === null || safra==null) return false;
+			if ($scope.fazenda === null || safra==null) return false;
 
-			var refSafraXquadra = new Firebase(Constant.Url + '/filial/' + $scope.fazendaSelecioanda.key + '/safra/' + safra.key+'/quadra');
+			var refSafraXquadra = new Firebase(Constant.Url + '/filial/' + $scope.fazenda.key + '/safra/' + safra.key+'/quadra');
 			refSafraXquadra.on('child_added', function(snap) {
 
 				var objNovo = snap.val();
-				var x = 0;
 				var posicao = null;
 				$scope.planejamentos.forEach(function(obj) {
 					if (obj.key === objNovo.key) {
-						posicao = x;
+						posicao = $scope.planejamentos.indexOf(obj);
 					}
-					x++;
 
 				});
+
+				$scope.todasQuadras.forEach(function(obj2) {
+					if (obj2.key!=null && objNovo.key == obj2.key) {
+						objNovo['quadra'] = obj2;
+					}
+				});
+
+				$scope.todasCulturas.forEach(function(obj2) {
+					if (objNovo.key_cultura === obj2.key) {
+						objNovo['cultura'] = obj2;
+					}
+				});
+
 				if (posicao == null) {
-					$scope.fazendaSelecioanda.todasQuadras.forEach(function(obj2) {
-						if (obj2.key!=null && objNovo.key == obj2.key) {
-							objNovo['quadra'] = obj2;
-						}
-					});
-
-					$scope.todasCulturas.forEach(function(obj2) {
-						if (objNovo.key_cultura === obj2.key) {
-							objNovo['cultura'] = obj2;
-						}
-					});
-
 					$scope.planejamentos.push(objNovo);
+					$scope.gridOptions.data = $scope.planejamentos;
+				}
+				else
+				{
+					$scope.planejamentos[posicao]=objNovo;
 					$scope.gridOptions.data = $scope.planejamentos;
 				}
 				if (!$scope.$$phase) {
@@ -281,17 +290,14 @@
 			refSafraXquadra.on('child_changed', function(snap) {
 				$('#myPleaseWait').modal('hide');
 				var objNovo = snap.val();
-				var x = 0;
 				var posicao = null;
 				$scope.planejamentos.forEach(function(obj) {
 					if (obj.key === objNovo.key) {
-						posicao = x;
+						posicao = $scope.planejamentos.indexOf(obj);
 					}
-					x++;
 
 				});
 				if (posicao != null) {
-
 					$scope.todasQuadras.forEach(function(obj2) {
 						if (obj2.key!=null && objNovo.key === obj2.key) {
 							objNovo['quadra'] = obj2;
@@ -318,10 +324,8 @@
 				var posicao = null;
 				$scope.planejamentos.forEach(function(obj) {
 					if (obj.key === objNovo.key) {
-						posicao = x;
+						posicao = $scope.planejamentos.indexOf(obj);
 					}
-					x++;
-
 				});
 				if (posicao != null) {
 					delete $scope.planejamentos[posicao];
@@ -332,6 +336,16 @@
 		//-------------------------------------------------------------------
 		$scope.setaFazenda = function(fazenda){
 			if(fazenda === null) return false;
+			//--------------------------------------
+			//Controle Acesso	
+			$scope.menu  = $sce.trustAsHtml(Controleacesso.refazMenu_Acesso(fazenda.aceemps));
+			$scope.objetoTelaAcesso=Controleacesso.retornaObjetoTela(fazenda.aceemps, 'planejamento');
+
+			if($scope.objetoTelaAcesso==null || $scope.objetoTelaAcesso.visualizacao==null || $scope.objetoTelaAcesso.visualizacao==false)
+			{
+				window.location.href = '#home';
+			}
+			//--------------------------------------
 
 			$scope.fazendas.forEach(function(item){
 				if(item.key === fazenda.key) 	
@@ -347,9 +361,9 @@
 			} else {
 
 				$scope.todasQuadras = [];
-				fazenda.filial['todasQuadras']=[];
+				fazenda['todasQuadras']=[];
 
-				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
+				var baseRef = new Firebase(Constant.Url);
 				var refNovoQuadra = new Firebase.util.NormalizedCollection(
 					baseRef.child("/filial/" + fazenda.key + "/quadra"), [baseRef.child("/quadra"), "$key"]
 					).select({
@@ -363,54 +377,29 @@
 					refNovoQuadra.on('child_added', function(snap) {
 						var objNovo = snap.val();
 						$scope.todasQuadras.push(objNovo['Quadras']);
-						fazenda.filial.todasQuadras.push(objNovo['Quadras']);
+						fazenda.todasQuadras.push(objNovo['Quadras']);
 						if (!$scope.$$phase) {
 							$scope.$apply();
 						}
-						if(fazenda.filial.key==$scope.fazendas[0].key)
+						if(fazenda.key==$scope.fazendas[$scope.posicaoFilial].key)
 						{
 							if(verificaFinalizacaoCarregamento())
 							{
-								$scope.chengeFazenda($scope.fazendas[0]);
-								$scope.fazenda=$scope.fazendas[0];
+								if(Array.isArray(fazenda.safra))
+								{
+									$scope.chengeSafra(fazenda.safra[0]);
+									$scope.safra=fazenda.safra[0];						
+								}
+								else
+								{
+									$scope.chengeSafra(castObjToArray(fazenda.safra)[0]);
+									$scope.safra=(castObjToArray(fazenda.safra)[0]);
+								}
+
 								$('#myPleaseWait').modal('hide');
 							}
 						}
-					});
-
-					refNovoQuadra.on('child_changed', function(snap) {
-						$('#myPleaseWait').modal('hide');
-						var objNovo = snap.val();
-						var x = 0;
-						var posicao = null;
-						$scope.todasQuadras.forEach(function(obj) {
-							if (obj.key === objNovo['Quadras'].key) {
-								posicao = x;
-							}
-							x++;
-
-						});
-						if (posicao != null)
-							$scope.todasQuadras[posicao] = objNovo['Quadras'];
-
-						if (!$scope.$$phase) {
-							$scope.$apply();
-						}
-					});
-
-					refNovoQuadra.on('child_removed', function(snap) {
-						var x = 0;
-						var posicao = null;
-						$scope.todasQuadras.forEach(function(obj) {
-							if (obj.key === objNovo['Quadras'].key) {
-								posicao = x;
-							}
-							x++;
-
-						});
-						if (posicao != null)
-							delete	$scope.todasQuadras[posicao];
-					});
+					});					
 				}
 			}
 		//-------------------------------------------------------------------
@@ -424,25 +413,50 @@
 				var refUsuarios= new Firebase(Constant.Url + '/variedade/'+fazenda.key);
 
 				refUsuarios.ref().on('child_added', function(snap) {
-					var variedades_brutas=snap.val();
-					$scope.todasVariedades.push(variedades_brutas);
+					var objNovo= snap.val();
+					if(snap.key()<20)
+					{
+						return;
+					}
 
-					for(var obj in variedades_brutas ){
-						var objVar=variedades_brutas[obj];
-						$scope.todasVariedades.push(objVar);
-					};
+					$scope.culturas.forEach(function(obj) {
+						if (obj.key == objNovo.key_cultura) {
+							objNovo['cultura']=obj;
+						}
+					});
+
+					var posicao;
+					$scope.todasVariedades.forEach(function(obj) {
+						if (obj.key === objNovo.key) {
+							posicao = $scope.todasVariedades.indexOf(obj);
+						}
+					});
+					if (posicao == null)
+						$scope.todasVariedades.push(objNovo);
+
+					if(!$scope.$$phase) {
+						$scope.$apply();
+					}
+
 					if(verificaFinalizacaoCarregamento())
 					{
-						$scope.chengeFazenda($scope.fazendas[0]);
-						$scope.fazenda=$scope.fazendas[0];
+						if(Array.isArray(fazenda.safra))
+						{
+							$scope.chengeSafra(fazenda.safra[0]);
+							$scope.safra=fazenda.safra[0];						
+						}
+						else
+						{
+							$scope.chengeSafra(castObjToArray(fazenda.safra)[0]);
+							$scope.safra=(castObjToArray(fazenda.safra)[0]);
+						}
+
 						$('#myPleaseWait').modal('hide');
 						if (!$scope.$$phase) {
 							$scope.$apply();
 						}
 					}
 				}); 
-
-				
 			}
 		}
 		//-------------------------------------------------------------------
@@ -497,14 +511,13 @@
 			console.log('todasQuadras: ' + $scope.todasQuadras.length + ' - qde: ' + $scope.qtde_quadras);
 			console.log('todasCulturas: ' + $scope.todasCulturas.length + ' - qde: ' + $scope.qtde_culturas);
 			console.log('todasVariedades: ' + $scope.todasVariedades.length + ' - qde: ' + $scope.qtde_variedades);
-			console.log('fazendas: ' + $scope.fazendas.length + ' - qde: ' + $scope.qtde_fazendas);
+			//console.log('fazendas: ' + $scope.fazendas.length + ' - qde: ' + $scope.qtde_fazendas);
 
 			console.log(' --------------------- ');
 
 			if($scope.todasQuadras.length==$scope.qtde_quadras
 				&& $scope.todasCulturas.length==$scope.qtde_culturas
 				&& $scope.todasVariedades.length>=$scope.qtde_variedades
-				&& $scope.fazendas.length == $scope.qtde_fazendas
 				)
 			{
 				return true;
@@ -1128,14 +1141,11 @@
 			if(key_cultura === null) return false;
 			$scope.variedadesAdd=[];
 			for (var i = 0; i < $scope.todasVariedades.length; i++)
-			{						
-				for(var obj in $scope.todasVariedades[i])
-				{	
-					if($scope.todasVariedades[i][obj].key_cultura==key_cultura)
-					{
-						$scope.variedadesAdd.push($scope.todasVariedades[i][obj]);					
-					}
-				}
+			{					
+				if($scope.todasVariedades[i].key_cultura==key_cultura)
+				{
+					$scope.variedadesAdd.push($scope.todasVariedades[i]);					
+				}				
 			}
 		};
 
@@ -1304,14 +1314,9 @@
 
 			}
 		}
-/*
-		$scope.$watch('quadra', function(newValue, oldValue){
-			if(_salvarQuadra){
-				$scope.addHistorico(newValue[newValue.length - 1].key, newValue[newValue.length - 1].key_cultura, 'Adicionou');
-				_salvarQuadra = false;
-			}
-		});
-		*/
+
+		recuperaCulturaQtde();
+
 	}
 
 }());

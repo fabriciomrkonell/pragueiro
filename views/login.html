@@ -44,7 +44,25 @@
       <a href="/singup" class="pull-right btn-create-user">Cadastre-se</a>
     </form>
   </div>
-
+  <!-- Modal Start here-->
+  <div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">
+            <span class="glyphicon glyphicon-time">
+            </span>&nbsp;&nbsp;Aguarde, carregando...
+          </h4>
+        </div>
+        <div class="modal-body">
+          <div class="progress">
+            <div class="progress-bar progress-bar-info progress-bar-striped active" style="width: 100%">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <footer id="footer">
     <div class="container">
       <div class="row">
@@ -81,6 +99,8 @@
       </div>
       <a id="to-top" href="#top" class="btn btn-dark btn-lg"><i class="fa fa-chevron-up fa-fw fa-1x"></i></a>
     </footer>
+
+
     <script src="app/libraries/angularjs/js/angular.min.js"></script>
     <script src="app/libraries/jquery/js/jquery.min.js"></script>
     <script src="https://cdn.firebase.com/js/client/2.2.4/firebase.js"></script>
@@ -144,19 +164,26 @@
 
         $scope.login = function(data){
           if(validForm(data)) return false;
-          ref.authWithPassword({
-            email: data.email,
-            password: data.senha
-          }, function(error, auth) {
-            if(error){
-              setMessageError(error);
-            }else{
-              window.location.href = '/app';
-            }
-          });
-        }
 
-      }]);
-    </script>
-  </body>
-  </html>
+         // $('#myPleaseWait').modal('show');
+
+         ref.authWithPassword({
+          email: data.email,
+          password: data.senha
+        }, function(error, auth) {
+          if(error){
+
+             // $('#myPleaseWait').modal('hide');
+
+             setMessageError(error);
+           }else{
+            window.location.href = '/app';
+            //window.location.href = '/selecaofilial';
+          }
+        });
+       }
+
+     }]);
+   </script>
+ </body>
+ </html>

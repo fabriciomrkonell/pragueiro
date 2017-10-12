@@ -4,9 +4,9 @@
 
 	angular.module('Pragueiro.controllers').registerCtrl('controleacessoCtrl', controleacessoCtrl);
 
-	controleacessoCtrl.$inject = ['$scope', '$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Notify'];
+	controleacessoCtrl.$inject = ['$scope','$compile', '$sce', '$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Notify'];
 
-	function controleacessoCtrl($scope, $firebaseArray, $firebaseObject, Session, Constant, Notify) {
+	function controleacessoCtrl($scope, $compile, $sce, $firebaseArray, $firebaseObject, Session, Constant, Notify) {
 
 		angular.extend($scope, {
 			edit: false,
@@ -18,12 +18,16 @@
 			}
 		});
 
+		$scope.menu  = $sce.trustAsHtml(window.localStorage.getItem('menu'));
+		$scope.fazendas  = JSON.parse(window.localStorage.getItem('todasFiliais'));
+		$scope.fazenda  = JSON.parse(window.localStorage.getItem('filialCorrente'));
+
+
 		$scope.tipo = ['Praga', 'Doença'];
 		$scope.numeracao_codigo = 1;
 		$scope.todosControleacessos=[];
 		
 		
-
 		$scope.gridOptions = { 
 			enableRowSelection: true, 
 			enableRowHeaderSelection: false,
@@ -93,14 +97,12 @@
 
 			baseRef.on('child_changed', function(snap) {
 				var objNovo= snap.val();
-				var x=0;
 				var posicao=null;
 				$scope.todosControleacessos.forEach(function(obj){
 					if(obj.key === objNovo.key)
 					{ 
-						posicao=x;
+						posicao=$scope.todosControleacessos.indexOf(obj);
 					}
-					x++;
 
 				});
 				if(posicao!=null)
@@ -121,7 +123,7 @@
 			refOrdser.on('child_added', function(snap) {
 				$scope.numeracao_codigo++;
 				if (!$scope.edit) {
-					$scope.data.key=$scope.numeracao_codigo;
+					//$scope.data.key=$scope.numeracao_codigo;
 					$scope.data.codigo = zeroFill($scope.numeracao_codigo, 3);
 					if (!$scope.$$phase) {
 						$scope.$apply();
@@ -132,7 +134,7 @@
 			refOrdser.on('child_removed', function(snap) {
 				$scope.numeracao_codigo--;
 				if (!$scope.edit) {
-					$scope.data.key=$scope.numeracao_codigo;
+					//$scope.data.key=$scope.numeracao_codigo;
 					$scope.data.codigo = zeroFill($scope.numeracao_codigo, 3);
 					if (!$scope.$$phase) {
 						$scope.$apply();

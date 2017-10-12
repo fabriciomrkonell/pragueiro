@@ -1,4 +1,6 @@
 <div ng-controller="safraCtrl" class="ng-scope ng_scope">
+	<div ng-bind-html="menu" init-bind></div>
+
 	<div class="container container-view">
 		<div class="row">
 			<div class="col-sm-6 col-sm-no-bottom">
@@ -8,42 +10,41 @@
 			</div>
 		</div>
 
-		<div class="row">
-			<div class="col-sm-4 col-sm-no-bottom">
-				<form class="form-signin" role="form" action="/login" method="post">
-					<div class="form-group">
-						<label>Fazenda</label>
-						<select class="form-control" ng-options="fazenda.nome for fazenda in fazendas" ng-model="data.fazenda" ng-change="chengeFazenda(data.fazenda)">
-						</select>
-					</div>
-				</form>
-			</div>
-		</div>
 		<hr/>
 		<div class="row">
 			<div class="col-sm-6">
 				
-				<button type="button" class="btn btn-success" ng-show="save" ng-click="salvarSafra(data.fazenda, formSafra)">Salvar</button>
-				<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarSafra(formSafra)">Atualizar</button>
+				<button type="button" class="btn btn-success" ng-show="save && objetoTelaAcesso.inclusao" ng-click="salvarSafra(data)">Salvar</button>
+				<button type="button" class="btn btn-success" ng-show="edit && objetoTelaAcesso.edicao" ng-click="atualizarSafra(data)">Atualizar</button>
 				<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar/Novo</button>
-				<button type="button" class="btn btn-default btn-warning" ng-disabled="true" ng-click="showQuadras(data.fazenda, formSafra)">Quadra</button>
-				<button type="button" class="btn btn-default btn-warning" ng-disabled="true" ng-click="getHistoricoQuadrasCulturas(data.fazenda, formSafra)">Histórico</button>
-				<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="chamaExcluirSafra(formSafra)">Excluir</button>
+				<button type="button" class="btn btn-default btn-warning" ng-disabled="true" ng-show="false" ng-click="showQuadras(data.fazenda, data)">Quadra</button>
+				<button type="button" class="btn btn-default btn-warning" ng-disabled="true" ng-show="false" ng-click="getHistoricoQuadrasCulturas(data)">Histórico</button>
+				<button type="button" class="btn btn-default btn-danger" ng-show="edit && objetoTelaAcesso.exclusao" ng-click="chamaExcluirSafra(data)">Excluir</button>
+				<br />
 				<br />
 				<form class="form-signin" role="form" >
-					<div class="form-group">
-						<label>Código Interno</label>
-						<input type="text" class="form-control" ng-disabled="true" placeholder="Descriçāo" name="descricao" ng-model="formSafra.key" />
+					<div class="row">
+						<div class="col-sm-9">
+							<div class="form-group">
+								<label><i>Código Interno</i></label>
+								<p>
+									<label>{{data.key}}</label>
+								</p>
+							</div>
+						</div>
+						<div class="col-sm-3">
+							<div class="form-group">
+								<input type="checkbox"  ng-model="data.ativo"
+								ng-true-value="true" ng-false-value="false">	
+								<label>Ativo</label>						
+							</div>		
+						</div>
 					</div>
 					<div class="form-group">
 						<label>Descriçāo</label>
-						<input type="text" class="form-control" placeholder="Descriçāo" name="descricao" ng-model="formSafra.descricao" />
+						<input type="text" class="form-control" placeholder="Descriçāo" name="descricao" ng-model="data.descricao" />
 					</div>
-					<div class="form-group">
-						<input type="checkbox"  ng-model="formSafra.ativo"
-						ng-true-value="true" ng-false-value="false">	
-						<label>Ativo</label>						
-					</div>
+					
 					
 				</form>
 			</div>
@@ -278,13 +279,13 @@
 				</div>
 
 				<div class="modal-body">
-					<p>Têm certeza que deseja excluir a Variedade '{{formSafra.descricao}}'?</p>
+					<p>Têm certeza que deseja excluir a Variedade '{{data.descricao}}'?</p>
 					<p class="debug-url"></p>
 				</div>
 
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-					<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="excluirSafra(formSafra)">Excluir</button>
+					<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="excluirSafra(data)">Excluir</button>
 				</div>
 			</div>
 		</div>

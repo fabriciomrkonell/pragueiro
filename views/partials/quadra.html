@@ -1,237 +1,229 @@
 <div ng-controller="quadraCtrl" class="ng-scope ng_scope">
 	<style type="text/css">		
-		.angular-google-map-container { height: 400px; }
+	.angular-google-map-container { height: 400px; }
 
-		#map {
-			height:420px;
-			width:600px;
-		}
-		.infoWindowContent {
-			font-size:  14px !important;
-			border-top: 1px solid #ccc;
-			padding-top: 10px;
-		}
+	#map {
+		height:420px;
+		width:600px;
+	}
+	.infoWindowContent {
+		font-size:  14px !important;
+		border-top: 1px solid #ccc;
+		padding-top: 10px;
+	}
 
-	</style>
+</style>
 
-	
-	<div class="container container-view">
-		<div class="row">
-			<div class="col-sm-6 col-sm-no-bottom">
-				<p>Você está em <a href="#home">Início</a> / <a href="#cadastro">Cadastro</a>  / <a href="#quadra">Quadra/Região</a></p>
 
-				<br />
-			</div>
+<div class="container container-view">
+
+	<div ng-bind-html="menu" init-bind></div>
+
+	<div class="row">
+		<div class="col-sm-6 col-sm-no-bottom">
+			<p>Você está em <a href="#home">Início</a> / <a href="#cadastro">Cadastro</a>  / <a href="#quadra">Quadra/Região</a></p>
+
+			<br />
 		</div>
+	</div>
 
-		<div class="row">
-			<div class="col-sm-7 col-sm-no-bottom">
-				<label>Fazenda</label>
-				<select class="form-control" ng-disabled=desabilitaFazenda ng-options="fazenda.nome for fazenda in fazendas" ng-model="data.fazenda" ng-change="chengeFazenda(data.fazenda)">
-					<option value="">Selecione</option>
-				</select>
-			</div>
-			<div class="col-sm-5 col-sm-no-bottom">
-				<b>Observação importante: </b><p> A quadra/região salva nesta tela só aparecerá no Aplicativo Mobile quando estiver associado em uma safra (tela <a href="#planejamento">Planejamento de Safra</a>).</p>
-			</div>
-		</div>
-		<hr/>
-		<div class="row">
-			<div class="col-sm-7">
-				
+	<hr/>
+	<div class="row">
+		<div class="col-sm-7">
 
-				<button type="button" class="btn btn-success" ng-show="save" ng-click="salvarQuadra(data)">Salvar</button>
-				<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarQuadra
-				(data)">Atualizar</button>
-				<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar/Novo</button>
-				<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="excluir()">Excluir</button>
-				<br />
-				<br />
-				<form class="form-signin" role="form" >
-					<div class="form-group">
-						<label><i>Código Interno</i></label>
-						<p>
-							<label>{{data.key}}</label>
-						</p>
-					</div>
-					<div class="form-group">
-						<label>Código</label>
-						<input type="text" class="form-control" placeholder="Código" ng-model="data.codigo" />
-					</div>
-					<div class="form-group">
-						<label>Nome</label>
-						<input type="text" class="form-control" placeholder="Nome" ng-model="data.nome" />
-					</div>					
 
-					
-				</form>
-				<hr class="small">  
-				<div class="form-group col-sm-3">
-					<br><input type="checkbox" disabled=true ng-model="data.coordenadas"
-					ng-true-value="true" ng-false-value="false">	<label>Coordenadas</label>
-
-				</div>
-				<div class="form-group col-sm-9">
-					<br>
+			<button type="button" class="btn btn-success" ng-show="save && objetoTelaAcesso.inclusao" ng-click="salvarQuadra(data)">Salvar</button>
+			<button type="button" class="btn btn-success" ng-show="edit && objetoTelaAcesso.edicao" ng-click="editarQuadra
+			(data)">Atualizar</button>
+			<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar/Novo</button>
+			<button type="button" class="btn btn-default btn-danger" ng-show="edit && objetoTelaAcesso.exclusao" ng-click="excluir()">Excluir</button>
+			<br />
+			<br />
+			<form class="form-signin" role="form" >
+				<div class="form-group">
+					<label><i>Código Interno</i></label>
 					<p>
-						Escolha um arquivo no formato shapefile ou KML clicando no botão abaixo.
-						Obs.: A quadra/região precisa estar salva. 
-						<br>
-						<a href="javascript:showDicas()" >Clique aqui para dicas & Instruções.</a>
-						<br>
-
-						<input type="file" id="fileInputElement" accept=".kml,.shp" data-buttonText="teste">
+						<label>{{data.key}}</label>
 					</p>
-					<button type="button" class="btn btn-primary" ng-show="edit" ng-click="uploadFiles()">Carregar</button>
-					<button type="button" class="btn btn-success" ng-show="arquivoCarregado" ng-click="salvarArquivo(data)">Salvar</button>
-					<button type="button" class="btn btn-default" ng-show="arquivoCarregado" ng-click="limparArquivo(data)">Limpar</button>
 				</div>
+				<div class="form-group">
+					<label>Código</label>
+					<input type="text" class="form-control" placeholder="Código" ng-model="data.codigo" />
+				</div>
+				<div class="form-group">
+					<label>Nome</label>
+					<input type="text" class="form-control" placeholder="Nome" ng-model="data.nome" />
+				</div>					
 
-				<div class="col-sm-12">
-					<div class="form-group">
 
-						<div id="map"></div>
+			</form>
+			<hr class="small">  
+			<div class="form-group col-sm-3">
+				<br><input type="checkbox" disabled=true ng-model="data.coordenadas"
+				ng-true-value="true" ng-false-value="false">	<label>Coordenadas</label>
 
-						<div id="class" ng-repeat="marker in markers | orderBy : 'title'">
-							<a href="#" ng-click="openInfoWindow($event, marker)">{{marker.title}}</a>
-						</div>
+			</div>
+			<div class="form-group col-sm-9">
+				<br>
+				<p>
+					Escolha um arquivo no formato shapefile ou KML clicando no botão abaixo.
+					Obs.: A quadra/região precisa estar salva. 
+					<br>
+					<a href="javascript:showDicas()" >Clique aqui para dicas & Instruções.</a>
+					<br>
+
+					<input type="file" id="fileInputElement" accept=".kml,.shp" data-buttonText="teste">
+				</p>
+				<button type="button" class="btn btn-primary" ng-show="edit" ng-click="uploadFiles()">Carregar</button>
+				<button type="button" class="btn btn-success" ng-show="arquivoCarregado" ng-click="salvarArquivo(data)">Salvar</button>
+				<button type="button" class="btn btn-default" ng-show="arquivoCarregado" ng-click="limparArquivo(data)">Limpar</button>
+			</div>
+
+			<div class="col-sm-12">
+				<div class="form-group">
+
+					<div id="map"></div>
+
+					<div id="class" ng-repeat="marker in markers | orderBy : 'title'">
+						<a href="#" ng-click="openInfoWindow($event, marker)">{{marker.title}}</a>
 					</div>
 				</div>
 			</div>
-			<div class="col-sm-5">
+		</div>
+		<div class="col-sm-5">
 
-				<div ui-grid="gridOptions" ui-grid-selection class="gridQuadra"></div>	
+			<div ui-grid="gridOptions" ui-grid-selection class="gridQuadra"></div>	
 
-			</div>
 		</div>
 	</div>
+</div>
 
 
-	<!--########################################################################################-->
-	<!--MODAL HISTORICO-->
+<!--########################################################################################-->
+<!--MODAL HISTORICO-->
 
 
-	<div class="modal fade" tabindex="-1" role="dialog" id="modalInstrucoes">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-					<h4 class="modal-title">Dicas & Instruções para importação arquivo</h4>
-				</div>
-				<div class="modal-body">
-					<div class="row">
-						<div class="col-sm-12">
-							<ul>
-
-								<p> Formatos aceitos:
-								</p>
-								<li>
-									<p> <a href="https://pt.wikipedia.org/wiki/Shapefile"> ShapeFile </a>- Somente o arquivo .SHP &eacute; necess&aacute;rio.</p>
-								</li>
-								<li>
-									<p><a href="https://pt.wikipedia.org/wiki/Keyhole_Markup_Language">  KML.</a>&nbsp; - não confuda com KMZ. Há essas 2 opções na hora de salvar/exportar do Google Earth.</p>
-								</li>
-
-							</ul>
-							<br>
-							<br>
-							<ul>
-								<li>
-									<p>A quadra/regi&atilde;o precisa estar salva, se n&atilde;o o bot&atilde;o de "<strong>carregar</strong>"&nbsp;n&atilde;o ficar&aacute; vis&iacute;vel.</p>
-								</li>
-
-								<li>
-									<p>N&atilde;o &eacute; necess&aacute;rio&nbsp;muitos pontos, pontos a cada 5 metros &eacute; o suficiente para a maioria dos casos. Quanto mais pontos mais preciso.</p>
-								</li>
-								<li>
-									<p>O arquivo precisa ter somente latitude e longitude em graus, mais nada (<strong>respeitando as diretrizes do formato do arquivo -ShapeFile e KML</strong>).</p>
-								</li>
-								<li>
-									<p>Se seu mapa não aparecer corretamente não salve.</p>
-								</li>
-							</ul>
-							<p>&nbsp;</p>
-							<p><strong>Caso apresente erro ou n&atilde;o apare&ccedil;a no mapa envie o arquivo por e-mail com seu e-mail e nome da quadra para o e-mail:&nbsp;<a href="mailto:pragueirovistoriaagricola@gmail.com">pragueirovistoriaagricola@gmail.com</a>&nbsp;que iremos verificar seu arquivo e tentar import&aacute;-lo.</strong></p>
-							<p>Envie sugestões para outros formatos para o e-mail:&nbsp;<a href="mailto:pragueirovistoriaagricola@gmail.com">pragueirovistoriaagricola@gmail.com</a>&nbsp;que iremos verificar e implementar a importação.</strong></p>
-
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="modal fade" tabindex="-1" role="dialog" id="modalAviso">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-					<h4 class="modal-title">Aviso</h4>
-				</div>
-				<div class="modal-body">
-					<div class="row">
-						<div class="col-sm-12">
-							
-
-							<p> A quadra/região foi salva, mas só aparecerá no Aplicativo Mobile quando estiver associado em uma safra!</p>
-
-
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- Modal DELETE-->
-	<div class="modal fade" id="modalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-					<h4 class="modal-title" id="myModalLabel">Confirmação Exclusão</h4>
-				</div>
-
-				<div class="modal-body">
-					<p>Têm certeza que deseja excluir a Quadra '{{data.nome}}'?</p>
-					<p class="debug-url"></p>
-				</div>
-
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-					<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="excluirQuadra(data)">Excluir</button>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- Modal Start here-->
-	<div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"
-	role="dialog" aria-hidden="true" data-backdrop="static">
-	<div class="modal-dialog modal-sm">
+<div class="modal fade" tabindex="-1" role="dialog" id="modalInstrucoes">
+	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h4 class="modal-title">
-					<span class="glyphicon glyphicon-time">
-					</span>&nbsp;&nbsp;Aguarde, carregando...
-				</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">Dicas & Instruções para importação arquivo</h4>
 			</div>
 			<div class="modal-body">
-				<div class="progress">
-					<div class="progress-bar progress-bar-info
-					progress-bar-striped active"
-					style="width: 100%" >
+				<div class="row">
+					<div class="col-sm-12">
+						<ul>
+
+							<p> Formatos aceitos:
+							</p>
+							<li>
+								<p> <a href="https://pt.wikipedia.org/wiki/Shapefile"> ShapeFile </a>- Somente o arquivo .SHP &eacute; necess&aacute;rio.</p>
+							</li>
+							<li>
+								<p><a href="https://pt.wikipedia.org/wiki/Keyhole_Markup_Language">  KML.</a>&nbsp; - não confuda com KMZ. Há essas 2 opções na hora de salvar/exportar do Google Earth.</p>
+							</li>
+
+						</ul>
+						<br>
+						<br>
+						<ul>
+							<li>
+								<p>A quadra/regi&atilde;o precisa estar salva, se n&atilde;o o bot&atilde;o de "<strong>carregar</strong>"&nbsp;n&atilde;o ficar&aacute; vis&iacute;vel.</p>
+							</li>
+
+							<li>
+								<p>N&atilde;o &eacute; necess&aacute;rio&nbsp;muitos pontos, pontos a cada 5 metros &eacute; o suficiente para a maioria dos casos. Quanto mais pontos mais preciso.</p>
+							</li>
+							<li>
+								<p>O arquivo precisa ter somente latitude e longitude em graus, mais nada (<strong>respeitando as diretrizes do formato do arquivo -ShapeFile e KML</strong>).</p>
+							</li>
+							<li>
+								<p>Se seu mapa não aparecer corretamente não salve.</p>
+							</li>
+						</ul>
+						<p>&nbsp;</p>
+						<p><strong>Caso apresente erro ou n&atilde;o apare&ccedil;a no mapa envie o arquivo por e-mail com seu e-mail e nome da quadra para o e-mail:&nbsp;<a href="mailto:pragueirovistoriaagricola@gmail.com">pragueirovistoriaagricola@gmail.com</a>&nbsp;que iremos verificar seu arquivo e tentar import&aacute;-lo.</strong></p>
+						<p>Envie sugestões para outros formatos para o e-mail:&nbsp;<a href="mailto:pragueirovistoriaagricola@gmail.com">pragueirovistoriaagricola@gmail.com</a>&nbsp;que iremos verificar e implementar a importação.</strong></p>
+
+					</div>
 				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
 			</div>
 		</div>
 	</div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="modalAviso">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">Aviso</h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-sm-12">
+
+
+						<p> A quadra/região foi salva, mas só aparecerá no Aplicativo Mobile quando estiver associado em uma safra!</p>
+
+
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal DELETE-->
+<div class="modal fade" id="modalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="myModalLabel">Confirmação Exclusão</h4>
+			</div>
+
+			<div class="modal-body">
+				<p>Têm certeza que deseja excluir a Quadra '{{data.nome}}'?</p>
+				<p class="debug-url"></p>
+			</div>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+				<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="excluirQuadra(data)">Excluir</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal Start here-->
+<div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"
+role="dialog" aria-hidden="true" data-backdrop="static">
+<div class="modal-dialog modal-sm">
+	<div class="modal-content">
+		<div class="modal-header">
+			<h4 class="modal-title">
+				<span class="glyphicon glyphicon-time">
+				</span>&nbsp;&nbsp;Aguarde, carregando...
+			</h4>
+		</div>
+		<div class="modal-body">
+			<div class="progress">
+				<div class="progress-bar progress-bar-info
+				progress-bar-striped active"
+				style="width: 100%" >
+			</div>
+		</div>
+	</div>
+</div>
 </div>
 </div>
 

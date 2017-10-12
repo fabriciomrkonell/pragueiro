@@ -1,0 +1,135 @@
+		<div ng-controller="selecaofilialCtrl" class="ng-scope ng_scope">
+			<nav class="navbar navbar-default navbar-fixed-top">
+				<div class="container-fluid">
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<a class="navbar-brand"><img src="dist/img/actionbar_title.png" class="logo-actionbar_title"</a>
+					</div>
+					<ul class="nav navbar-nav navbar-right">
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Configurações <span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li><a href="#/perfil">Meu perfil</a></li>
+								<li><a href="#/sair">Sair</a></li>
+								<!--<li><a href="#/erros">Erros</a></li>-->
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</nav>
+
+
+
+
+			<div class="container container-view">
+
+				<div class="row">
+					<h3> Selecione uma fazenda </h3>
+					<br>
+					<div ui-grid="gridOptions" ui-grid-selection class="gridFazendaSelecao"></div>			
+
+				</div>
+			</div>
+			<div class="modal fade" tabindex="-1" role="dialog" id="modalUsuarios">
+				<div class="modal-dialog modal-lg">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+							<h4 class="modal-title">Usuários - {{objModal.nome}}</h4>
+						</div>
+						<div class="modal-body">
+							<div class="row">
+								<div class="col-sm-4">
+									<form class="form-signin" role="form" action="/login" method="post">
+										<div class="form-group">
+											<label>Usuário</label>
+											<select class="form-control" ng-model="objModalUsuario.usuario">
+												<option value="{{usuario.$id}}" ng-repeat="usuario in todoUsuarios | orderBy:'nome'">{{usuario.nome}}</option>
+											</select>
+										</div>
+
+										<button type="button" class="btn btn-success pull-left" ng-show="!editUsuario" ng-click="salvarUsuarioXfil(objModal, objModalUsuario.usuario)">Salvar</button>
+										<button type="button" class="btn btn-success pull-left" ng-show="editUsuario" ng-click="atualizarUsuarioXfil(objModal, objModalUsuario.usuario)">Atualizar</button>
+										<button type="button" class="btn btn-default btn-cancel" ng-click="clearUsuarioXfil(data.fazenda.$id, objModal.$id)">Cancelar</button>
+									</form>
+								</div>
+								<div class="col-sm-8">
+									<table class="table table-condensed table-bordered">
+										<thead>
+											<tr>
+												<th>Usuários</th>
+												<th class="text-center" width="70px">Ações</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr ng-repeat="user in usuarios">
+												<td>{{user.nome}}</td>									
+												<td class="text-center" width="70px">											
+													<button type="button" class="btn btn-danger btn-xs" ng-click="excluirUsuarioxfilial(objModal, user)">
+														<i class="glyphicon glyphicon-remove"></i>
+													</button>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Modal DELETE-->
+			<div class="modal fade" id="modalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="myModalLabel">Confirmação Exclusão</h4>
+						</div>
+
+						<div class="modal-body">
+							<p>Têm certeza que deseja excluir a Fazenda '{{data.nome}}'?</p>
+							<p class="debug-url"></p>
+						</div>
+
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+							<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="excluirFilial(data)">Excluir</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Modal Aguarde-->
+			<div class="modal fade bs-example-modal-sm" id="myPleaseWait" tabindex="-1"
+			role="dialog" aria-hidden="true" data-backdrop="static">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">
+							<span class="glyphicon glyphicon-time">
+							</span>&nbsp;&nbsp;Aguarde, carregando...
+						</h4>
+					</div>
+					<div class="modal-body">
+						<div class="progress">
+							<div class="progress-bar progress-bar-info
+							progress-bar-striped active"
+							style="width: 100%">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Modal ends Here -->
+</div>

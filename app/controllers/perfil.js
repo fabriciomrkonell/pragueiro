@@ -4,27 +4,19 @@
 
 	angular.module('Pragueiro.controllers').registerCtrl('perfilCtrl', perfilCtrl);
 
-	perfilCtrl.$inject = ['$scope', '$rootScope', '$firebaseArray', '$firebaseObject', 'Constant', 'Notify', 'Session', 'Util'];
+	perfilCtrl.$inject = ['$scope',  '$compile', '$sce', '$rootScope', '$firebaseArray', '$firebaseObject', 'Constant', 'Notify', 'Session', 'Util'];
 
-	function perfilCtrl($scope, $rootScope, $firebaseArray, $firebaseObject, Constant, Notify, Session, Util) {
-/*
-	angular.extend($scope, {
-				data: {
-					editEmail: {
-						email: user.password.email,
-						novoemail: ''
-					},
-					editSenha: {
-						senha: '',
-						novasenha: ''
-					}
-				}
-			});
-			*/
-			var refUsuario;
-		//user = Session.getUser();
+	function perfilCtrl($scope, $compile, $sce, $rootScope, $firebaseArray, $firebaseObject, Constant, Notify, Session, Util) {
 
-		//$scope.arrayData = $firebaseArray(ref.orderByChild("uid").equalTo(user.uid));
+		var refUsuario;
+		
+
+		$scope.menu  = $sce.trustAsHtml(window.localStorage.getItem('menu'));
+		$scope.fazendas  = JSON.parse(window.localStorage.getItem('todasFiliais'));
+		$scope.posicaoFilial = window.localStorage.getItem('posicaoFilial');
+		$scope.fazenda  = $scope.fazendas[$scope.posicaoFilial];
+		var key_usuario  = window.localStorage.getItem('key_usuario');	
+		
 
 		console.log('tesssse');
 		$('#myPleaseWait').modal('show');

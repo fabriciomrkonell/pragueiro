@@ -1,4 +1,7 @@
 <div ng-controller="planejamentoCtrl" class="ng-scope ng_scope">
+
+	<div ng-bind-html="menu" init-bind></div>
+
 	<div class="container container-view">
 		<div class="row">
 			<div class="col-sm-6 col-sm-no-bottom">
@@ -9,15 +12,7 @@
 		</div>
 
 		<div class="row">
-			<div class="col-sm-4 col-sm-no-bottom">
-				<form class="form-signin" >
-					<div class="form-group">
-						<label>Fazenda</label>
-						<select class="form-control" ng-options="fazenda.nome for fazenda in fazendas" ng-model="fazenda" ng-change="chengeFazenda(fazenda)">
-						</select>
-					</div>
-				</form>
-			</div>
+			
 			<div class="col-sm-4 col-sm-no-bottom ">
 				<form class="form-signin" role="form" >
 					<div class="form-group">
@@ -33,12 +28,12 @@
 		<div class="row">
 			<div class="col-sm-6">
 				
-				<button type="button" class="btn btn-success" ng-show="save" ng-click="salvarPlanejamento(false)">Salvar</button>
-				<button type="button" class="btn btn-success" ng-show="save" ng-click="salvarPlanejamento(true)">Salvar + Novo</button>
-				<button type="button" class="btn btn-success" ng-show="edit" ng-click="atualizarPlanejamento()">Atualizar</button>
+				<button type="button" class="btn btn-success" ng-show="save && objetoTelaAcesso.inclusao" ng-click="salvarPlanejamento(false)">Salvar</button>
+				<button type="button" class="btn btn-success" ng-show="save && objetoTelaAcesso.inclusao" ng-click="salvarPlanejamento(true)">Salvar + Novo</button>
+				<button type="button" class="btn btn-success" ng-show="edit && objetoTelaAcesso.edicao" ng-click="atualizarPlanejamento()">Atualizar</button>
 				<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar/Novo</button>
 				
-				<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="chamaExcluirPlanejamento()">Excluir</button>
+				<button type="button" class="btn btn-default btn-danger" ng-show="edit && objetoTelaAcesso.exclusao" ng-click="chamaExcluirPlanejamento()">Excluir</button>
 				<br />
 				<form class="form-signin" role="form" >
 					<div class="form-group">
@@ -47,7 +42,7 @@
 					<div class="form-group">
 						<label>Quadra/Região</label>
 
-						<select class="form-control"  ng-model="data.key"  ng-options="quadra.key as (quadra.nome) for quadra in fazendaSelecioanda.todasQuadras"> >							
+						<select class="form-control"  ng-model="data.key"  ng-options="quadra.key as (quadra.nome) for quadra in todasQuadras"> >							
 							<option></option>
 						</select>
 					</div> 

@@ -4,9 +4,9 @@
 
 	angular.module('Pragueiro.controllers').registerCtrl('tipatiCtrl', tipatiCtrl);
 
-	tipatiCtrl.$inject = ['$scope', '$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Notify'];
+	tipatiCtrl.$inject = ['$scope', '$compile', '$sce', '$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Notify', 'Controleacesso'];
 
-	function tipatiCtrl($scope, $firebaseArray, $firebaseObject, Session, Constant, Notify) {
+	function tipatiCtrl($scope, $compile, $sce, $firebaseArray, $firebaseObject, Session, Constant, Notify, Controleacesso) {
 
 		angular.extend($scope, {
 			edit: false,
@@ -26,10 +26,11 @@
 		});
 
 
-		var ref = new Firebase(Constant.Url + '/tipati');
-		$scope.todasTipatis = $firebaseArray(ref);
-		//var refFazendas = new Firebase(Constant.Url + '/filial');
-		atualizaListaFiliais();
+		$scope.menu  = $sce.trustAsHtml(window.localStorage.getItem('menu'));
+		$scope.fazendas  = JSON.parse(window.localStorage.getItem('todasFiliais'));
+		$scope.posicaoFilial = window.localStorage.getItem('posicaoFilial');
+		$scope.fazenda  = $scope.fazendas[$scope.posicaoFilial];
+		var key_usuario  = window.localStorage.getItem('key_usuario');		
 
 		$scope.gridOptions = { 
 			enableRowSelection: true, 
@@ -72,144 +73,133 @@
 
 		function atualizaListaFiliais()
 		{
-			$('#myPleaseWait').modal('show');
+			$scope.chengeFazenda($scope.fazenda);			
 
-			var refUser = new Firebase(Constant.Url + '/usuarioxauth/'+Session.getUser().uid);		
-			var obj = $firebaseObject(refUser);
-			var key_usuario;
-			obj.$loaded().then(function() {
-				key_usuario= obj.$value;
-				
-				$scope.fazendas=[];
-				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
-				var refNovo = new Firebase.util.NormalizedCollection(
-					[baseRef.child("/usuario/"+key_usuario+"/filial/"), "$key"],
-					baseRef.child("/filial")
-					).select(
-					{"key":"$key.$key","alias":"key"},
-					{"key":"filial.$value","alias":"filial"}
-					).ref();
+			var baseRef = new Firebase(Constant.Url);
+			var refNovo = new Firebase.util.NormalizedCollection(
+				[baseRef.child("/usuario/"+key_usuario+"/filial/"), "$key"],
+				baseRef.child("/filial")
+				).select(
+				{"key":"$key.$key","alias":"key"},
+				{"key":"filial.$value","alias":"filial"}
+				).ref();
 
-					var i=0;
-					refNovo.on('child_added', function(snap) {
-						$('#myPleaseWait').modal('hide');
-
-						//console.log('Adicionou filial', snap.name(), snap.val());
-						var obj= snap.val();
-						$scope.fazendas.push(obj.filial);
-						if(i==0)
-						{
-							$scope.chengeFazenda($scope.fazendas[0]);
-							$scope.data.fazenda=$scope.fazendas[0];
-						}
-						if(!$scope.$$phase) {
-							$scope.$apply();
+				refNovo.on('child_changed', function(snap) {
+					$('#myPleaseWait').modal('hide');
+					var objNovo = snap.val();
+					var posicao = null;
+					$scope.fazendas.forEach(function(obj) {
+						if (obj.key === objNovo['filial'].key) {
+							posicao = $scope.fazendas.indexOf(obj);
 						}
 					});
+					if (posicao != null)
+						$scope.fazendas[posicao] = objNovo['filial'];
 
-					refNovo.on('child_changed', function(snap) {
-						//console.log('Houve uma atualização', snap.name(), snap.val());
-						var objNovo= snap.val();
-
-						var x=0;
-						var posicao=null;
-						$scope.fazendas.forEach(function(obj){
-							if(obj.key === objNovo.filial.key)
-							{ 
-								posicao=x;
-							}
-							x++;
-
-						});
-						if(posicao!=null)
-							$scope.fazendas[posicao]=objNovo.filial;
-
-					});
-
-					refNovo.on('child_removed', function(snap) {
-						//console.log('Houve uma remoção', snap.name(), snap.val());
-						atualizaListaFiliais();
-					});
-					if($scope.fazendas.length==0)
+					if(objNovo['filial'].key==$scope.fazenda.key)
 					{
-						$('#myPleaseWait').modal('hide');
+						window.localStorage.setItem('filialCorrente', JSON.stringify( objNovo['filial']));
+						$scope.fazenda=objNovo['filial'];
 					}
-			});// final do load
-		}		
+					window.localStorage.setItem('todasFiliais', JSON.stringify( $scope.fazendas));
+
+				});
+			}	
+
+		//---	
 
 		$scope.chengeFazenda = function(fazenda)
 		{
+			$scope.clear();
+
 			if(fazenda === null) 
 			{
 				$scope.tipatis =null;
 			}
 			else
 			{				
+				//--------------------------------------
+				//Controle Acesso	
+				$scope.menu  = $sce.trustAsHtml(Controleacesso.refazMenu_Acesso(fazenda.aceemps));
+				$scope.objetoTelaAcesso=Controleacesso.retornaObjetoTela(fazenda.aceemps, 'tipati');
 
-				//$('#myPleaseWait').modal('show');
+				if($scope.objetoTelaAcesso==null || $scope.objetoTelaAcesso.visualizacao==null || $scope.objetoTelaAcesso.visualizacao==false)
+				{
+					window.location.href = '#home';
+				}
+				//-------------------------------------
+				$scope.clear();
+				if(fazenda.tipati!=null)
+				{
+					$scope.qtde_tipati= castObjToArray(fazenda.tipati).length;
+				}
+				else
+				{
+					$scope.qtde_tipati=0;
+					$('#myPleaseWait').modal('hide');
+				}
+
 
 				$scope.tipatis=[];
 				$scope.gridOptions.data=$scope.tipatis;
 
-				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
-				var refNovoQuadra = new Firebase.util.NormalizedCollection(
-					baseRef.child("/filial/"+fazenda.key+"/tipati"),
-					[baseRef.child("/tipati"), "$key"]
-					).select(
-					{"key":"tipati.$value","alias":"filial"},
-					{"key":"$key.$value","alias":"tipatis"}
-					).ref();
+				var baseRef = new Firebase(Constant.Url + '/tipati/' + fazenda.key);				
 
-/*
-					refNovoQuadra.on('value', function(snapshot) {
-						if(snapshot.numChildren()==0)
-						{
-							$('#myPleaseWait').modal('hide');
+				baseRef.on('child_added', function(snap) {
+					var objNovo= snap.val();
+
+					var posicao=null;
+					$scope.tipatis.forEach(function(obj){
+						if(obj.key === objNovo.key)
+						{ 
+							posicao=$scope.tipatis.indexOf(obj);
 						}
+
 					});
-					*/
-					refNovoQuadra.on('child_added', function(snap) {
+					if(posicao==null)
+						$scope.tipatis.push(objNovo);
+					else						
+						$scope.tipatis[posicao]=objNovo;
+
+					
+					if(!$scope.$$phase) {
+						$scope.$apply();
+					}
+					$scope.gridOptions.data = $scope.tipatis;
+
+					if($scope.qtde_tipati==$scope.tipatis.length)
+					{
 						$('#myPleaseWait').modal('hide');
-						var objNovo= snap.val();
-						$scope.tipatis.push(objNovo['tipatis']);
-						if(!$scope.$$phase) {
-							$scope.$apply();
+					}
+				});
+
+				baseRef.on('child_changed', function(snap) {
+					$('#myPleaseWait').modal('hide');
+					var objNovo= snap.val();
+					var posicao=null;
+					$scope.tipatis.forEach(function(obj){
+						if(obj.key === objNovo.key)
+						{ 
+							posicao=$scope.tipatis.indexOf(obj);
 						}
-						$scope.gridOptions.data=$scope.tipatis;
+
 					});
+					if(posicao!=null)
+						$scope.tipatis[posicao]=objNovo;
 
-					refNovoQuadra.on('child_changed', function(snap) {
-						$('#myPleaseWait').modal('hide');
-						var objNovo= snap.val();
-						var x=0;
-						var posicao=null;
-						$scope.tipatis.forEach(function(obj){
-							if(obj.key === objNovo['tipatis'].key)
-							{ 
-								posicao=x;
-							}
-							x++;
+					if(!$scope.$$phase) {
+						$scope.$apply();
+					}
+				});
 
-						});
-						if(posicao!=null)
-							$scope.tipatis[posicao]=objNovo['tipatis'];
-
-						if(!$scope.$$phase) {
-							$scope.$apply();
-						}
-					});
-
-					refNovoQuadra.on('child_removed', function(snap) {
-						$scope.chengeFazenda($scope.data.fazenda);
-					});
+				baseRef.on('child_removed', function(snap) {
+					$scope.chengeFazenda($scope.fazenda);
+				});
 
 
 
-				}
-			};
-
-
-
+			}
+		};
 
 
 		//############################################################################################################################
@@ -217,55 +207,21 @@
 		// QUADRA
 		//############################################################################################################################
 
-		
-
-		$scope.getDadosTipati = function(obj, nomeColuna){
-			var retorno = '';
-			if(nomeColuna=='nome')
-			{
-				$scope.todasTipatis.forEach(function(item){
-					if(item.$id === obj.$id) retorno = item['nome'];
-				});
-			}
-			if(nomeColuna=='codigo')
-			{
-				$scope.todasTipatis.forEach(function(item){
-					if(item.$id === obj.$id) retorno = item['codigo'];
-				});
-			}
-			if(nomeColuna=='ativo')
-			{
-				$scope.todasTipatis.forEach(function(item){
-					if(item.$id === obj.$id) retorno = item['ativo'];
-				});
-			}
-			if(nomeColuna=='coordenadas')
-			{
-				$scope.todasTipatis.forEach(function(item){
-					if(item.$id === obj.$id) retorno = item['coordenadas'];
-				});
-			}
-			return retorno;
-		};
-
 		$scope.salvarTipati = function(data){
 			if(validForm(data)) return false;
 
-			var fazendaTmp=data.fazenda;
-			delete data.fazenda;
 			delete data.$$hashKey;	
-			data['filial']=[];
-			data['filial'][fazendaTmp.key]=true;
-			var refTipati = new Firebase(Constant.Url + '/tipati/');
-			var key=refTipati.push().key();
-			var refTipatiNovo = new Firebase(Constant.Url + '/tipati/'+key);
-			data.key=key;
+
+			var refTipati = new Firebase(Constant.Url + '/tipati/'+$scope.fazenda.key );
+			data['key']=refTipati.push().key();
+
+			var refTipatiNovo = new Firebase(Constant.Url + '/tipati/'+$scope.fazenda.key +'/'+data.key);
 			refTipatiNovo.set(data);
-			var refTipatiNovo = new Firebase(Constant.Url + '/filial/'+fazendaTmp.key + '/tipati/'+key);
-			refTipatiNovo.set(true);
-			$scope.chengeFazenda(fazendaTmp);
+
+			var refFilial = new Firebase(Constant.Url + '/filial/'+$scope.fazenda.key + '/tipati/'+data.key);
+			refFilial.set(true);
+
 			$scope.clear();						
-			$scope.setaFazenda(fazendaTmp);	
 
 			Notify.successBottom('Tipo Ordem de Serviço/Atividade inserida com sucesso!');
 
@@ -275,31 +231,26 @@
 
 		$scope.editarTipati = function(data){
 			if(validForm(data)) return false;
-			var fazendaTmp=data.fazenda;
-			delete data.fazenda;
-			delete data.$$hashKey;		
-			var refTipati = new Firebase(Constant.Url + '/tipati/'+data.key);
-			refTipati.set(data);
-			data.fazenda=fazendaTmp;
+
+			delete data.$$hashKey;	
+
+			var refTipatiNovo = new Firebase(Constant.Url + '/tipati/'+$scope.fazenda.key +'/'+data.key);
+			refTipatiNovo.set(data);
+
 			$scope.clear();
 
 			Notify.successBottom('Tipo Ordem de Serviço/Atividade atualizada com sucesso!');
 		};
 
 		$scope.cancelar = function(){
-			var fazendaTmp=$scope.data.fazenda;
 			$scope.clear();
-			$scope.setaFazenda(fazendaTmp);	
-			$scope.chengeFazenda($scope.data.fazenda);	
 			$scope.edit = false;
 			$scope.save= true;
 		};
 
 		$scope.editar = function(obj){
 			$scope.desabilitaFazenda=true;
-			var fazendaTmp=$scope.data.fazenda;
 			$scope.data = obj;
-			$scope.data.fazenda=fazendaTmp;
 			$scope.edit = true;
 			$scope.save= false;
 
@@ -313,7 +264,7 @@
 
 		$scope.excluirTipati = function(objeto){
 			$('#modalDelete').modal('hide');
-			var fazendaTmp=$scope.data.fazenda;
+
 			if(objeto.qtd!=null)
 			{
 				if(objeto.qtd>0)
@@ -323,13 +274,16 @@
 				}
 			}		
 
-			var refTipatiNovo = new Firebase(Constant.Url + '/tipati/'+objeto.key);
+			var refTipatiNovo = new Firebase(Constant.Url + '/tipati/'+$scope.fazenda.key +'/'+objeto.key);
 			refTipatiNovo.remove();
-			var refTipatiNovo = new Firebase(Constant.Url + '/filial/'+ $scope.data.fazenda.key + '/tipati/'+objeto.key);
-			refTipatiNovo.remove();			
+
+			var refFilial = new Firebase(Constant.Url + '/filial/'+$scope.fazenda.key + '/tipati/'+objeto.key);
+			refFilial.remove();		
+
 			Notify.successBottom('Tipo Ordem de Serviço/Atividade removida com sucesso!');
-			$scope.chengeFazenda(fazendaTmp);
-			$scope.cancelar();
+
+			$scope.clear();
+			
 			return true;
 			
 		};
@@ -340,17 +294,6 @@
 		//UTEIS
 		//############################################################################################################################
 
-		$scope.setaFazenda = function(fazenda){
-			if(fazenda === null) return false;
-
-			$scope.fazendas.forEach(function(item){
-				if(item.key === fazenda.key) 	
-				{
-					$scope.data.fazenda = item;		
-				}
-			});
-			
-		};
 
 		function setMessageError(message){
 			Notify.errorBottom(message);
@@ -358,7 +301,7 @@
 
 		function validForm(data){
 
-			if(data.fazenda==null || data.fazenda.key == null){
+			if($scope.fazenda==null || $scope.fazenda.key == null){
 				setMessageError('O campo fazenda é inválido!');
 				return true;
 			}			
@@ -389,7 +332,6 @@
 		};
 		
 		$scope.clear = function(){
-			//var fazendaTmp=$scope.data.fazenda;
 			angular.extend($scope.data, {
 				ativo: true,
 				nome: '',
@@ -401,18 +343,31 @@
 				colheita: false,
 				quahor:0
 			});
-			//$scope.data.fazenda=fazendaTmp;
 			$scope.desabilitaFazenda=false;
 			$scope.edit=false;
 			if(!$scope.$$phase) {
 				$scope.$apply();
 			}
-			//$scope.chengeFazenda($scope.fazenda);
-			//$scope.data.fazenda=fazendaTmp;
 		};
-		
 
-		//$scope.clear();
+		function castObjToArray(myObj)
+		{
+			if(myObj==null)
+			{
+				var sem_nada=[];
+				return sem_nada;
+			}
+			else
+			{
+				var array = $.map(myObj, function(value, index) {
+					return [value];
+				});
+				return array;
+
+			}
+		}
+		
+		atualizaListaFiliais();
 
 	}
 

@@ -4,9 +4,9 @@
 
 	angular.module('Pragueiro.controllers').registerCtrl('configuracoesCtrl', configuracoesCtrl);
 
-	configuracoesCtrl.$inject = ['$scope', '$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Notify'];
+	configuracoesCtrl.$inject = ['$scope', '$compile', '$sce',  '$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Notify', 'uiGridGroupingConstants', 'Controleacesso'];
 
-	function configuracoesCtrl($scope, $firebaseArray, $firebaseObject, Session, Constant, Notify) {
+	function configuracoesCtrl($scope, $compile,  $sce, $firebaseArray, $firebaseObject, Session, Constant, Notify, uiGridGroupingConstants, Controleacesso) {
 
 		angular.extend($scope, {
 			edit: false,
@@ -52,6 +52,8 @@
 			}
 		});
 
+
+
 		$scope.ocorrencia = [
 		{
 			nome:'Primeiro ponto',
@@ -68,14 +70,12 @@
 
 		$scope.terminou=false;
 
-		var ref = new Firebase(Constant.Url + '/configuracoes');
-		$scope.todasConfiguracoess = $firebaseArray(ref);
-		//var refFazendas = new Firebase(Constant.Url + '/filial');
-		
+		var objMenuVazio;
 
 		$scope.todasCulturas=[];
 		$scope.exibePermissoes=false;
 		$scope.todosControleacessos =[];
+		$scope.todosControleacessosGeral =[];
 		$scope.usuarios=[];
 		$scope.aceemps=[];
 		$scope.todoUsuarios=[];
@@ -83,8 +83,9 @@
 		$scope.qtde_controleacesso=0;
 		$scope.qtde_culturas=0;
 
-		
-
+		$scope.menu  = $sce.trustAsHtml(window.localStorage.getItem('menu'));
+		$scope.fazendas  = JSON.parse(window.localStorage.getItem('todasFiliais'));
+		$scope.fazenda  = JSON.parse(window.localStorage.getItem('filialCorrente'));
 
 		$scope.usuario_inclusao={};
 
@@ -162,7 +163,12 @@
 			multiSelect : false,
 			modifierKeysToMultiSelect : false,
 
+			//treeRowHeaderAlwaysVisible: false,
+
 			columnDefs : [
+			{ field: "nomgru", displayName: "Menu", width: 300, enableCellEdit: false, grouping: { groupPriority: 0 } , cellTemplate: "<div class='cell_personalizada'>{{grid.appScope.mapValue(row)}}</div>"},
+			
+
 			{ field: "nome", displayName: "Nome", width: 300, enableCellEdit: false, },
 			{ name: 'Visualização', enableCellEdit: false, width: 130, field: 'visualizacao', cellTemplate: '<input type="checkbox" ng-model="row.entity.visualizacao">'},
 			{ field: "inclusao", displayName: "Inclusão", width: 130, enableCellEdit: false, cellTemplate: '<input type="checkbox" ng-model="row.entity.inclusao">'},
@@ -171,10 +177,33 @@
 			],
 			appScopeProvider: {
 				mapValue: function(row) {
-					return row.entity.ativo ? 'Sim' : 'Não';
+					if(row.groupHeader)
+					{
+						var entity = row.treeNode.children[0].row.entity;
+						return entity.nomgru;
+					}
+					else
+					{
+						return '';
+					}
 				}
 			}			
 		};
+
+		$scope.name = function(grid,row,col)
+		{
+			if(row.groupHeader)
+			{
+				var entity = row.treeNode.children[0].row.entity;
+				return entity.codgru;
+			}
+			else
+			{
+				return row.entity.codgru;
+			}
+			return "SAmple";
+		}
+
 
 		$scope.gridOptionsControleacesso.onRegisterApi = function(gridApi){
 			$scope.gridApi = gridApi;
@@ -192,9 +221,7 @@
 
 		};
 
-		recuperaTodosUsuarios();
-		recuperaCulturaQtde();
-		recuperaControleacessoQtde();
+
 
 		//############################################################################################################################
 		//############################################################################################################################
@@ -204,8 +231,13 @@
 		function atualizaListaFiliais()
 		{
 			$scope.terminou=true;
+
+			$scope.chengeFazenda($scope.fazendas[0]);
 			console.log('atualizaListaFiliais()')
-			$('#myPleaseWait').modal('show');
+			$('#myPleaseWait').modal('hide');
+
+
+			return;
 
 			var refUser = new Firebase(Constant.Url + '/usuarioxauth/'+Session.getUser().uid);		
 			var obj = $firebaseObject(refUser);
@@ -259,7 +291,23 @@
 				$scope.configuracoess =null;
 			}
 			else
-			{			
+			{		
+				//--------------------------------------
+				//Controle Acesso	
+				//$scope.menu  = $sce.trustAsHtml(Controleacesso.refazMenu_Acesso(fazenda.aceemps));
+				$scope.objetoTelaAcesso=Controleacesso.retornaObjetoTela(fazenda.aceemps, 'configuracoes');
+
+				if($scope.objetoTelaAcesso==null || $scope.objetoTelaAcesso.visualizacao==null || $scope.objetoTelaAcesso.visualizacao==false)
+				{
+				//	window.location.href = '#home';
+			}
+				//--------------------------------------
+				else
+				{
+					$('#myPleaseWait').modal('show');
+				}
+
+				recuperaConfiguracao($scope.fazendas[0]);	
 				$scope.recuperaUsuarios(fazenda);
 				$scope.configuracoess=[];
 
@@ -342,12 +390,11 @@
 		{
 			if(fazenda === null || fazenda==null) 
 			{
-				$scope.configuracoess =null;
+				$scope.usuarios =null;
 			}
 			else
 			{			
-
-				$scope.configuracoess=[];
+				$scope.usuarios=[];
 
 				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
 				var refNovoQuadra = new Firebase.util.NormalizedCollection(
@@ -508,6 +555,7 @@
 				if(verificaTermino() && !$scope.terminou)
 				{
 					console.log('recuperaCultura terminou()')
+					
 					atualizaListaFiliais();
 				}					
 
@@ -517,6 +565,8 @@
 		}
 
 		function recuperaTodosUsuarios() {
+
+			$('#myPleaseWait').modal('show');
 
 			var baseRef = new Firebase(Constant.Url+'/usuario');
 
@@ -535,12 +585,41 @@
 
 		function recuperaControleacesso() {
 
+			$scope.todosControleacessosGeral = [];
+			$scope.todosControleacessos =[];
+			$scope.gridOptionsControleacesso.data=$scope.todosControleacessos;
+
 			var baseRef = new Firebase(Constant.Url+'/controleacesso');
 
 			baseRef.on('child_added', function(snapshot) {
 
 				var objNovo = snapshot.val();
-				$scope.todosControleacessos.push(objNovo);
+
+				$scope.todosControleacessosGeral.push(objNovo);
+
+				if(objNovo.ativo==null || objNovo.ativo==false)
+				{
+					$scope.qtde_controleacesso --;
+					if(objNovo.codigo=='001')
+					{
+						objMenuVazio=objNovo;
+					}
+					return;
+				}
+				else
+				{
+					if(objNovo.grupo!=null && objNovo.grupo==true)
+					{
+						$scope.qtde_controleacesso --;						
+						return;
+					}
+					else
+					{
+						$scope.todosControleacessos.push(objNovo);
+					}
+				}
+
+				
 
 				
 				$scope.gridOptionsControleacesso.data=$scope.todosControleacessos;
@@ -561,9 +640,6 @@
 		function recuperaControleacessoPorUsuario() {
 			if($scope.fazenda==null) return false;
 			if($scope.usuario.key==null) return false;
-
-
-
 
 			var i=0
 			$scope.todosControleacessos.forEach(function(controle){
@@ -690,7 +766,7 @@
 
 		//############################################################################################################################
 		//############################################################################################################################
-		// QUADRA
+		// CONFIGURACOES
 		//############################################################################################################################
 		$scope.salvar = function(data){
 			if($scope.fazenda==null) return false;
@@ -725,9 +801,12 @@
 			var refNovoUserXFil = new Firebase(Constant.Url + '/usuario/'+usuario.key+'/filial/'+ $scope.fazenda.key);
 			refNovoUserXFil.set(true);
 
-			/*
-			$scope.quadra.$add(form);
-			*/
+			objMenuVazio['key_filial'] = $scope.fazenda.key ;
+			objMenuVazio['key_usuario'] = usuario.key ;
+
+			var refAcess = new Firebase(Constant.Url + '/aceemp/' + $scope.fazenda.key + '/' + usuario.key+'/'+ objMenuVazio.key);
+			refAcess.set(objMenuVazio);
+
 			$('#modalUsuarios').modal('hide');
 			
 			Notify.successBottom('Usuário adicionado com sucesso!');
@@ -761,14 +840,22 @@
 					foo [ user.uid ]  =  user.uid ; 
 					refNovoAuth.set( user.uid);
 
-					var refNovo = new Firebase(Constant.Url + '/usuario/' + user.uid);
+					data['key']= user.uid;
+					var refNovo = new Firebase(Constant.Url + '/usuario/' + data.uid);
 					refNovo.set(data);
 
-					var refNovo = new Firebase(Constant.Url + '/filial/' + $scope.fazenda.key + '/usuario/'+user.uid);
+					var refNovo = new Firebase(Constant.Url + '/filial/' + $scope.fazenda.key + '/usuario/'+data.key);
 					refNovo.set(true);
 
-					var refNovoUserXFil = new Firebase(Constant.Url + '/usuario/'+user.uid+'/filial/'+ $scope.fazenda.key);
+					var refNovoUserXFil = new Firebase(Constant.Url + '/usuario/'+data.key+'/filial/'+ $scope.fazenda.key);
 					refNovoUserXFil.set(true);
+
+					objMenuVazio['key_filial'] = $scope.fazenda.key ;
+					objMenuVazio['key_usuario'] = data.key ;
+
+					var refAcess = new Firebase(Constant.Url + '/aceemp/' + $scope.fazenda.key + '/' + data.key  +'/'+ objMenuVazio.key);
+					refAcess.set(objMenuVazio);
+
 
 					Notify.successBottom('Usuário criado e associado a fazenda com sucesso!');
 
@@ -790,8 +877,36 @@
 			aceemp['key_usuario'] = $scope.usuario.key ;
 
 			var refConfiguracoes = new Firebase(Constant.Url + '/aceemp/' + $scope.fazenda.key + '/' + $scope.usuario.key+'/'+ aceemp.key);
-
 			refConfiguracoes.set(aceemp);
+
+			if(aceemp.visualizacao)
+			{
+				$scope.todosControleacessosGeral.forEach(function(obj) {
+					if(aceemp.keygru==obj.key)
+					{
+						var aceempGrupo = clone(obj);
+						aceempGrupo.visualizacao=true;
+
+						var refConfiguracoes = new Firebase(Constant.Url + '/aceemp/' + $scope.fazenda.key + '/' + $scope.usuario.key+'/'+ aceempGrupo.key);
+						refConfiguracoes.set(aceempGrupo);
+					}
+				});
+			}
+			else
+			{
+				var temOutraTela=false;
+				$scope.aceemps.forEach(function(obj) {
+					if(aceemp.key!=obj.key && aceemp.codgru == obj.codgru && (obj.grupo==false || obj.grupo==false) && obj.visualizacao)
+					{
+						temOutraTela=true;
+					}
+				});
+				if(!temOutraTela)
+				{
+					var refConfiguracoes = new Firebase(Constant.Url + '/aceemp/' + $scope.fazenda.key + '/' + $scope.usuario.key+'/'+ aceemp.keygru);
+					refConfiguracoes.remove();
+				}
+			}
 		}
 
 		$scope.chamaExcluirAcesso = function(){
@@ -805,6 +920,7 @@
 			$('#modalDeleteAcesso').modal('hide');
 
 			if( $scope.usuario==null) return false;
+			if( $scope.usuario.key==null) return false;
 			if($scope.fazenda==null) return false;
 
 			var refNovo = new Firebase(Constant.Url + '/filial/' + $scope.fazenda.key + '/usuario/'+ $scope.usuario.key);
@@ -826,10 +942,66 @@
 			$scope.exibePermissoes=false;
 		}
 
+		$scope.setarAcessoTotal = function (){
+			if($scope.fazenda==null) return false;
+			if($scope.usuario.key==null) return false;
+
+			$scope.todosControleacessosGeral.forEach(function(obj) {
+				if(obj.ativo == true)
+				{
+					var aceempPadrao = clone(obj);
+
+					delete aceempPadrao.$$hashKey;	
+
+					aceempPadrao.inclusao = true;
+					aceempPadrao.visualizacao=true;
+					aceempPadrao.edicao = true;
+					aceempPadrao.exclusao = true;
+
+
+					var refConfiguracoes = new Firebase(Constant.Url + '/aceemp/' + $scope.fazenda.key + '/' + $scope.usuario.key+'/'+ aceempPadrao.key);
+					refConfiguracoes.set(aceempPadrao);
+				}
+			});
+
+			Notify.successBottom('Acesso total definido para o usuário ' + $scope.usuario.nome +' com sucesso!');
+
+		}
+
+		$scope.retirarAcessoTotal = function (){
+			if($scope.fazenda==null) return false;
+			if($scope.usuario.key==null) return false;
+
+			$scope.todosControleacessosGeral.forEach(function(obj) {
+				if(obj.ativo == true)
+				{
+					var aceempPadrao = clone(obj);
+
+					delete aceempPadrao.$$hashKey;	
+
+					aceempPadrao.inclusao = false;
+					aceempPadrao.visualizacao=false;
+					aceempPadrao.edicao = false;
+					aceempPadrao.exclusao = false;
+
+
+					var refConfiguracoes = new Firebase(Constant.Url + '/aceemp/' + $scope.fazenda.key + '/' + $scope.usuario.key+'/'+ aceempPadrao.key);
+					refConfiguracoes.set(aceempPadrao);
+				}
+			});
+
+			Notify.successBottom('Retirado acessos do usuário ' + $scope.usuario.nome +' com sucesso!');
+
+		}
+
 	//############################################################################################################################
 	//############################################################################################################################
 	//UTEIS
 	//############################################################################################################################
+
+	recuperaTodosUsuarios();
+	recuperaCulturaQtde();
+	recuperaControleacessoQtde();
 
 	$scope.setaFazenda = function(fazenda){
 		if(fazenda === null) return false;
@@ -1002,10 +1174,17 @@
 				quagravag_estagio : false
 			}
 		};
-		
 
-		//$scope.clear();
 
+	}
+
+	function clone(obj) {
+		if (null == obj || "object" != typeof obj) return obj;
+		var copy = obj.constructor();
+		for (var attr in obj) {
+			if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+		}
+		return copy;
 	}
 
 }());

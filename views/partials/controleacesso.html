@@ -1,5 +1,7 @@
 <div ng-controller="controleacessoCtrl" class="ng-scope ng_scope">
 
+	<div ng-bind-html="menu" init-bind></div>
+	
 	<div class="container container-view">
 		<div class="row">
 			<div class="col-sm-6 col-sm-no-bottom">
@@ -42,14 +44,32 @@
 							</div>		
 						</div>
 					</div>
+
 					<div class="form-group">
 						<label>Código</label>
 						<input type="text" class="form-control" placeholder="Código" ng-model="data.codigo" />
 					</div>	
+
+					<div class="form-group">
+						<label>Código GRUPO</label>
+						<input type="text" class="form-control" placeholder="Código grupo" ng-model="data.codgru" />
+					</div>
+
+					<div class="form-group">
+						<label>key GRUPO</label>
+						<input type="text" class="form-control" placeholder="Key grupo" ng-model="data.keygru" />
+					</div>
+
 					<div class="form-group">
 						<label>Nome</label>
 						<input type="text" class="form-control" placeholder="Nome" ng-model="data.nome" />
 					</div>	
+
+					<div class="form-group">
+						<label>Nome GRUPO</label>
+						<input type="text" class="form-control" placeholder="Nome grupo" ng-model="data.nomgru" />
+					</div>
+
 					<div class="form-group">
 						<label>link</label>
 						<input type="text" class="form-control" placeholder="Código" ng-model="data.link" />

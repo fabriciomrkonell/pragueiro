@@ -1,4 +1,7 @@
 <div ng-controller="tipequCtrl" class="ng-scope ng_scope">
+
+	<div ng-bind-html="menu" init-bind></div>
+
 	<div class="container container-view">
 
 		<div class="row">
@@ -9,24 +12,14 @@
 			</div>
 		</div>
 
-		<div class="row">
-			<div class="col-sm-6 col-sm-no-bottom">
-
-				<label>Fazenda</label>
-				<select class="form-control" ng-disabled=desabilitaFazenda ng-options="fazenda.nome for fazenda in fazendas" ng-model="data.fazenda" ng-change="chengeFazenda(data.fazenda)">
-					<option value="">Selecione</option>
-				</select>
-
-			</div>
-		</div>
 		<hr/>
 		<div class="row">
 			<div class="col-sm-6">
-				<button type="button" class="btn btn-success" ng-show="save" ng-click="salvarTipequ(data)">Salvar</button>
-				<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarTipequ
+				<button type="button" class="btn btn-success" ng-show="save && objetoTelaAcesso.inclusao" ng-click="salvarTipequ(data)">Salvar</button>
+				<button type="button" class="btn btn-success" ng-show="edit && objetoTelaAcesso.edicao" ng-click="editarTipequ
 				(data)">Atualizar</button>
 				<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar/Novo</button>
-				<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="excluir()">Excluir</button>
+				<button type="button" class="btn btn-default btn-danger" ng-show="edit && objetoTelaAcesso.exclusao" ng-click="excluir()">Excluir</button>
 				<br />
 				<br />
 				<form class="form-signin" role="form">

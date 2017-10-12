@@ -1,12 +1,12 @@
 (function(){
 
-	'use strict';
+	'use strict'; 
 
 	angular.module('Pragueiro.controllers').registerCtrl('clapraempCtrl', clapraempCtrl);
 
-	clapraempCtrl.$inject = ['$scope', '$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Notify'];
+	clapraempCtrl.$inject = ['$scope', '$compile', '$sce', '$firebaseArray', '$firebaseObject', 'Session', 'Constant', 'Notify', 'Controleacesso'];
 
-	function clapraempCtrl($scope, $firebaseArray, $firebaseObject, Session, Constant, Notify) {
+	function clapraempCtrl($scope,  $compile,  $sce, $firebaseArray, $firebaseObject, Session, Constant, Notify, Controleacesso) {
 
 		angular.extend($scope, {
 			edit: false,
@@ -22,10 +22,13 @@
 		$scope.numeracao_codigo = 1;
 		$scope.todasClapras=[];
 		
-		atualizaListaFiliais();
-		//listenerCodigo();
-		//recuperaClapra();
 
+		$scope.menu  = $sce.trustAsHtml(window.localStorage.getItem('menu'));
+		$scope.fazendas = JSON.parse(window.localStorage.getItem('todasFiliais'));
+		$scope.posicaoFilial = window.localStorage.getItem('posicaoFilial');
+		$scope.fazenda  = $scope.fazendas[$scope.posicaoFilial];
+		var key_usuario  = window.localStorage.getItem('key_usuario');	
+		
 		$scope.gridOptions = { 
 			enableRowSelection: true, 
 			enableRowHeaderSelection: false,
@@ -71,63 +74,61 @@
 		{
 			$('#myPleaseWait').modal('show');
 
-			var refUser = new Firebase(Constant.Url + '/usuarioxauth/'+Session.getUser().uid);		
-			var obj = $firebaseObject(refUser);
-			var key_usuario;
-			obj.$loaded().then(function() {
-				key_usuario= obj.$value;
-				
-				$scope.fazendas=[];
-				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
-				var refNovo = new Firebase.util.NormalizedCollection(
-					[baseRef.child("/usuario/"+key_usuario+"/filial/"), "$key"],
-					baseRef.child("/filial")
-					).select(
-					{"key":"$key.$key","alias":"key"},
-					{"key":"filial.$value","alias":"filial"}
-					).ref();
 
-					var i=0;
-					
-					refNovo.on('child_added', function(snap) {
-						
-						
-						//console.log('Adicionou filial', snap.name(), snap.val());
-						var obj= snap.val();
-						//recuperaTipequi(obj);
+			$scope.chengeFazenda($scope.fazenda);
 
-						$scope.fazendas.push(obj.filial);
+			var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
+			var refNovo = new Firebase.util.NormalizedCollection(
+				[baseRef.child("/usuario/"+key_usuario+"/filial/"), "$key"],
+				baseRef.child("/filial")
+				).select(
+				{"key":"$key.$key","alias":"key"},
+				{"key":"filial.$value","alias":"filial"}
+				).ref();
 
-						if(i==0)
-						{
-							$scope.chengeFazenda($scope.fazendas[0]);
-							$scope.fazenda=$scope.fazendas[0];
-							$('#myPleaseWait').modal('hide');
+				refNovo.on('child_changed', function(snap) {
+					$('#myPleaseWait').modal('hide');
+					var objNovo = snap.val();
+					var posicao = null;
+					$scope.fazendas.forEach(function(obj) {
+						if (obj.key === objNovo['filial'].key) {
+							posicao = $scope.fazendas.indexOf(obj);
 						}
-
-
-						if(!$scope.$$phase) {
-							
-							$scope.$apply();
-						}
-						i++;
 					});
+					if (posicao != null)
+						$scope.fazendas[posicao] = objNovo['filial'];
 
-					if($scope.fazendas.length==0)
+					if(objNovo['filial'].key==$scope.fazenda.key)
 					{
-						$('#myPleaseWait').modal('hide');
+						window.localStorage.setItem('filialCorrente', JSON.stringify( objNovo['filial']));
+						$scope.fazenda=objNovo['filial'];
 					}
-			});// final do load
-		}		
+					window.localStorage.setItem('todasFiliais', JSON.stringify( $scope.fazendas));
 
+				});
+			}		
+		//--
 		$scope.chengeFazenda = function(fazenda){
 			if(fazenda === null) 
 			{
 				$scope.todasClapras =null;
 			}
 			else
-			{			
-				$('#myPleaseWait').modal('show');	
+			{		
+				//--------------------------------------
+				//Controle Acesso	
+				$scope.menu  = $sce.trustAsHtml(Controleacesso.refazMenu_Acesso(fazenda.aceemps));
+				$scope.objetoTelaAcesso=Controleacesso.retornaObjetoTela(fazenda.aceemps, 'clapraemp');
+
+				if($scope.objetoTelaAcesso==null || $scope.objetoTelaAcesso.visualizacao==null || $scope.objetoTelaAcesso.visualizacao==false)
+				{
+					window.location.href = '#home';
+				}
+				//--------------------------------------
+				else
+				{
+					$('#myPleaseWait').modal('show');	
+				}				
 
 				$scope.todasClapras=[];
 				$scope.gridOptions.data = $scope.todasClapras;
@@ -138,60 +139,64 @@
 				}
 				else
 				{
+					$scope.qtde_clapras=0;
 					$scope.data.ordem=1;
+					$('#myPleaseWait').modal('hide');	
 				}
-				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
-				var refNovoQuadra = new Firebase.util.NormalizedCollection(
-					baseRef.child("/filial/"+fazenda.key+"/clapraemp"),
-					[baseRef.child("/clapraemp/"+fazenda.key), "$key"]
-					).select(
-					{"key":"clapraemp.$value","alias":"filial"},
-					{"key":"$key.$value","alias":"clapraemps"}
-					).ref();
 
+				var baseRef = new Firebase(Constant.Url + "/clapraemp/"+fazenda.key);			
 
-					var i=1;
-					refNovoQuadra.on('child_added', function(snap) {
+				baseRef.on('child_added', function(snap) {
 
-						var objNovo= snap.val();
-						$scope.todasClapras.push(objNovo['clapraemps']);
-						if(!$scope.$$phase) {
-							$scope.$apply();
+					var objNovo= snap.val();
+					$scope.todasClapras.push(objNovo);
+					if(!$scope.$$phase) {
+						$scope.$apply();
+					}
+					$scope.gridOptions.data = $scope.todasClapras;
+
+					if($scope.qtde_clapras>=$scope.todasClapras.length)
+					{
+						$('#myPleaseWait').modal('hide');	
+						$scope.data.ordem=$scope.todasClapras.length + 1;
+					}
+
+				});
+
+				baseRef.on('child_changed', function(snap) {
+					$('#myPleaseWait').modal('hide');
+					var objNovo = snap.val();
+					var x = 0;
+					var posicao = null;
+					$scope.todasClapras.forEach(function(obj) {
+						if (obj.key === objNovo.key) {
+							posicao = x;
 						}
-						$scope.gridOptions.data = $scope.todasClapras;
-
-						if($scope.qtde_clapras==$scope.todasClapras.length)
-						{
-							$('#myPleaseWait').modal('hide');	
-							$scope.data.ordem=$scope.todasClapras.length + 1;
-						}
-						i++;
-
+						x++;
 
 					});
+					if (posicao != null)
+						$scope.todasClapras[posicao] = objNovo;
 
-					refNovoQuadra.on('child_changed', function(snap) {
-						$('#myPleaseWait').modal('hide');
-						var objNovo = snap.val();
-						var x = 0;
-						var posicao = null;
-						$scope.todasClapras.forEach(function(obj) {
-							if (obj.key === objNovo['clapraemps'].key) {
-								posicao = x;
-							}
-							x++;
+					if (!$scope.$$phase) {
+						$scope.$apply();
+					}
+				});
 
-						});
-						if (posicao != null)
-							$scope.todasClapras[posicao] = objNovo['clapraemps'];
-
-						if (!$scope.$$phase) {
-							$scope.$apply();
+				baseRef.on('child_removed', function(snap) {
+					var posicao = null;
+					$scope.todasClapras.forEach(function(obj) {
+						if (obj.key == snap.key()) {
+							posicao = $scope.todasClapras.indexOf(obj);
 						}
 					});
+					if (posicao != null)
+						delete $scope.todasClapras[posicao];
 
-					
-					
+					$scope.gridOptions.data = $scope.todasClapras;
+				});
+
+
 
 					//-------------------------------------------------------------------
 
@@ -274,43 +279,10 @@
 			
 		}
 
-
-
 		//############################################################################################################################
 		//############################################################################################################################
 		// QUADRA
 		//############################################################################################################################
-
-		
-
-		$scope.getDadosClapra = function(obj, nomeColuna){
-			var retorno = '';
-			if(nomeColuna=='nome')
-			{
-				$scope.todasClapras.forEach(function(item){
-					if(item.$id === obj.$id) retorno = item['nome'];
-				});
-			}
-			if(nomeColuna=='codigo')
-			{
-				$scope.todasClapras.forEach(function(item){
-					if(item.$id === obj.$id) retorno = item['codigo'];
-				});
-			}
-			if(nomeColuna=='ativo')
-			{
-				$scope.todasClapras.forEach(function(item){
-					if(item.$id === obj.$id) retorno = item['ativo'];
-				});
-			}
-			if(nomeColuna=='coordenadas')
-			{
-				$scope.todasClapras.forEach(function(item){
-					if(item.$id === obj.$id) retorno = item['coordenadas'];
-				});
-			}
-			return retorno;
-		};
 
 		$scope.salvarClapra = function(data){
 			if(validForm(data)) return false;	
@@ -400,11 +372,47 @@
 
 		};
 
+		$scope.chamaClonar = function()
+		{
+			$('#modalClonar').modal('show');
+		}
 
+		$scope.clonar = function()
+		{	
+			if($scope.fazendaCopia==null)
+			{
+				Notify.errorBottom('É preciso selecionar uma fazenda!');
+				return;
+			}
+
+			if($scope.fazendaCopia.key == $scope.fazenda.key)
+			{
+				Notify.errorBottom('É preciso selecionar uma fazenda diferente da atual!');
+				return;
+			}
+
+
+			$scope.todasClapras.forEach(function(obj){
+				var classeClonada = clone(obj);
+
+				delete classeClonada.$$hashKey;	
+
+				var refClapra= new Firebase(Constant.Url + '/clapraemp/' + $scope.fazendaCopia.key + '/' + classeClonada.key  );
+
+				refClapra.set(classeClonada);
+
+				var refFilial = new Firebase(Constant.Url + '/filial/'+$scope.fazendaCopia.key + '/clapraemp/'+classeClonada.key);
+				refFilial.set(true);
+			});
+			Notify.successBottom('Classe de Pragas copiadas com sucesso!');
+
+			$('#modalClonar').modal('hide');
+		}
 		//############################################################################################################################
 		//############################################################################################################################
 		//UTEIS
 		//############################################################################################################################
+		atualizaListaFiliais();
 
 
 		function setMessageError(message){

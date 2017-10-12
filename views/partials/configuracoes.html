@@ -12,6 +12,9 @@
   console.log('testee1#');
 </script>
 <div ng-controller="configuracoesCtrl" class="ng-scope ng_scope">
+
+	<div ng-bind-html="menu" init-bind></div>
+
 	<div class="container container-view">
 		<div class="row">
 			<div class="col-sm-6 col-sm-no-bottom">
@@ -21,20 +24,11 @@
 			</div>
 		</div>
 
-		<div class="row">
-			<div class="col-sm-6 col-sm-no-bottom">
 
-				<label>Fazendas</label>
-				<select class="form-control" ng-disabled=desabilitaFazenda ng-options="fazenda.nome for fazenda in fazendas" ng-model="fazenda" ng-change="chengeFazenda(fazenda)">
-					<option value="">Selecione</option>
-				</select>
-
-			</div>
-		</div>
 		<hr/>
 		<div class="row">
 			<div class="col-sm-12">
-				<button type="button2" class="btn btn-success" ng-show="save" ng-click="salvar(data)">Salvar</button>
+				<button type="button2" class="btn btn-success" ng-show="save && objetoTelaAcesso.inclusao" ng-click="salvar(data)">Salvar</button>
 				
 				
 				<br />
@@ -362,7 +356,11 @@
 											<legend class="permissao">Permissões</legend>
 										</div>
 										<div class="form-group">
-											<div ui-grid="gridOptionsControleacesso" ui-grid-selection  ui-grid-edit  class="gridPermissoes"></div>	
+											<button type="button" class="btn btn-success" ng-click="setarAcessoTotal()">Aplicar acesso total</button>
+											<button type="button" class="btn btn-warning" ng-click="retirarAcessoTotal()">Retirar todos os acessos</button>
+											<br>
+											<br>
+											<div ui-grid="gridOptionsControleacesso" ui-grid-selection   ui-grid-grouping ui-grid-edit  class="gridPermissoes"></div>	
 										</div>
 									</div>
 								</div>

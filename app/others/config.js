@@ -4,6 +4,7 @@
 
   angular.module('Pragueiro.config').config(['$routeProvider', '$controllerProvider',
     function($routeProvider, $controllerProvider) {
+
       angular.module('Pragueiro.controllers').registerCtrl = $controllerProvider.register;
       angular.module('Pragueiro.controllers').resolveScriptDeps = function(dependencies){
         return function($q,$rootScope){
@@ -22,17 +23,35 @@
         resolve: {
           deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/home.js'])
         }
+
       }).when('/index', {
         templateUrl: '/views/partials/index.html',
         resolve: {
           deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/index.js'])
+        }
+      }).when('/sair', {
+        templateUrl: '/views/partials/sair.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/sair.js'])
+        }
+      }).when('/selecaofilial', {
+        templateUrl: '/views/partials/selecaofilial.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/selecaofilial.js'])
         }
       }).when('/controleacesso', {
         templateUrl: '/views/partials/controleacesso.html',
         resolve: {
           deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/controleacesso.js'])
         }
-      }).when('/erros', {
+      }).
+      when('/menu', {
+        templateUrl: '/views/partials/menu.html',
+        resolve: {
+          deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/menu.js'])
+        }
+      }).
+      when('/erros', {
         templateUrl: '/views/partials/erros.html',
         resolve: {
           deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/erros.js'])
@@ -159,7 +178,7 @@
           deps: angular.module('Pragueiro.controllers').resolveScriptDeps([ '/app/controllers/ordser.js'])
         }
       }).otherwise({
-        redirectTo: '/home'
+        redirectTo: '/selecaofilial'
       });
     }
     ]);

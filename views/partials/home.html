@@ -47,19 +47,12 @@
 
 </style>
 <div ng-controller="homeCtrl" class="ng-scope ng_scope">
-
+	
+	<div ng-bind-html="menu" init-bind></div>
 
 	<div class="container container-view" >
 		<div class="row">
-			<div class="col-sm-3 nopadding col-sm-no-bottom ">
-				<form class="form-signin" role="form">
-					<div class="form-group">
-						<label>Escolha uma Fazenda</label>
-						<select class="form-control" ng-options="fazenda.nome for fazenda in fazendas" ng-change="chengeFazenda(fazenda)" ng-model="fazenda" >
-						</select>
-					</div>
-				</form>
-			</div>
+			
 			<div class="col-sm-2 col-sm-no-bottom ">
 				<form class="form-signin" role="form" >
 					<div class="form-group">

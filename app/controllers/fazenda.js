@@ -4,15 +4,14 @@
 
 	angular.module('Pragueiro.controllers').registerCtrl('fazendaCtrl', fazendaCtrl);
 
-	fazendaCtrl.$inject = 
-	['$scope', '$firebase', '$firebaseObject', '$firebaseArray', 'Constant', 'Session', 'Notify'];
+	fazendaCtrl.$inject = ['$scope',  '$compile', '$sce', '$firebase',  '$firebaseObject', '$firebaseArray', 'Constant', 'Session', 'Notify', 'Controleacesso'];
 
-	function fazendaCtrl($scope,  $firebase, $firebaseObject, $firebaseArray, Constant, Session, Notify) {
+	function fazendaCtrl($scope,  $compile,  $sce,   $firebase, $firebaseObject, $firebaseArray, Constant, Session, Notify, Controleacesso) {
 
 		angular.extend($scope, {
 			edit: false,
 			save:true,
-			fazendas: [],
+			//fazendas: [],
 			data: {}
 		});
 
@@ -38,14 +37,24 @@
 			});
 		};
 
-		var key_usuario;
 
 		$scope.tipintapls = ['Data aplicação', 'Data atual'];
 
+		$scope.menu  = $sce.trustAsHtml(window.localStorage.getItem('menu'));
+		$scope.fazendas  = JSON.parse(window.localStorage.getItem('todasFiliais'));
+		$scope.posicaoFilial = window.localStorage.getItem('posicaoFilial');
+		$scope.fazenda  = $scope.fazendas[$scope.posicaoFilial];
+		var key_usuario  = window.localStorage.getItem('key_usuario');
+
+		$scope.data = $scope.fazenda;
+
+		delete $scope.data.aceemps;
+
+		$scope.edit = true;
+		$scope.save = false;
+
 		var ref = new Firebase(Constant.Url + '/filial');
 		$scope.todosFiliais=$firebaseArray(ref);
-		atualizaListaFiliais();
-
 
 		$scope.gridOptions = { 
 			enableRowSelection: true, 
@@ -67,7 +76,6 @@
 			$scope.gridApi.selection.setMultiSelect(!$scope.gridApi.grid.options.multiSelect);
 		};
 
-
 		$scope.gridOptions.onRegisterApi = function(gridApi){
 			$scope.gridApi = gridApi;
 			gridApi.selection.on.rowSelectionChanged($scope,function(row){
@@ -77,60 +85,107 @@
 
 		function atualizaListaFiliais()
 		{
-			var refUser = new Firebase(Constant.Url + '/usuarioxauth/'+Session.getUser().uid);		
-			var obj = $firebaseObject(refUser);
+			//$scope.chengeFazenda($scope.fazenda);			
 
-			obj.$loaded().then(function() {
-				key_usuario= obj.$value;
+			var baseRef = new Firebase(Constant.Url);
+			var refNovo = new Firebase.util.NormalizedCollection(
+				[baseRef.child("/usuario/"+key_usuario+"/filial/"), "$key"],
+				baseRef.child("/filial")
+				).select(
+				{"key":"$key.$key","alias":"key"},
+				{"key":"filial.$value","alias":"filial"}
+				).ref();
 
-				$scope.fazendas=[];
-				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
-				var refNovo = new Firebase.util.NormalizedCollection(
-					[baseRef.child("/usuario/"+key_usuario+"/filial/"), "$key"],
-					baseRef.child("/filial")
-					).select(
-					{"key":"$key.$key","alias":"key"},
-					{"key":"filial.$value","alias":"filial"}
-					).ref();
-
-					refNovo.on('child_added', function(snap) {
-						console.log('Adicionou filial', snap.name(), snap.val());
-						var obj= snap.val();
-						$scope.fazendas.push(obj.filial);
-						$scope.gridOptions.data = $scope.fazendas;
-
+				refNovo.on('child_changed', function(snap) {
+					$('#myPleaseWait').modal('hide');
+					var objNovo = snap.val();
+					var posicao = null;
+					$scope.fazendas.forEach(function(obj) {
+						if (obj.key === objNovo['filial'].key) {
+							posicao = $scope.fazendas.indexOf(obj);
+						}
 					});
+					if (posicao != null)
+						$scope.fazendas[posicao] = objNovo['filial'];
 
-					refNovo.on('child_changed', function(snap) {
-						console.log('Houve uma atualização', snap.name(), snap.val());
-						var objNovo= snap.val();
+					if(objNovo['filial'].key==$scope.fazenda.key)
+					{
+						window.localStorage.setItem('filialCorrente', JSON.stringify( objNovo['filial']));
+						$scope.fazenda=objNovo['filial'];
+						$scope.data = $scope.fazenda;
 
-						var x=0;
-						var posicao=null;
-						$scope.fazendas.forEach(function(obj){
-							if(obj.key === objNovo.filial.key)
-							{ 
-								posicao=x;
-							}
-							x++;
+						delete $scope.data.aceemps;
+					}
+					window.localStorage.setItem('todasFiliais', JSON.stringify( $scope.fazendas));
 
-						});
-						if(posicao!=null)
-							$scope.fazendas[posicao]=objNovo.filial;
+				});
+			}	
 
+		//---	
+
+		function atualizaListaFiliais2()
+		{		
+			$scope.todasFazendas=[];
+			var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
+			var refNovo = new Firebase.util.NormalizedCollection(
+				[baseRef.child("/usuario/"+key_usuario+"/filial/"), "$key"],
+				baseRef.child("/filial")
+				).select(
+				{"key":"$key.$key","alias":"key"},
+				{"key":"filial.$value","alias":"filial"}
+				).ref();
+
+				refNovo.on('child_added', function(snap) {
+					console.log('Adicionou filial', snap.name(), snap.val());
+					var objNovo= snap.val();
+
+					var posicao = null;
+					$scope.todasFazendas.forEach(function(obj) {
+						if (obj.key === objNovo['filial'].key) {
+							posicao = $scope.todasFazendas.indexOf(obj);
+						}
 					});
+					if (posicao == null)
+						$scope.todasFazendas.push(objNovo.filial);
 
-					refNovo.on('child_removed', function(snap) {
-						console.log('Houve uma remoção', snap.name(), snap.val());
-						atualizaListaFiliais();
+					$scope.gridOptions.data = $scope.todasFazendas;
 
+
+				});
+
+				refNovo.on('child_changed', function(snap) {
+					$('#myPleaseWait').modal('hide');
+					var objNovo = snap.val();
+					var posicao = null;
+					$scope.todasFazendas.forEach(function(obj) {
+						if (obj.key === objNovo['filial'].key) {
+							posicao = $scope.todasFazendas.indexOf(obj);
+						}
 					});
+					if (posicao != null)
+						$scope.todasFazendas[posicao] = objNovo['filial'];
 
+					if(objNovo['filial'].key==$scope.fazenda.key)
+					{
+						window.localStorage.setItem('filialCorrente', JSON.stringify( objNovo['filial']));
+						$scope.fazenda=	$scope.todasFazendas[posicao];
+					}
+					window.localStorage.setItem('todasFiliais', JSON.stringify( $scope.todasFazendas));
+				});
 
-			});// final do load
+				refNovo.on('child_removed', function(snap) {
+					console.log('Houve uma remoção', snap.name(), snap.val());
+					atualizaListaFiliais();
 
+				});
+			}
+
+		//--
+		$scope.chengeFazenda = function(fazenda)
+		{
+			window.location.href = '#selecaofilial';			
 		}
-
+		//---	
 		function extend(base) {
 			var parts = Array.prototype.slice.call(arguments, 1);
 			parts.forEach(function (p) {
@@ -182,23 +237,29 @@
 			return false;
 		};
 
-
+		//----
 		$scope.salvarFazenda = function(data){
+
 			if(validForm(data)) return false;
+			if(key_usuario==null) return false;
+
+			delete data.$$hashKey;	
+			delete data.$id;	
+			delete data.$priority;	
+
 			data.key_usuario = key_usuario;
-			$scope.todosFiliais.$add(data).then(function(ref) {
-				data.key = ref.key();
-				var refNovo = new Firebase(Constant.Url + '/filial/'+ref.key());
-				refNovo.set(data);
 
-				var refNovo = new Firebase(Constant.Url + '/filial/'+ref.key()+'/usuario/'+key_usuario);
-				refNovo.set(true);
+			var refNovo = new Firebase(Constant.Url + '/filial/');
+			data.key=refNovo.push().key();
 
-				var refNovoUsuXFil = new Firebase(Constant.Url + '/usuario/'+key_usuario+'/filial/'+ref.key());
-				refNovoUsuXFil.set(true);
+			var refPraemp = new Firebase(Constant.Url + '/filial/'+ data.key );
+			refPraemp.set(data);
 
-				atualizaListaFiliais();
-			});
+			var refNovo = new Firebase(Constant.Url + '/filial/'+data.key+'/usuario/'+key_usuario);
+			refNovo.set(true);
+
+			var refNovoUsuXFil = new Firebase(Constant.Url + '/usuario/'+key_usuario+'/filial/'+data.key);
+			refNovoUsuXFil.set(true);
 
 			$scope.edit = false;
 			$scope.save = true;
@@ -206,10 +267,18 @@
 			Notify.successBottom('Fazenda salva com sucesso!');
 		};
 
+
 		$scope.editarFazenda = function(data){
 			if(validForm(data)) return false;
+			if(data.key==null) return false;
 
-			$scope.todosFiliais.$save(data);
+			delete data.$$hashKey;	
+			delete data.$id;	
+			delete data.$priority;	
+
+			var refNovo = new Firebase(Constant.Url + '/filial/'+data.key);
+			refNovo.set(data);
+
 			$scope.edit = false;
 			$scope.save = true;
 			$scope.clear();
@@ -254,8 +323,9 @@
 				refNovoUsuXFil.remove();
 				refNovoUsuXFil = new Firebase(Constant.Url + '/filial/'+data.key+'/usuario/'+key_usuario);
 				refNovoUsuXFil.remove();
-				$scope.fazendas.$remove(data);
 				Notify.successBottom('Fazenda removida com sucesso!');
+
+				window.location.href = '/#sair';
 			}
 			$scope.cancelar();
 			return true;
@@ -334,8 +404,16 @@
 			return true;
 		};
 
+		function clone(obj) {
+			if (null == obj || "object" != typeof obj) return obj;
+			var copy = obj.constructor();
+			for (var attr in obj) {
+				if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+			}
+			return copy;
+		}
 
-		$scope.clear();
+		atualizaListaFiliais();
 
 	}
 

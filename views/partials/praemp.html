@@ -1,6 +1,8 @@
 <div ng-controller="praempCtrl" class="ng-scope ng_scope">
 	<div class="container container-view">
 
+		<div ng-bind-html="menu" init-bind></div>
+
 		<div class="row">
 			<div class="col-sm-6 col-sm-no-bottom">
 				<p>Você está em <a href="#home">Início</a> / <a href="#cadastro">Cadastro</a>  / <a href="#configuracoes">Configuracoes</a></p>
@@ -9,25 +11,16 @@
 			</div>
 		</div>
 
-		<div class="row">
-			<div class="col-sm-6 col-sm-no-bottom">
-
-				<label>Fazendas</label>
-				<select class="form-control" ng-disabled="edit" ng-options="fazenda.nome for fazenda in fazendas" ng-model="fazenda" ng-change="chengeFazenda(data.fazenda)">
-					<option value="">Selecione</option>
-				</select>
-
-			</div>
-		</div>
+		
 		<hr/>
 		<div class="row">
 			<div class="col-sm-6">
 				<div class="form-group">
 					<button type="button" class="btn btn-success"  ng-show="false" ng-click="clonar()">Clonar</button>
-					<button type="button" class="btn btn-success" ng-show="!edit" ng-click="salvarPraga(data)">Salvar Praga</button>
-					<button type="button" class="btn btn-success" ng-show="edit" ng-click="editarPraga(data)">Atualizar Praga</button>
+					<button type="button" class="btn btn-success" ng-show="!edit && objetoTelaAcesso.inclusao" ng-click="salvarPraga(data)">Salvar Praga</button>
+					<button type="button" class="btn btn-success" ng-show="edit && objetoTelaAcesso.edicao" ng-click="editarPraga(data)">Atualizar Praga</button>
 					<button type="button"  class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar</button>
-					<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="excluir()">Excluir Praga</button>
+					<button type="button" class="btn btn-default btn-danger" ng-show="edit && objetoTelaAcesso.exclusao" ng-click="excluir()">Excluir Praga</button>
 				</div>
 				<form class="form-signin" role="form">
 					<div class="row">
@@ -283,7 +276,15 @@
 									<button type="button" class="btn btn-default btn-xm btn-danger" ng-show="edit_valor" ng-click="questionaExcluirValor()">Excluir Valor</button>
 								</div>
 								<div class="form-group">
-									<div ui-grid="gridOptionsValor" ui-grid-selection class="gridValores"></div>	
+									<div class="row">
+										<button type="button" class="btn btn-warning" ng-show="save" ng-click="chamaClonar()">Copiar todas para outra fazenda</button>
+										<br>
+									</div>
+									<div class="row">
+										<br>
+
+										<div ui-grid="gridOptionsValor" ui-grid-selection class="gridValores"></div>
+									</div>	
 								</div>
 							</div>	
 						</div>
@@ -292,11 +293,45 @@
 			</div>
 
 			<div class="col-sm-6">
-				<div ui-grid="gridOptions" ui-grid-selection class="gridPraga"></div>	
+				<div class="row">
+					<button type="button" class="btn btn-warning" ng-show="!edit" ng-click="chamaClonar()">Copiar todas para outra fazenda</button>
+					<br>
+				</div>
+				<div class="row">
+					<br>
+					<div ui-grid="gridOptions" ui-grid-selection class="gridPraga"></div>	
+				</div>
 			</div>
 		</div>
 	</div>
 
+	<!-- Modal Clonar-->
+	<div class="modal fade bs-example-modal-md" id="modalClonar" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+		<div class="modal-dialog modal-md">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">
+						Selecione uma fazenda que irá receber uma cópia de TODAS as classes:
+					</h4>
+					<br />
+					<br />
+				</div>
+				<div class="modal-body">
+
+					<label>Fazenda</label>
+					<select class="form-control" ng-disabled=desabilitaFazenda ng-options="fazenda.nome for fazenda in fazendas" ng-model="fazendaCopia">
+						<option value="">Selecione</option>
+					</select>
+					<br />
+					<br />
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+					<button type="button" class="btn btn-default btn-warning"  ng-click="clonar()">Copiar</button>
+				</div>
+			</div>
+		</div>
+	</div>
 	<!-- Modal DELETE-->
 	<div class="modal fade" id="modalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 		<div class="modal-dialog">

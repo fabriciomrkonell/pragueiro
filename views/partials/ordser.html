@@ -1,5 +1,7 @@
 <div ng-controller="ordserCtrl" class="ng-scope ng_scope">
 
+	<div ng-bind-html="menu" init-bind></div>
+
 	<div class="container container-view">
 		<div class="row">
 			<div class="col-sm-5 col-sm-no-bottom">
@@ -9,26 +11,17 @@
 			</div>
 		</div>
 
-		<div class="row">
-			<div class="col-sm-5 col-sm-no-bottom">
-
-				<label>Fazenda</label>
-				<select class="form-control" ng-disabled=desabilitaFazenda ng-options="fazenda.nome for fazenda in fazendas" ng-model="data.fazenda" ng-change="chengeFazenda(data.fazenda)">
-					<option value="">Selecione</option>
-				</select>
-			</div>
-		</div>
 		<hr/>
 		
 		<div class="row">
 			<div class="col-sm-5">
 				<form class="form-signin" role="form">
-					<button type="button" class="btn btn-success" ng-disabled="finalizado" ng-show="save" ng-click="salvarOrdser(data)">Salvar</button>
-					<button type="button" class="btn btn-success" ng-disabled="finalizado" ng-show="edit" ng-click="editarOrdser
+					<button type="button" class="btn btn-success" ng-disabled="finalizado" ng-show="save && objetoTelaAcesso.inclusao" ng-click="salvarOrdser(data)">Salvar</button>
+					<button type="button" class="btn btn-success" ng-disabled="finalizado" ng-show="edit && objetoTelaAcesso.edicao" ng-click="editarOrdser
 					(data)">Atualizar</button>
 					<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar/Novo</button>
-					<button type="button" class="btn btn-default btn-danger" ng-disabled="temquadras"  ng-show="edit" ng-click="excluir()">Excluir</button>
-					<button type="button" class="btn btn-success" ng-disabled="finalizado"   ng-show="temexecucoes" ng-click="finalizarOrdser(data)">Finalizar</button>
+					<button type="button" class="btn btn-default btn-danger" ng-disabled="temquadras"  ng-show="edit && objetoTelaAcesso.exclusao" ng-click="excluir()">Excluir</button>
+					<button type="button" class="btn btn-success" ng-disabled="finalizado"   ng-show="temexecucoes && objetoTelaAcesso.edicao" ng-click="finalizarOrdser(data)">Finalizar</button>
 					<br />
 					<br />
 					<div class="row">
@@ -89,7 +82,7 @@
 						<div class="col-sm-6 col-sm-no-bottom">
 							<div class="form-group">
 								<label>Tipo Ordem de Serv.*</label>
-								<select class="form-control" ng-change="chengeTipOrdser()" ng-model="data.key_tipati"  ng-options="tipati.key as (tipati.nome) for tipati in tipatis"> >							
+								<select class="form-control" ng-change="chengeTipOrdser()" ng-model="data.key_tipati"  ng-options="tipati.key as (tipati.nome) for tipati in todasTipatis"> >							
 									<option></option>
 								</select>
 							</div>				
@@ -97,7 +90,7 @@
 						<div class="col-sm-6 col-sm-no-bottom">
 							<div class="form-group">
 								<label>Equipe</label>
-								<select class="form-control" ng-model="data.key_equipe" ng-disabled="temexecucoes" ng-options="equipe.key as (equipe.nome) for equipe in equipes">
+								<select class="form-control" ng-model="data.key_equipe" ng-disabled="temexecucoes" ng-options="equipe.key as (equipe.nome) for equipe in todasEquipes">
 									<option></option>
 								</select>
 							</div>		

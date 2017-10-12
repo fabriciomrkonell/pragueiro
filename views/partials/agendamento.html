@@ -53,8 +53,8 @@
 				<br>
 			</div>
 			<div class="col-sm-6">
-				<button type="button" class="btn btn-success" ng-show="true" ng-click="novo()">Novo</button>
-				<button type="button" class="btn btn-success" ng-show="detalhe" ng-click="mostrarDetalhe(data_agendamento)">Detalhar</button>
+				<button type="button" class="btn btn-success" ng-show="true && objetoTelaAcesso.inclusao" ng-click="novo()">Novo</button>
+				<button type="button" class="btn btn-success" ng-show="detalhe && objetoTelaAcesso.edicao" ng-click="mostrarDetalhe(data_agendamento)">Detalhar</button>
 				<br />
 				<br />
 				<div ui-grid="gridOptions" ui-grid-selection class="gridEquipe"></div>	
@@ -129,10 +129,10 @@
 				</div>
 
 				<div class="modal-footer">
-					<button type="button" class="btn btn-success" ng-show="save" ng-click="salvarAgendamento(data_agendamento)">Salvar</button>
-					<button type="button" class="btn btn-success" ng-disabled="finalizado" ng-show="edit && data_agendamento.temUsuario" ng-click="editarAgendamento
+					<button type="button" class="btn btn-success" ng-show="save && objetoTelaAcesso.inclusao" ng-click="salvarAgendamento(data_agendamento)">Salvar</button>
+					<button type="button" class="btn btn-success" ng-disabled="finalizado" ng-show="edit && data_agendamento.temUsuario && objetoTelaAcesso.edicao" ng-click="editarAgendamento
 					(data_agendamento)">Atualizar</button>
-					<button type="button" class="btn btn-default btn-danger" ng-show="edit && data_agendamento.temUsuario" ng-click="excluir()">Excluir</button>
+					<button type="button" class="btn btn-default btn-danger" ng-show="edit && data_agendamento.temUsuario && objetoTelaAcesso.exclusao" ng-click="excluir()">Excluir</button>
 					<button type="button" class="btn btn-default btn-cancel" ng-click="cancelar()">Cancelar</button>
 					
 				</div>
@@ -156,7 +156,7 @@
 
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-					<button type="button" class="btn btn-default btn-danger" ng-show="edit" ng-click="excluirAgendamento(data_agendamento)">Excluir</button>
+					<button type="button" class="btn btn-default btn-danger" ng-show="edit && objetoTelaAcesso.exclusao" ng-click="excluirAgendamento(data_agendamento)">Excluir</button>
 				</div>
 			</div>
 		</div>

@@ -115,6 +115,10 @@
 	height: 700px;
 }
 
+.gridFazendaSelecao {
+	height: 200px;
+}
+
 .gridQuadra {
 	height: 900px;
 }
@@ -221,6 +225,25 @@ hr {
 	padding: 20px;
 	background-color: white;
 }
+
+.navFazenda
+{
+	
+	margin-top: 8px;
+	color: #fff;
+}
+.navFazenda.select
+{
+	
+	color: #000000;
+}
+
+
+.navFazendaTexto
+{
+	color: #fff;
+}
+
 
 .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
 	color: #fd541f;

@@ -4,9 +4,9 @@
 
 	angular.module('Pragueiro.controllers').registerCtrl('safraCtrl', safraCtrl);
 
-	safraCtrl.$inject = ['$scope', 'Constant', 'Session', '$firebaseArray', '$firebaseObject', 'Notify', '$interval'];
+	safraCtrl.$inject = ['$scope', '$compile', '$sce', 'Constant', 'Session', '$firebaseArray', '$firebaseObject', 'Notify', '$interval', 'Controleacesso'];
 
-	function safraCtrl($scope, Constant, Session, $firebaseArray, $firebaseObject, Notify, $interval) {
+	function safraCtrl($scope, $compile,  $sce,  Constant, Session, $firebaseArray, $firebaseObject, Notify, $interval, Controleacesso) {
 
 		angular.extend($scope, {
 			objSafra: {},
@@ -33,7 +33,7 @@
 			quadrasPlanejamento: [],
 			data: {
 			},
-			formSafra: {
+			data: {
 				descricao: '',
 				ativo: true,
 				key: '',
@@ -41,7 +41,15 @@
 				data_plantio : ''
 			}
 		});
-		$scope.formSafra.data_plantio = new Date();
+
+		$scope.menu  = $sce.trustAsHtml(window.localStorage.getItem('menu'));
+		$scope.fazendas  = JSON.parse(window.localStorage.getItem('todasFiliais'));
+		$scope.posicaoFilial = window.localStorage.getItem('posicaoFilial');
+		$scope.fazenda  = $scope.fazendas[$scope.posicaoFilial];
+		var key_usuario  = window.localStorage.getItem('key_usuario');
+
+
+		$scope.data.data_plantio = new Date();
 		var ref = new Firebase(Constant.Url + '/filial'),
 		refCultura = new Firebase(Constant.Url + '/cultura'),
 		refQuadra = new Firebase(Constant.Url + '/quadra'),
@@ -50,7 +58,7 @@
 		refQuadrasCulturas = null,
 		refHistoricoQuadrasCulturas = null;
 
-		atualizaListaFiliais();
+
 		$scope.planejamentoExcluir={};
 
 		$scope.culturas = $firebaseArray(refCultura);
@@ -106,106 +114,112 @@
 
 		function atualizaListaFiliais()
 		{
-			$('#myPleaseWait').modal('show');
-			var refUser = new Firebase(Constant.Url + '/usuarioxauth/'+Session.getUser().uid);		
-			var obj = $firebaseObject(refUser);
-			var key_usuario;
-			obj.$loaded().then(function() {
-				key_usuario= obj.$value;
-
-				var i =0;
-				
-				$scope.fazendas=[];
-				var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
-				var refNovo = new Firebase.util.NormalizedCollection(
-					[baseRef.child("/usuario/"+key_usuario+"/filial/"), "$key"],
-					baseRef.child("/filial")
-					).select(
-					{"key":"$key.$key","alias":"key"},
-					{"key":"filial.$value","alias":"filial"}
-					).ref();
-
-					refNovo.on('child_added', function(snap) {
-
-						$('#myPleaseWait').modal('hide');
-						//console.log('Adicionou filial', snap.name(), snap.val());
-						var obj= snap.val();
-						$scope.fazendas.push(obj.filial);
-
-						if(i==0)
-						{
-							$scope.chengeFazenda($scope.fazendas[0]);
-							$scope.data.fazenda=$scope.fazendas[0];
-						}
-
-						if(!$scope.$$phase) {
-							$scope.$apply();
-						}
-					});
-
-					refNovo.on('child_changed', function(snap) {
-						//console.log('Houve uma atualização', snap.name(), snap.val());
-						var objNovo= snap.val();
-
-						var x=0;
-						var posicao=null;
-						$scope.fazendas.forEach(function(obj){
-							if(obj.key === objNovo.filial.key)
-							{ 
-								posicao=x;
-							}
-							x++;
-
-						});
-						if(posicao!=null)
-							$scope.fazendas[posicao]=objNovo.filial;
-
-					});
-
-					refNovo.on('child_removed', function(snap) {
-						//console.log('Houve uma remoção', snap.name(), snap.val());
-						atualizaListaFiliais();
-					});
-					if($scope.fazendas.length==0)
-					{
-						$('#myPleaseWait').modal('hide');
-					}
-			});// final do load
-		}
-		
-
-		$scope.chengeFazenda = function(fazenda){
-			if(fazenda === null) return false;
-			refSafra = new Firebase(Constant.Url + '/filial/' + fazenda.key + '/safra');
-			atualizaVariedade(fazenda.key);
-			$scope.safras = $firebaseArray(refSafra);
-			$scope.todasQuadras=[];
-			$scope.todasQuadras.push({nome:'', key:null});
-			var filialxquadras = $firebaseArray(new Firebase(Constant.Url + '/filial/'+fazenda.key+'/quadra'));
-			filialxquadras.$loaded(function() {
-				filialxquadras.forEach(function(filxqua){
-					todasQuadras.forEach(function(item){
-						if(item.$id === filxqua.$id)
-						{ 							
-							$scope.todasQuadras.push(item);
-						}
-					});
-				});
-			});
-			$scope.gridOptions.data = $scope.safras;
-		};
-
-		$scope.setaFazenda = function(fazenda){
-			if(fazenda === null) return false;
-
-			$scope.fazendas.forEach(function(item){
-				if(item.key === fazenda.key) 	
-				{
-					$scope.data.fazenda = item;		
-				}
-			});
 			
-		};
+			//$scope.chengeFazenda($scope.fazenda);
+
+			var baseRef = new Firebase("https://pragueiroproducao.firebaseio.com");
+			var refNovo = new Firebase.util.NormalizedCollection(
+				[baseRef.child("/usuario/"+key_usuario+"/filial/"), "$key"],
+				baseRef.child("/filial")
+				).select(
+				{"key":"$key.$key","alias":"key"},
+				{"key":"filial.$value","alias":"filial"}
+				).ref();
+
+
+				refNovo.on('child_added', function(snap) {
+					$('#myPleaseWait').modal('hide');
+					var objNovo = snap.val();
+					var posicao = null;
+					$scope.fazendas.forEach(function(obj) {
+						if (obj.key === objNovo['filial'].key) {
+							posicao = $scope.fazendas.indexOf(obj);
+						}
+					});
+					if (posicao == null)
+						$scope.fazendas[posicao] = objNovo['filial'];
+
+					if(objNovo['filial'].key==$scope.fazenda.key)
+					{
+						window.localStorage.setItem('filialCorrente', JSON.stringify( objNovo['filial']));
+						$scope.fazenda  = $scope.fazendas[$scope.posicaoFilial];
+						$scope.chengeFazenda($scope.fazenda);
+					}
+					window.localStorage.setItem('todasFiliais', JSON.stringify( $scope.fazendas));
+
+				});	
+
+				refNovo.on('child_changed', function(snap) {
+					$('#myPleaseWait').modal('hide');
+					var objNovo = snap.val();
+					var posicao = null;
+					$scope.fazendas.forEach(function(obj) {
+						if (obj.key === objNovo['filial'].key) {
+							posicao = $scope.fazendas.indexOf(obj);
+						}
+					});
+					if (posicao != null)
+						$scope.fazendas[posicao] = objNovo['filial'];
+
+					if(objNovo['filial'].key==$scope.fazenda.key)
+					{
+						window.localStorage.setItem('filialCorrente', JSON.stringify( objNovo['filial']));
+						$scope.fazenda=objNovo['filial'];
+						$scope.chengeFazenda($scope.fazenda);
+					}
+					window.localStorage.setItem('todasFiliais', JSON.stringify( $scope.fazendas));
+
+				});			
+
+			}
+
+
+			$scope.chengeFazenda = function(fazenda){
+				if(fazenda === null) return false;
+
+				//--------------------------------------
+				//Controle Acesso	
+				$scope.menu  = $sce.trustAsHtml(Controleacesso.refazMenu_Acesso(fazenda.aceemps));
+				$scope.objetoTelaAcesso=Controleacesso.retornaObjetoTela(fazenda.aceemps, 'safra');
+
+				if($scope.objetoTelaAcesso==null || $scope.objetoTelaAcesso.visualizacao==null || $scope.objetoTelaAcesso.visualizacao==false)
+				{
+					window.location.href = '#home';
+				}
+				//-------------------------------------
+				$scope.clear();
+				$scope.safras = [];
+				$scope.gridOptions.data = $scope.safras;
+				if(fazenda.safra!=null)
+				{
+					$scope.safras=castObjToArray(fazenda.safra);
+					$scope.gridOptions.data = $scope.safras;
+					if(!$scope.$$phase) {
+						$scope.$apply();
+					}
+				}
+				else
+				{
+					$scope.safras = [];
+					$scope.gridOptions.data = $scope.safras;
+					if(!$scope.$$phase) {
+						$scope.$apply();
+					}
+				}
+
+			};
+
+			$scope.setaFazenda = function(fazenda){
+				if(fazenda === null) return false;
+
+				$scope.fazendas.forEach(function(item){
+					if(item.key === fazenda.key) 	
+					{
+						$scope.data.fazenda = item;		
+					}
+				});
+
+			};
 
 
 		//############################################################################################################################
@@ -213,30 +227,39 @@
 		// SAFRA
 		//############################################################################################################################
 
-		$scope.salvarSafra = function(fazenda, formSafra){
+		$scope.salvarSafra = function(data){
 			
-			if(validFormSafra(formSafra)) return true;
-			$scope.safras.$add(formSafra).then(function(ref) {
-				formSafra.key = ref.key();
-				
-				var fazendaTmp=fazenda;
-				var refNovo = new Firebase(Constant.Url + '/filial/' + fazenda.key + '/safra/'+formSafra.key);
-				refNovo.set(formSafra);
-				Notify.successBottom('Safra salva com sucesso!');
-				$scope.clearFormSafra();
-				$scope.setaFazenda(fazendaTmp);		
-			});
+			if(validdata(data)) return true;
+			if($scope.fazenda==null) return false;
+
+			delete data.$$hashKey;
+
+			var refSafra =  new Firebase(Constant.Url + '/filial/'+$scope.fazenda.key+'/safra/');
+			data.key=refSafra.push().key();
+			
+			var refSafraNovo = new Firebase(Constant.Url + '/filial/'+$scope.fazenda.key+'/safra/'+data.key);
+			refSafraNovo.set(data);
+
+			Notify.successBottom('Safra salva com sucesso!');
+
+			$scope.clear();
 		};
 
-		$scope.atualizarSafra = function(formSafra){
-			if(validFormSafra(formSafra)) return true;
-			$scope.safras.$save(formSafra);
+		$scope.atualizarSafra = function(data){
+			if(validdata(data)) return true;
+			if($scope.fazenda==null) return false;
+
+			delete data.$$hashKey;
+			
+			var refSafraNovo = new Firebase(Constant.Url + '/filial/'+$scope.fazenda.key+'/safra/'+data.key);
+			refSafraNovo.set(data);
+
 			Notify.successBottom('Safra atualizada com sucesso!');
-			$scope.clearFormSafra();
+			$scope.clear();
 		};
 
 		$scope.ChamarEditarSafra = function(data){
-			$scope.formSafra = data;
+			$scope.data = clone(data);
 			$scope.edit = true;
 			$scope.save=false;
 		};
@@ -251,16 +274,16 @@
 			$('#modalDelete').modal('hide');
 			if(data!=null && data.key!=null)
 			{
-				var fazendaTmp=$scope.data.fazenda;
-				$scope.safras.$remove(data);
+				var refVariedadeNovo = new Firebase(Constant.Url + '/filial/'+$scope.fazenda.key+'/safra/'+data.key);
+				refVariedadeNovo.remove();
+
 				Notify.successBottom('Safra removida com sucesso!');
-				$scope.setaFazenda(fazendaTmp);
-				$scope.clearFormSafra();
+				$scope.clear();
 			}
 		};
 
 		$scope.cancelar= function(data){
-			$scope.clearFormSafra();
+			$scope.clear();
 			$scope.edit = false;
 			$scope.save = true;
 			return true;
@@ -542,12 +565,12 @@
 		//UTEIS
 		//############################################################################################################################
 
-		function validFormSafra(data){
-			if($scope.data.fazenda == null){
+		function validdata(data){
+			if($scope.fazenda == null){
 				Notify.errorBottom('O campo fazenda é inválido!');
 				return true;
 			}
-			if(data.descricao === ''){
+			if(data.descricao == ''){
 				Notify.errorBottom('O campo descriçāo é inválido!');
 				return true;
 			}
@@ -586,11 +609,11 @@
 			return false;
 		};
 
-		$scope.clearFormSafra = function(){
-			angular.extend($scope.formSafra, {
-				descricao: '',
-				ativo: true
-			});		
+		$scope.clear = function(){
+			$scope.data.descricao = '';
+			$scope.data.ativo= true
+			$scope.data.key='';
+
 			$scope.edit=false;
 			$scope.save=true;
 			return true;
@@ -624,8 +647,29 @@
 			}
 		});
 
-		$scope.formSafraat = 'yyyy/MM/dd';
+
+		function castObjToArray(myObj)
+		{
+			if(myObj==null)
+			{
+				var sem_nada=[];
+				return sem_nada;
+			}
+			else
+			{
+				var array = $.map(myObj, function(value, index) {
+					return [value];
+				});
+				return array;
+
+			}
+		}
+
+		$scope.dataat = 'yyyy/MM/dd';
 		$scope.date = new Date();
+
+
+		atualizaListaFiliais();
 	}
 
 }());
