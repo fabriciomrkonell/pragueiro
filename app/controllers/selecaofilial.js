@@ -307,7 +307,10 @@
 				});
 			}			
 			
-			window.localStorage.setItem('menu', Controleacesso.refazMenu_Acesso($scope.todosControleacessos));
+			window.localStorage.setItem('aceemps',  JSON.stringify(data.aceemps));		
+			
+			window.localStorage.setItem('aceempsObj',  JSON.stringify(data.aceempsObj));			
+			window.localStorage.setItem('menu', Controleacesso.refazMenu_Acesso($scope.todosControleacessos));			
 			window.localStorage.setItem('todasFiliais', JSON.stringify( $scope.fazendas));
 			window.localStorage.setItem('filialCorrente', JSON.stringify(data));
 			window.localStorage.setItem('key_usuario', key_usuario);

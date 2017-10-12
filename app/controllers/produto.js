@@ -99,6 +99,9 @@
 
 					if(objNovo['filial'].key==$scope.fazenda.key)
 					{
+						objNovo['filial'].aceempsObj= JSON.parse(window.localStorage.getItem('aceempsObj'));
+						objNovo['filial'].aceemps= JSON.parse(window.localStorage.getItem('aceemps'));
+
 						window.localStorage.setItem('filialCorrente', JSON.stringify( objNovo['filial']));
 						$scope.fazenda=objNovo['filial'];
 					}
@@ -208,37 +211,6 @@
 		// QUADRA
 		//############################################################################################################################
 
-		
-
-		$scope.getDadosProduto = function(obj, nomeColuna){
-			var retorno = '';
-			if(nomeColuna=='nome')
-			{
-				$scope.todasProdutos.forEach(function(item){
-					if(item.$id === obj.$id) retorno = item['nome'];
-				});
-			}
-			if(nomeColuna=='codigo')
-			{
-				$scope.todasProdutos.forEach(function(item){
-					if(item.$id === obj.$id) retorno = item['codigo'];
-				});
-			}
-			if(nomeColuna=='ativo')
-			{
-				$scope.todasProdutos.forEach(function(item){
-					if(item.$id === obj.$id) retorno = item['ativo'];
-				});
-			}
-			if(nomeColuna=='coordenadas')
-			{
-				$scope.todasProdutos.forEach(function(item){
-					if(item.$id === obj.$id) retorno = item['coordenadas'];
-				});
-			}
-			return retorno;
-		};
-
 		$scope.salvarProduto = function(data){
 			if(validForm(data)) return false;
 
@@ -305,8 +277,10 @@
 
 				var refProdutoNovo = new Firebase(Constant.Url + '/produto/'+$scope.fazenda.key + '/'+ objeto.key);
 				refProdutoNovo.remove();
+
 				var refProdutoNovo = new Firebase(Constant.Url + '/filial/'+ $scope.fazenda.key + '/produto/'+objeto.key);
-				refProdutoNovo.remove();						
+				refProdutoNovo.remove();	
+
 				Notify.successBottom('Produto removida com sucesso!');
 				$scope.cancelar();
 			}

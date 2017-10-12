@@ -171,6 +171,9 @@
 
 					if(objNovo['filial'].key==$scope.fazenda.key)
 					{
+						objNovo['filial'].aceempsObj= JSON.parse(window.localStorage.getItem('aceempsObj'));
+						objNovo['filial'].aceemps= JSON.parse(window.localStorage.getItem('aceemps'));
+						
 						window.localStorage.setItem('filialCorrente', JSON.stringify( objNovo['filial']));
 						$scope.fazenda=	$scope.todasFazendas[posicao];
 					}

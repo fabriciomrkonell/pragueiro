@@ -181,6 +181,9 @@
 
 					if(objNovo['filial'].key==$scope.fazenda.key)
 					{
+						objNovo['filial'].aceempsObj= JSON.parse(window.localStorage.getItem('aceempsObj'));
+						objNovo['filial'].aceemps= JSON.parse(window.localStorage.getItem('aceemps'));
+						
 						window.localStorage.setItem('filialCorrente', JSON.stringify( objNovo['filial']));
 						$scope.fazenda=objNovo['filial'];
 					}
@@ -415,6 +418,7 @@
 					var objNovo= snap.val();
 					if(snap.key()<20)
 					{
+						$scope.qtde_variedades--;
 						return;
 					}
 
