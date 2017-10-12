@@ -408,13 +408,14 @@
 
 		$scope.chamaClonar = function()
 		{
-			//$('#modalClonar').modal('show');
-			$scope.consertoVariedades();
+			$('#modalClonar').modal('show');
+			//$scope.consertoVariedades();
 
 		}
 
 		$scope.consertoVariedades2= function()
 		{
+			return;
 			$scope.variedadesConserto=[];
 			var refVariedade= new Firebase(Constant.Url + '/equipe/');
 
